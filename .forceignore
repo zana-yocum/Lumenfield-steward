@@ -1,0 +1,14 @@
+# Files the Salesforce CLI ignores when deploying and retrieving
+# https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_exclude_source.htm
+
+package.xml
+
+# LWC configuration files
+**/jsconfig.json
+**/.eslintrc.json
+
+# LWC Jest tests
+**/__tests__/**
+
+# Placeholder files that keep empty folders in Git
+**/.gitkeep

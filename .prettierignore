@@ -1,0 +1,6 @@
+# Files Prettier leaves alone
+**/staticresources/**
+.sf
+.sfdx
+node_modules
+coverage

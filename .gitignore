@@ -1,0 +1,37 @@
+# Salesforce CLI (includes your local default org setting)
+.sf/
+.sfdx/
+.localdevserver/
+deploy-options.json
+
+# LWC autocomplete and Jest coverage
+**/lwc/jsconfig.json
+coverage/
+
+# Node
+node_modules/
+npm-debug.log*
+.eslintcache
+
+# Logs
+logs
+*.log
+
+# Local environment
+.env
+.env.*
+
+# Keys and certificates: never commit them (S-05, NFR-08)
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+server.*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/

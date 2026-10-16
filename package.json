@@ -1,0 +1,19 @@
+{
+  "name": "lumenfield-steward",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Steward: Agentforce, Apex and Data 360 on the Lumenfield org",
+  "scripts": {
+    "test": "npm run test:unit",
+    "test:unit": "sfdx-lwc-jest",
+    "test:unit:coverage": "sfdx-lwc-jest --coverage",
+    "prettier": "prettier --write \"force-app/**/*.{cls,trigger,js,html,css,xml,json}\"",
+    "prettier:verify": "prettier --check \"force-app/**/*.{cls,trigger,js,html,css,xml,json}\""
+  },
+  "devDependencies": {
+    "@prettier/plugin-xml": "^3.4.2",
+    "@salesforce/sfdx-lwc-jest": "^7.9.0",
+    "prettier": "^3.6.2",
+    "prettier-plugin-apex": "^2.3.0"
+  }
+}

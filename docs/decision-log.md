@@ -1,0 +1,195 @@
+# Decision Log — Steward
+
+The decisions that shape Steward, the options considered, and why one was chosen. Same format as Accord's D-01 to D-10.
+
+**Status:** **Decided**, or **Proposed**: a starting position that's confirmed or changed, with evidence from the org, in the phase shown.
+
+| ID | Decision | Status |
+|---|---|---|
+| S-01 | The service agent runs as its own least-privilege user | Proposed · Phase 6 |
+| S-02 | Salesforce asks the payment provider; the provider never calls Salesforce | Proposed · Phase 7 |
+| S-03 | Apex for agent actions; Accord's flows keep the policy | Decided |
+| S-04 | Customer Community licenses with sharing sets | Proposed · Phase 4 |
+| S-05 | The pipeline validates against the org; no scratch orgs | Decided |
+| S-06 | What the agent may never do | Decided |
+| S-07 | The model never chooses whose data to read | Decided · mechanism confirmed in Phase 6 |
+| S-08 | Customers see commitments through a scoped read service | Proposed · Phase 4 |
+| S-09 | Agent outcomes are logged to a custom object | Proposed · Phase 3 |
+| S-10 | The agent's definition lives in Git and ships through the pipeline | Decided |
+| S-11 | The portal is an LWR site | Proposed · Phase 4 |
+
+---
+
+### S-01 — The service agent runs as its own least-privilege user
+**Status:** Proposed · confirm in Phase 6
+
+**Context:** Every agent action runs as a user. Whatever that user can reach, a cleverly worded conversation might reach too.
+
+**Options**
+1. Accept the agent user and permissions the setup wizard creates by default.
+2. A dedicated agent user on an Einstein Agent license, named in the Agent Script, with one Steward permission set and nothing inherited. **← starting position**
+3. Run every action as the logged-in customer.
+
+**Why:** Option 2 turns the agent's reach into a short list someone can review line by line (ST-12). Option 1 leaves that list to defaults nobody chose. Option 3 sounds safest, but service agent actions run as the agent user, and the customer's identity still has to be carried into each action deliberately (S-07).
+
+**Consequences:** `PS_Steward_Agent` is the whole of the agent's access, listed in `docs/security-model.md`. The agent has to serve any household, so it gets access to Residential Agreement accounts through a criteria-based sharing rule, not View All, and Organization accounts stay out of reach. Any new action that needs more access needs an entry here first.
+
+---
+
+### S-02 — Salesforce asks the payment provider; the provider never calls Salesforce
+**Status:** Proposed · confirm in Phase 7
+
+**Context:** A customer pays on the provider's checkout page. Salesforce needs to learn about each completed payment once, reliably.
+
+**Options**
+1. **Webhook:** the provider calls a public Salesforce endpoint when a payment completes. Fast, but it opens a public door into the org that needs a site user and signature verification to secure.
+2. **Polling:** Salesforce checks for completed payments once when the customer returns to the portal, and again on a schedule as a safety net. **← starting position**
+3. **Salesforce Payments**, the native product: less code, but the work becomes configuring its checkout and merchant onboarding rather than building an integration.
+
+**Why:** Polling leaves no public surface to secure and works within Developer Edition. Its cost is a delay of up to one schedule interval when a customer never returns to the portal, which is acceptable for a monthly lease payment. The integration skills it exercises (credentials, callouts, async reconciliation, idempotency) carry over to any provider.
+
+**Consequences:** `PaymentReconciliationJob` runs on a schedule. Duplicates are prevented by upserting on `External_Reference__c`, and every request that creates something at the provider sends an idempotency key. A production build would revisit webhooks, with signature checks, for real-time posting.
+
+---
+
+### S-03 — Apex for agent actions; Accord's flows keep the policy
+**Status:** Decided
+
+**Context:** Agent actions can be flows, Apex or prompt templates. Accord already enforces its policy in flows, validation rules and an approval process.
+
+**Options**
+1. Flows for every action.
+2. Apex for every action that reads or writes data; prompt templates only for wording. **← decided**
+3. Rebuild Accord's rules inside the actions so the agent can explain them.
+
+**Why:** The agent needs structured results (a list of reasons with amounts, eligibility with a reason code), bulk-safe queries, and record scoping that can be unit-tested, and Apex does all three cleanly. Writes stay thin: the service inserts the record and Accord's automation applies the policy, so there's one source of truth. Option 3 would create a second copy of every rule, and the copies would drift.
+
+**Consequences:** Each action is a small `@InvocableMethod` class that calls a service class. Where a service checks a rule before saving (the 30-day window, for example), the check exists only to give the customer a clear answer first; the save still goes through Accord's rule, and both read the same `Policy_Setting__mdt` value.
+
+---
+
+### S-04 — Customer Community licenses with sharing sets
+**Status:** Proposed · confirm in Phase 4
+
+**Context:** Customers must see only their own household. The org has five Customer Community and five Customer Community Plus licenses.
+
+**Options**
+1. **Customer Community:** no roles; record access through sharing sets matched on the user's account. **← starting position**
+2. **Customer Community Plus:** adds roles, sharing rules and reports.
+
+**Why:** "The household" maps exactly onto a sharing set (the record's account is the user's account), and the master-detail records follow the account. Plus adds role-based sharing that nothing here needs.
+
+**Consequences:** Two limits shape the design. Customer licenses can't be given opportunity access (S-08), and each customer user can reach at most 10 custom objects; the portal needs three (Billing Statement, Lease Payment, Promise to Pay). Account owners must have a role before a contact can become a customer user, which is checked in Phase 4.
+
+---
+
+### S-05 — The pipeline validates against the org; no scratch orgs
+**Status:** Decided
+
+**Context:** Every pull request needs a real org to validate against. Dev Hub isn't enabled, and Steward depends on Accord's metadata, Agentforce, Experience Cloud and Data 360.
+
+**Options**
+1. A scratch org per pull request: needs Dev Hub, a full deploy of Accord each time, and features scratch orgs may not support.
+2. A check-only deploy with local Apex tests against the Developer Edition org, then a quick deploy on merge. **← decided**
+3. Deploy from a laptop with the CLI, as Accord did.
+
+**Why:** Option 2 tests every change against the real data model with no new infrastructure. Option 3 is what ST-13 exists to replace.
+
+**Consequences:** The pipeline signs in with a certificate (JWT) through an External Client App, set up in Phase 2. Validation and deployment hit the same org; a real team would validate in a sandbox first. That's recorded as a known limit, not hidden.
+
+---
+
+### S-06 — What the agent may never do
+**Status:** Decided
+
+The agent never:
+- approves, posts or waives a credit or a fee
+- creates anything that would need a supervisor's approval
+- changes a status, an owner or a policy value
+- reads or repeats payment method details, processor references or card numbers
+- reads or acts on any household other than the verified one
+- gives legal or tax advice
+- promises anything that isn't already on the customer's records
+
+**Why:** Each line is something a collections rep can't do either, or something no one should do in a chat. The list is short enough to test every line (ST-12, ST-16).
+
+**Consequences:** Each line maps to at least one adversarial test case in Phase 10.
+
+---
+
+### S-07 — The model never chooses whose data to read
+**Status:** Decided · mechanism confirmed in Phase 6
+
+**Context:** Anything a customer types in a chat reaches the model, including another customer's name or record ID. If an action accepted an account ID from the model, a well-crafted message could point it at someone else's account.
+
+**Options**
+1. Let the model pass record IDs into actions, and rely on instructions to keep it honest.
+2. Set the customer's identity from the authenticated session when the conversation starts, hold it where the model can't change it, and have every action use it and re-check that records belong to it. **← decided**
+3. Verify customers inside the chat with a one-time code.
+
+**Why:** Option 1 makes security depend on the model following instructions, which is exactly what injection attacks target. Option 2 makes it structural: no action has an account parameter to abuse. Option 3 suits a chat open to the public; Steward's chat sits behind the portal login, so the login is the verification.
+
+**Consequences:** Hidden pre-chat fields are set by the browser, so they don't count as identity. The identity must come from the platform's link between the logged-in user and the conversation, confirmed in Phase 6. Every action re-checks that any record ID it's given belongs to the verified account (ST-12).
+
+---
+
+### S-08 — Customers see commitments through a scoped read service
+**Status:** Proposed · confirm in Phase 4
+
+**Context:** Commitments are detail records of the opportunity, so seeing one requires access to its opportunity. Customer licenses can't be given opportunity access, and customers shouldn't see the deal record anyway.
+
+**Options**
+1. Change Commitment's relationship to the opportunity so commitments can be shared on their own. That rebuilds Accord's data model (NFR-09).
+2. Copy commitments into an object customers can see: two copies that can drift.
+3. A read service that runs in system mode, finds commitments by `Account__c` for the verified household only, and returns five fields. **← starting position**
+
+**Why:** Option 3 keeps one source of truth and exposes the minimum. Accord's DEF-07 lookup (`Commitment__c.Account__c`) makes the household filter a single field.
+
+**Consequences:** This is the one exception to user mode (NFR-01). It lives in an inner class with a comment citing S-08, and tests prove that a customer, the agent, and a portal call carrying another household's ID each get only their own household's commitments.
+
+---
+
+### S-09 — Agent outcomes are logged to a custom object
+**Status:** Proposed · confirm in Phase 3
+
+**Context:** Supervisors need to see what the agent did, including requests it declined, where nothing else in the org changes (ST-11).
+
+**Options**
+1. Built-in Agentforce analytics: rich conversation data, but it records what was said, not which policy decided the outcome.
+2. `Agent_Action_Log__c`: one record per action, written by the action. **← starting position**
+3. Platform event logging only: nothing to report on afterwards without extra storage.
+
+**Why:** A declined request is a business event, and the reason ("date outside the 30-day window") is what a supervisor needs. Only the action knows it. Option 2 turns it into a reportable record.
+
+**Consequences:** Every action writes a log record, failures included, and never stores sensitive text. Built-in analytics, where available, supplement it. Payment callouts log failures to `Integration_Log__c` the same way.
+
+---
+
+### S-10 — The agent's definition lives in Git and ships through the pipeline
+**Status:** Decided
+
+**Context:** New agents are built in the Agentforce Builder with Agent Script. The script is metadata (`AiAuthoringBundle`) that can be retrieved, reviewed in a pull request, and deployed. The legacy Setup builder no longer creates new agents.
+
+**Options**
+1. Build and change the agent only in the builder.
+2. Keep the Agent Script in the repo, deploy it through the pipeline, then publish and activate a version from the release step. **← decided**
+3. Keep both the script and the runtime metadata it generates (`GenAiPlannerBundle`) in the repo and deploy them together.
+
+**Why:** Option 2 puts agent changes through the same review and tests as code (ST-13), with a readable diff of the script. Option 3 skips the publish step but versions generated files nobody should edit by hand.
+
+**Consequences:** Edits made in the builder are retrieved and committed the same day. A version is activated only after the agent test suites pass.
+
+---
+
+### S-11 — The portal is an LWR site
+**Status:** Proposed · confirm in Phase 4
+
+**Context:** Experience Cloud sites are built on either Lightning Web Runtime (LWR) or the older Aura framework.
+
+**Options**
+1. **Aura** (Customer Service template): more ready-made components.
+2. **LWR** (Build Your Own): faster pages built from Lightning web components, and the direction of Salesforce's newer Experience Cloud features. **← starting position**
+
+**Why:** Steward's portal pages are mostly its own components (ST-01, ST-02, ST-15), so Aura's ready-made components matter less than LWR's speed.
+
+**Consequences:** Phase 4 confirms everything the portal needs, including the Enhanced Chat deployment, works in an LWR site before building it.
