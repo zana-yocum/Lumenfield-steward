@@ -22,8 +22,8 @@ Pull request #2 passed its third validation, merged, and the pipeline quick-depl
 - ☑ 8a. Close-out commit pushed from GitHub Desktop (`6790b1f`, 11:28 AM CT). Its files match what was prepared
 - ☑ 8b. Claude connected to GitHub: account linked and the Claude GitHub App installed on `lumenfield-steward` (2026-10-18). Claude can push branches and open pull requests. It can't push or delete tags (refused, 403), so tags stay with you
 - ☑ 8c. Tags pushed with your `Zana-yocum` account, 11:45 AM CT: `v0.1` on `d4afaa0`, `v0.2` on `a32a79a` and `v0.3` on `6790b1f`. The stray `Push-orgin` tag is deleted. The first try was refused because the command line signs in to GitHub as a different account; naming `Zana-yocum@` in the address fixed it. Tags stay with you, so each phase ends with two lines in PowerShell from `C:\Lumenfield-steward`: `git tag v0.4 <commit>`, then `git push https://Zana-yocum@github.com/zana-yocum/Lumenfield-steward.git v0.4`
-- ☐ 9. If not done yet: delete the private key with `Remove-Item C:\Lumenfield-keys\steward-ci.key`. GitHub holds the copy the pipeline needs
-- ☐ 10. If not done yet: Setup → Quick Find **Einstein Setup** → confirm **Turn on Einstein** is on (Phase 5 needs it)
+- ☑ 9. Private key deleted from `C:\Lumenfield-keys` (11:47 AM CT, by you). The only copy left is the `SF_PRIVATE_KEY` GitHub secret the pipeline uses
+- ☑ 10. **Turn on Einstein** confirmed on in Einstein Setup (11:47 AM CT, checked by hand: the switch can't be read through the API). Phase 5 needs it
 
 **Known and accepted**
 - ⊘ No retrieve manifest for Phase 3: everything was built in source, nothing in Setup
