@@ -90,22 +90,24 @@ Stored in GitHub: Settings → Secrets and variables → Actions.
 1. Setup → Quick Find **App Manager** → **New External Client App**.
 2. External Client App Name `Steward CI` (API name `Steward_CI`), Contact Email: yours, Distribution State **Local**.
 3. Under **API (Enable OAuth Settings)**, tick **Enable OAuth**. Callback URL `http://localhost:1717/OauthRedirect`.
-4. OAuth Scopes: add **Manage user data via APIs (api)**, **Manage user data via Web browsers (web)** and **Perform requests at any time (refresh_token, offline_access)**.
+4. OAuth Scopes (they appear only after **Enable OAuth** is ticked, as two lists): move **Manage user data via APIs (api)**, **Manage user data via Web browsers (web)** and **Perform requests at any time (refresh_token, offline_access)** from **Available OAuth Scopes** to **Selected OAuth Scopes**. If the app already exists, add them from the **Settings** tab → **Edit**.
 5. Under **Flow Enablement**, tick **Enable JWT Bearer Flow**, then **Upload Files** → `C:\Lumenfield-keys\steward-ci.crt`.
 6. **Create**.
-7. **Policies** tab → **Edit** → **OAuth Policies**: Permitted Users **Admin approved users are pre-authorized** (confirm with **OK**); under **App Policies**, select the **Steward CI** permission set; IP Relaxation **Relax IP restrictions**; Refresh Token Policy **Expire refresh token after specific time**, **90** **Day(s)**; Session Timeout **15** minutes → **Save**.
+7. **Policies** tab → **Edit** → **OAuth Policies**: Permitted Users **Admin approved users are pre-authorized** (confirm with **OK**); under **App Policies**, select the **Steward CI** permission set; IP Relaxation **Relax IP restrictions**; Refresh Token Policy **Expire refresh token after specific time**, **90** **Day(s)** (the "if not used" option is capped at 30 days and won't save with 90); Session Timeout **15** minutes → **Save**. **Custom Scopes** on this tab is a different feature; leave it empty.
 8. **Settings** tab → **OAuth Settings** → **Consumer Key and Secret** → enter the code emailed to you → **Copy** the Consumer Key.
 
-**Part E — Test the sign-in from your computer (2 minutes).** In PowerShell, from `C:\Lumenfield-steward`:
+**Part E — Test the sign-in from your computer (2 minutes).** In PowerShell, from `C:\Lumenfield-steward`. The first line asks you to paste the Consumer Key:
 ```powershell
-sf org login jwt --client-id PASTE_CONSUMER_KEY --jwt-key-file C:\Lumenfield-keys\steward-ci.key --username steward.ci.lumenfield@example.com --instance-url https://orgfarm-27bf529dae-dev-ed.develop.my.salesforce.com --alias steward-ci
+$key = Read-Host "Paste the Consumer Key"
+sf org login jwt --client-id $key --jwt-key-file C:\Lumenfield-keys\steward-ci.key --username steward.ci.lumenfield@example.com --instance-url https://orgfarm-27bf529dae-dev-ed.develop.my.salesforce.com --alias steward-ci
 ```
+"client identifier invalid" means the Consumer Key is wrong or missing.
 It should say the org was authorized. If it says the user hasn't approved this consumer, check the permission set assignment, wait 10 minutes for the app settings to take effect, and try again.
 
-**Part F — GitHub secrets and push protection (4 minutes)**
+**Part F — GitHub secrets (4 minutes)**
 
 1. The repo on github.com → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**, four times: `SF_CLIENT_ID` (the consumer key), `SF_USERNAME` (the Steward CI username), `SF_INSTANCE_URL` (`https://orgfarm-27bf529dae-dev-ed.develop.my.salesforce.com`), and `SF_PRIVATE_KEY`. For the key, copy the whole file, including the BEGIN and END lines, with `Get-Content C:\Lumenfield-keys\steward-ci.key -Raw | Set-Clipboard`, then paste.
-2. **Settings** → **Advanced Security** → **Enable** next to Secret Protection if it's off, then **Enable** next to **Push protection**.
+2. Push protection needs no setup: GitHub turns it on by default for every account, and it blocks known secret formats pushed to public repositories. (The repository-level setting didn't appear for this personal public repo on 2026-10-17.)
 
 **Part G — The first pull request (5 minutes, then about 6 minutes of waiting)**
 

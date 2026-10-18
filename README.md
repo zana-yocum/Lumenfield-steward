@@ -4,7 +4,7 @@ Steward is the second Lumenfield Home Energy project, built on the same Salesfor
 
 **The rule it's built around:** the agent can never do what a person in the same seat can't. It acts only for the logged-in customer's household, every record it creates goes through Accord's policy, and every action it takes, or declines, is logged for a supervisor.
 
-**Status:** Phase 2 of 10 in progress (pipeline). **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md)
+**Status:** Phase 2 of 10 complete (pipeline). Next: Apex services. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md)
 
 ---
 
@@ -27,8 +27,8 @@ The same way as Accord: requirements before configuration, decisions written dow
 | # | Phase | Status |
 |---|---|---|
 | 1 | Requirements: 18 stories, 6 agent guardrails, 11 decisions | Done, 2026-10-16 |
-| 2 | Pipeline: validate on every pull request, quick deploy on merge, CI sign-in by certificate | In progress |
-| 3 | Apex services and the agent action log | Planned |
+| 2 | Pipeline: validate on every pull request, quick deploy on merge, CI sign-in by certificate | Done, 2026-10-17 |
+| 3 | Apex services and the agent action log | Next |
 | 4 | Customer portal | Planned |
 | 5 | Rep assistant | Planned |
 | 6 | Service agent | Planned |

@@ -2,9 +2,9 @@
 
 Newest first. One entry per phase.
 
-## v0.2 — 2026-10-16 — Phase 2: Pipeline (in progress)
+## v0.2 — 2026-10-17 — Phase 2: Pipeline
 
-Every org change now goes through a pull request that's validated against the org before it can merge. Phase 2 closes when the first deploy is confirmed in the org.
+Every org change now goes through a pull request that's validated against the org before it can merge. The first change went through end to end on 2026-10-17: validated on pull request #1, merged, deployed by the pipeline, and confirmed in the org.
 
 ### Added
 - `.github/workflows/validate.yml`: on every pull request, a Prettier check, Jest (once components exist), Code Analyzer with critical and high findings blocking, sign-in as the Steward CI user by JWT, and a check-only deployment with local Apex tests. The validation's job ID is kept for 10 days
@@ -23,6 +23,20 @@ Every org change now goes through a pull request that's validated against the or
 - Both workflows pass actionlint, including its shell checks
 - Code Analyzer 5.16 on `force-app/`: 0 violations
 - The three records convert to Metadata API format cleanly (one `CustomMetadata` type, API 68.0)
+
+### Verified in the org
+- Validation `0Afaj00000o9QheCAE`: check-only with local tests, run as Steward CI; 3 of 3 components, 0 errors
+- Deployment `0Afaj00000o9ZplCAE`: run as Steward CI after pull request #1 merged; 3 of 3 components, 0 errors
+- `Self_Service_Broken_Promise_Limit` = 2, `Self_Service_Min_Coverage_Pct` = 100 and `Production_Guarantee_Pct` = 90 exist, all stamped 2026-10-17 8:04 PM CT
+- The org's deployment history names Steward CI, not the admin, for both runs (S-12)
+- `main` is protected by the `Protect main` ruleset: a pull request and a passing `validate` check are required, the branch has to be up to date, and the admin can bypass for doc commits (S-13)
+
+### What broke during setup, and the fix
+- **"client identifier invalid", twice.** Locally, the sign-in test was run with the placeholder `PASTE_CONSUMER_KEY` still in it; the test now prompts for the key instead. In the first validation run, the `SF_CLIENT_ID` secret held something other than the key, most likely from a clipboard mix-up while entering secrets. Re-entering each value right after copying it fixed it, and the re-run passed without a commit.
+- **The refresh token policy wouldn't save.** "Expire refresh token if not used for" is capped at 30 days; "Expire refresh token after specific time" accepts 90. The setup steps now name the right option.
+- **The OAuth scopes weren't visible.** They only appear after **Enable OAuth** is ticked. The setup steps now say so.
+- **No repository-level push protection setting** appeared for this personal public repo. GitHub's account-level push protection is on by default for public repositories, so the step was dropped.
+- **A tag named `Push-orgin` was created instead of `v0.1`.** It's deleted and replaced with `v0.1` and `v0.2` as part of closing this phase.
 
 ## v0.1 — 2026-10-16 — Phase 1: Requirements
 

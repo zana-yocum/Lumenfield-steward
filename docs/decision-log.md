@@ -209,7 +209,7 @@ The agent never:
 
 **Why:** The private key lives only in a GitHub secret and, for a moment, in the runner's temporary folder; the certificate in Salesforce can be replaced without touching anyone's login. A separate user makes pipeline deployments easy to tell apart from manual changes in the Setup Audit Trail, and only users holding `PS_Steward_CI` can use the app.
 
-**Consequences:** The Steward CI user takes the org's last free Salesforce license. It has the System Administrator profile, because deployments need that access; what limits it is that only this one user can use the app, and only with the key. The key is generated outside the repo folder and rotated by uploading a new certificate (`docs/pipeline.md`).
+**Consequences:** The Steward CI user takes the org's last free Salesforce license. It has the System Administrator profile, because deployments need that access; what limits it is that only this one user can use the app, and only with the key. The key is generated outside the repo folder and rotated by uploading a new certificate (`docs/pipeline.md`). Confirmed on 2026-10-17: the org's deployment history shows Steward CI, not the admin, as the user behind the first validation and deployment.
 
 ---
 

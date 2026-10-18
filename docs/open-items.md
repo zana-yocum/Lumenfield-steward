@@ -6,29 +6,32 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ---
 
-## Phase 2 — Setup — started 2026-10-16
+## Phase 2 — Pipeline — closed 2026-10-17
 
-Built: `validate.yml` and `deploy.yml` (checked with actionlint), `docs/pipeline.md`, decisions S-12 and S-13, and the first change to send through the pipeline: the three new policy settings. Code Analyzer was dry-run on `force-app/` before delivery: 0 violations.
+The first change went through the whole pipeline: pull request #1 validated as Steward CI, merged, deployed as Steward CI, and the three new policy settings confirmed in the org (details in `CHANGELOG.md` v0.2).
 
-**Your steps** (full detail in `docs/pipeline.md` → Setup)
-- ☐ A. Setup → Einstein Setup → **Turn on Einstein** on
-- ☐ B. Key and certificate made in `C:\Lumenfield-keys`, outside the repo
-- ☐ C. Permission set `PS_Steward_CI`, user Steward CI (System Administrator), permission set assigned
-- ☐ D. External client app Steward CI: JWT, certificate, pre-authorized through `PS_Steward_CI`; consumer key copied
-- ☐ E. `sf org login jwt` works from your computer
-- ☐ F. Four GitHub secrets added; push protection on
-- ☐ G. Branch `feature/ST-13-pipeline`, Phase 2 zip extracted, pull request opened, `validate` green
-- ☐ H. `Protect main` ruleset created, pull request merged, `Deploy` green
-- ☐ Delete `C:\Lumenfield-keys\steward-ci.key` once the deploy is confirmed in the org
+- ☑ A–H from `docs/pipeline.md` → Setup: Steward CI user and permission set, external client app with JWT, sign-in tested locally, four GitHub secrets, `Protect main` ruleset, pull request #1 merged
+- ☑ `Self_Service_Broken_Promise_Limit` = 2, `Self_Service_Min_Coverage_Pct` = 100, `Production_Guarantee_Pct` = 90 in the org (defaults accepted)
+- ⊘ Repository-level push protection: the setting didn't appear for this personal public repo; account-level push protection is on by default for public repositories
 
-**Mine, after your merge**
-- ☐ Confirm the three policy settings exist in the org with the right values, then close Phase 2 in the CHANGELOG
-- ☐ Confirm the `v0.1` tag reached GitHub. It wasn't there on 2026-10-16; GitHub Desktop sends tags with the next push, so it should go up with the Phase 2 branch
+**Your steps to close it** (about 5 minutes)
+- ☐ GitHub Desktop → **Current Branch** → **main** → **Fetch origin** → **Pull origin**
+- ☐ On pull request #1, click **Delete branch**. The feature branch is merged and done
+- ☐ Extract `steward-phase2-close.zip` into `C:\Lumenfield-steward` (replace files), commit to `main` as `Phase 2 closed: pipeline verified in the org`, then **Push origin**. It's docs only, so no deploy runs, and the ruleset lets you push docs straight to `main`
+- ☐ Replace the stray `Push-orgin` tag with `v0.1` and `v0.2`, in PowerShell from `C:\Lumenfield-steward`:
+  ```powershell
+  git pull
+  git push origin --delete Push-orgin
+  git tag -d Push-orgin
+  git tag v0.1 d4afaa0
+  git tag v0.2
+  git push origin v0.1 v0.2
+  ```
+- ☐ Delete the private key: `Remove-Item C:\Lumenfield-keys\steward-ci.key`. GitHub holds the copy the pipeline needs
+- ☐ Setup → Einstein Setup → confirm **Turn on Einstein** is on (Part A; needed by Phase 5)
 
-**Decisions for you** (the defaults go into the org with the first pull request, so say so before committing if you want different values)
-- ☐ `Self_Service_Broken_Promise_Limit` = **2**: customers with 2 or more broken promises in 90 days are handed to a person instead of arranging online (ST-04)
-- ☐ `Self_Service_Min_Coverage_Pct` = **100**: online arrangements must cover the full past-due balance; partial arrangements go to a person (ST-04)
-- ☐ `Production_Guarantee_Pct` = **90**: a system that produces under 90% of its estimate over 12 months gets a credit review (ST-14)
+**Mine, next sitting**
+- ☐ Note which path the first deploy took (quick deploy or the fallback). The org records both runs the same way, so the Deploy run log is the source
 
 ---
 
@@ -36,9 +39,7 @@ Built: `validate.yml` and `deploy.yml` (checked with actionlint), `docs/pipeline
 
 - ☑ Org facts read for the stories: policy settings, dispute evidence (16 records), statuses and types, record types, fields on the five Accord objects, Case, Account and Service Contract
 - ☑ `docs/requirements.md` (18 stories), `docs/decision-log.md`, `docs/conventions.md`, `docs/brief.md`
-- ☑ Phase 2 readiness checked (see Found in the org)
-- ☑ `C:\Lumenfield-steward` created, default org set to `lumenfield`, repo published as `lumenfield-steward`
-- ☑ Repo made public (confirmed 2026-10-16: public, default branch `main`)
+- ☑ `C:\Lumenfield-steward` created, default org set to `lumenfield`, repo published as `lumenfield-steward` and made public
 
 ---
 
@@ -48,16 +49,16 @@ Built: `validate.yml` and `deploy.yml` (checked with actionlint), `docs/pipeline
 - Messaging is available, with no channels yet
 - No agents exist yet. The admin has the Einstein Agent Platform permission, and the new Agentforce Builder (Agent Script) is available
 - The Trust Layer's master **Prompt Security** setting reads off (ST-17, decided in Phase 6)
-- The **Turn on Einstein** switch couldn't be read through the API (Part A checks it by hand)
+- The **Turn on Einstein** switch couldn't be read through the API (checked by hand, above)
 - Digital Experiences is off (turned on in Phase 4). Dev Hub is off and stays off (S-05)
-- Active users: Zana Yocum and OrgFarm EPIC (System Administrator), Test Persona (Minimum Access). Four Salesforce licenses, three in use; Steward CI takes the fourth (S-12)
+- Salesforce licenses: all four in use (Zana Yocum, OrgFarm EPIC, Test Persona, Steward CI)
 - Customer licenses can't be given opportunity access, so commitments reach customers through a scoped read service (S-08). Accord's DEF-07 field `Commitment__c.Account__c` is what makes the household filter simple
 
 ---
 
 ## To check in the phase that needs it
 
-**Phase 3 — Apex services**
+**Phase 3 — Apex services (next)**
 - ☐ Add the 90% per-class coverage check to `validate.yml` with the first Apex class (ST-13)
 - ☐ Find a household whose statements show an escalator step, for ST-03's known-answer test. If the dataset has none, add two statements to one test household
 
@@ -83,6 +84,5 @@ Built: `validate.yml` and `deploy.yml` (checked with actionlint), `docs/pipeline
 - **Einstein usage is capped in Developer Edition**, and agent test runs use it. Keep test suites focused and run the full set at release.
 - **Data 360 usage is capped** too, which is why ST-14 is a Should.
 - **Five customer licenses.** The plan uses three test households, which leaves room for a fourth if a test needs one.
-- **No spare Salesforce licenses** after Steward CI. A second persona user would mean switching Test Persona between roles, as Accord did.
-- **Quick deploy with no Apex in the org yet.** If Salesforce won't quick-deploy a validation that ran no tests, `deploy.yml` deploys again with tests and says so in the log. Expected to go away once Phase 3 adds Apex tests.
+- **No spare Salesforce licenses** now that Steward CI has the fourth. A second persona user would mean switching Test Persona between roles, as Accord did.
 - **Accord's DEF-07 is unfinished** (the Commitments related list isn't on the account layout). That's tracked in Accord's open items. Steward depends only on the `Account__c` field, which is done.
