@@ -1,6 +1,6 @@
 # Pipeline — Steward
 
-How a change gets from a branch to the org, what protects each step, and how it was set up. Serves ST-13; decisions S-05, S-12 and S-13.
+How a change gets from a branch to the org, what protects each step, and how it was set up. Serves ST-13; decisions S-05, S-12, S-13 and S-15.
 
 ---
 
@@ -21,6 +21,10 @@ feature branch ── pull request ──► Validate  (.github/workflows/valida
                                      1. Find the pull request behind the merge and its passing validation
                                      2. Quick-deploy that validation, with no second test run
                                      3. If Salesforce won't accept the quick deploy, deploy again with the same tests
+
+  run by hand ─────────────────────► Retrieve  (.github/workflows/retrieve.yml, S-15)
+                                     1. Sign in as Steward CI and retrieve what a manifest lists
+                                     2. Push the result to retrieve/<run number>; a pull request takes it to main
 ```
 
 The `main` branch is protected by a ruleset: a pull request is required, the `validate` check has to pass, and the branch has to be up to date with `main` before merging. That last rule is what guarantees the commit that was validated is exactly what gets merged.
@@ -52,6 +56,15 @@ Its tests are in `tests/pipeline/test_check_coverage.py`. To run them locally fr
 ## Code Analyzer settings
 
 The pipeline runs Code Analyzer's Recommended rules. Changes to the defaults live in `code-analyzer.yml` at the repo root, each with a comment giving the reason. There's one so far. `ApexUnitTestClassShouldHaveRunAs` is moved out of the default run: access tests run as a user created for the test, and business-logic tests run as the pipeline user on purpose, because no Salesforce license is free for a test admin.
+
+## Retrieving what's built outside source
+
+`retrieve.yml` brings configuration that didn't start in source into the repo (S-15). The first is the portal site: Salesforce's Build Your Own (LWR) template creates its pages, theme and settings.
+
+1. On a branch, add or update a manifest in `manifest/` listing what to retrieve.
+2. **Actions** → **Retrieve** → **Run workflow**. Choose that branch and enter the manifest's path.
+3. The run signs in as Steward CI, retrieves, and pushes the files to `retrieve/<run number>`. If the repo already matches the org, it says so and pushes nothing.
+4. Bring the files into a feature branch and open a pull request as usual. `validate` checks them like any other change.
 
 ## Secrets
 

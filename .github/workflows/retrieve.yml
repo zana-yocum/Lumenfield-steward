@@ -1,0 +1,93 @@
+# ST-13 · S-15
+# Brings configuration built outside source into the repo: the portal site as its template
+# creates it, and anything later changed in Experience Builder or Setup. Started by hand from
+# the Actions tab, on the branch that holds the manifest. It signs in as Steward CI, retrieves
+# what the manifest lists, and pushes the result to a new branch, retrieve/<run number>.
+# It never writes to main: the files reach main in a pull request that validates them.
+name: Retrieve
+
+on:
+  workflow_dispatch:
+    inputs:
+      manifest:
+        description: "Manifest to retrieve, for example manifest/portal.xml"
+        required: true
+        type: string
+
+permissions:
+  contents: write # push the retrieve/<run number> branch
+
+concurrency:
+  group: retrieve-org
+  cancel-in-progress: false
+
+jobs:
+  retrieve:
+    name: retrieve
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out the branch it was started on
+        uses: actions/checkout@v6
+
+      - name: Check the manifest
+        env:
+          MANIFEST: ${{ inputs.manifest }}
+        run: |
+          case "$MANIFEST" in
+            manifest/*.xml) ;;
+            *)
+              echo "::error::The manifest has to be an XML file in manifest/, such as manifest/portal.xml."
+              exit 1
+              ;;
+          esac
+          if [ ! -f "$MANIFEST" ]; then
+            echo "::error::$MANIFEST doesn't exist on ${GITHUB_REF_NAME}. Start the workflow on the branch that holds it."
+            exit 1
+          fi
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Install the Salesforce CLI
+        run: |
+          npm install --global @salesforce/cli
+          sf --version
+
+      - name: Sign in to the org as Steward CI (JWT)
+        env:
+          SF_CLIENT_ID: ${{ secrets.SF_CLIENT_ID }}
+          SF_PRIVATE_KEY: ${{ secrets.SF_PRIVATE_KEY }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_INSTANCE_URL: ${{ secrets.SF_INSTANCE_URL }}
+        run: |
+          key_file="$RUNNER_TEMP/steward-ci.key"
+          printf '%s\n' "$SF_PRIVATE_KEY" > "$key_file"
+          sf org login jwt --client-id "$SF_CLIENT_ID" --jwt-key-file "$key_file" \
+            --username "$SF_USERNAME" --instance-url "$SF_INSTANCE_URL" --alias ci --set-default
+          rm -f "$key_file"
+
+      - name: Retrieve
+        env:
+          MANIFEST: ${{ inputs.manifest }}
+        run: sf project retrieve start --manifest "$MANIFEST" --wait 30
+
+      - name: Push the result to a new branch
+        env:
+          MANIFEST: ${{ inputs.manifest }}
+          BRANCH: retrieve/${{ github.run_number }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$BRANCH"
+          git add force-app
+          if git diff --cached --quiet; then
+            echo "Nothing to commit: the repo already matches the org for everything in $MANIFEST." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git diff --cached --stat
+          git commit -m "Retrieve $MANIFEST from the org (run ${GITHUB_RUN_NUMBER})"
+          git push origin "$BRANCH"
+          echo "Retrieved $MANIFEST into branch \`$BRANCH\`. It reaches main through a pull request." >> "$GITHUB_STEP_SUMMARY"

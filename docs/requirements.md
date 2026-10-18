@@ -458,7 +458,7 @@ Planned components now; built components and test evidence are filled in as each
 | ST-10 | 5 | `Steward_Followup_Draft` prompt template | — | UAT-S10 |
 | ST-11 | 3, 6 | `Agent_Action_Log__c`, `AgentActionLogger`, Steward Agent dashboard | `Agent_Action_Log__c`, `AgentActionLogger`, `StewardOutcome` (3) | `AgentActionLoggerTest`, `StewardOutcomeTest`, UAT-S11 |
 | ST-12 | 3, 4, 6, 10 | Session identity (S-07), `PS_Steward_Agent`, `docs/security-model.md` | `HouseholdScope`, called first by every service (3) | `HouseholdScopeTest`, a scoping test in every service's test class, cross-household agent suite |
-| ST-13 | 2, 10 | `validate.yml`, `deploy.yml`, `Steward_CI` external client app, `PS_Steward_CI`, `Protect main` ruleset, push protection | Everything planned except repository-level push protection (2); the 90% per-class coverage gate (3) | Pipeline run evidence, `tests/pipeline/test_check_coverage.py` |
+| ST-13 | 2, 10 | `validate.yml`, `deploy.yml`, `Steward_CI` external client app, `PS_Steward_CI`, `Protect main` ruleset, push protection | Everything planned except repository-level push protection (2); the 90% per-class coverage gate (3); `retrieve.yml` for configuration built outside source (4, S-15) | Pipeline run evidence, `tests/pipeline/test_check_coverage.py` |
 | ST-14 | 8 | Ingestion API stream, identity resolution, `Production_vs_Guarantee` calculated insight, `ProductionGuaranteeService` | `Production_Guarantee_Pct` policy setting (2) | UAT-S14 |
 | ST-15 | 9 | `customerTimeline` component, `CustomerTimelineController` | — | Jest, Apex tests, UAT-S15 |
 | ST-16 | 6 | Agent Script welcome message and scope instructions | — | Agent suite, UAT-S16 |

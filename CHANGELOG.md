@@ -2,6 +2,19 @@
 
 Newest first. One entry per phase.
 
+## v0.4 — in progress — Phase 4: Customer portal
+
+The customer portal: an LWR site where a household sees its balance, statements, payments and commitments, and opens and follows its disputes. It's built in two pull requests. The first, below, turns on Digital Experiences and adds the workflow that brings the site's template-built configuration into the repo. The second builds the pages.
+
+### Added
+- `settings/Communities.settings-meta.xml` turns on Digital Experiences (S-04, S-11). Salesforce can't turn it off again. It's been in the plan since Phase 1, and the admin approved it before the merge
+- `.github/workflows/retrieve.yml` and decision S-15: configuration built outside source is retrieved as Steward CI into a branch of its own, and reaches `main` through a pull request (ST-13)
+
+### Checked in the org before building (2026-10-18)
+- All 88 households are owned by the admin, who holds the Collections Supervisor role, so their contacts can become customer users (S-04)
+- Licenses free for customer users: 5 Customer Community and 5 Customer Community Login, none in use
+- **The 31 commitments' terms (ST-02).** Each is one of four plain sentences in the rep's voice, such as "Rep agreed Lumenfield would cover the first 3 monthly payments." None holds internal notes, names or anything a customer shouldn't read. So the portal shows the terms as recorded, labeled that way, and no customer-facing field is needed
+
 ## v0.3 — 2026-10-18 — Phase 3: Apex services and the agent action log
 
 The services the portal and the agent will call, with the action log the supervisor's dashboard will read. Every service checks the household first, in user mode, and returns outcome codes and figures rather than sentences. Every limit comes from Accord's policy records. Every write goes through Accord's own flows and rules. Only three operations run outside user mode, and each is a named decision with its own tests (S-08, S-09, S-14). No agent, portal or permission set yet: those are Phases 4 and 6. It went through end to end on 2026-10-18: pull request #2 passed its third validation, merged, was quick-deployed by the pipeline and was confirmed in the org.
