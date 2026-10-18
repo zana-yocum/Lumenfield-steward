@@ -19,16 +19,15 @@ Pull request #2 passed its third validation, merged, and the pipeline quick-depl
 
 **Your steps**
 - ☑ 1–7. Branch, zip, commit, publish, pull request, two fixes, merge (2026-10-18)
-- ☐ 8. Close-out commit, then tags. In GitHub Desktop: **Current Branch** → `main`, then **Fetch origin**, then **Pull origin** when it appears. Extract `steward-phase3-close.zip` into `C:\Lumenfield-steward` and replace the files. Commit to `main` with the summary `Phase 3 closed: Apex services verified in the org`, then **Push origin**. Docs go straight to `main` (S-13), so nothing validates or deploys. Then in PowerShell from `C:\Lumenfield-steward`. This replaces the stray `Push-orgin` tag and tags all three phases, with v0.3 on the commit you just pushed. If a delete line says the tag doesn't exist, that's fine; carry on:
+- ☑ 8a. Close-out commit pushed from GitHub Desktop (`6790b1f`, 11:28 AM CT). Its files match what was prepared
+- ☑ 8b. Claude connected to GitHub: account linked and the Claude GitHub App installed on `lumenfield-steward` (2026-10-18). Claude can push branches and open pull requests. It can't push or delete tags (refused, 403), so tags stay with you
+- ☐ 8c. Tags. The first PowerShell push was refused because the command line signs in to GitHub as a different account, which can't write to this repo. Putting `Zana-yocum@` in the address makes it use yours: if a sign-in window opens, sign in as `Zana-yocum`. In PowerShell from `C:\Lumenfield-steward` (`-f` sets each tag even if an old one is still there):
   ```powershell
-  git checkout main
-  git pull
-  git push origin --delete Push-orgin
-  git tag -d Push-orgin
-  git tag v0.1 d4afaa0
-  git tag v0.2 a32a79a
-  git tag v0.3
-  git push origin v0.1 v0.2 v0.3
+  git tag -f v0.1 d4afaa0
+  git tag -f v0.2 a32a79a
+  git tag -f v0.3 6790b1f
+  git push https://Zana-yocum@github.com/Zana-yocum/lumenfield-steward.git v0.1 v0.2 v0.3
+  git push https://Zana-yocum@github.com/Zana-yocum/lumenfield-steward.git --delete Push-orgin
   ```
 - ☐ 9. If not done yet: delete the private key with `Remove-Item C:\Lumenfield-keys\steward-ci.key`. GitHub holds the copy the pipeline needs
 - ☐ 10. If not done yet: Setup → Quick Find **Einstein Setup** → confirm **Turn on Einstein** is on (Phase 5 needs it)
