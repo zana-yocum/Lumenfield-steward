@@ -85,7 +85,8 @@ GitHub ── Actions: Code Analyzer · Jest · validate + local tests ── qu
 ## Requirements and decisions
 
 - **[Requirements](requirements.md):** 18 stories (11 Must, 6 Should, 1 Could), six agent guardrails, ten non-functional requirements, and what each audience can see.
-- **[Decision log](decision-log.md):** S-01 to S-13. Decided: Apex for actions with Accord keeping the policy (S-03), validating against the org instead of scratch orgs (S-05), what the agent may never do (S-06), identity from the login and never from the model (S-07), the Agent Script in Git (S-10), the pipeline's own sign-in (S-12), and pull requests for anything that deploys (S-13). The rest are starting positions confirmed in the phase that builds them.
+- **[Decision log](decision-log.md):** S-01 to S-14. Decided: Apex for actions with Accord keeping the policy (S-03), validating against the org instead of scratch orgs (S-05), what the agent may never do (S-06), identity from the login and never from the model (S-07), agent outcomes logged to a custom object (S-09), the Agent Script in Git (S-10), the pipeline's own sign-in (S-12), pull requests for anything that deploys (S-13), and dispute cases saved in system mode with the caller's create access applied to every other field (S-14). The rest are starting positions confirmed in the phase that builds them.
+- **[Explainers](explainers/README.md):** one page per Apex class, from Phase 3.
 - **[Pipeline](pipeline.md):** how a change reaches the org, and how the pipeline was set up.
 - **[Conventions](conventions.md):** naming and coding standards.
 
@@ -123,7 +124,7 @@ Paced against Accord, which took about four weeks for ten phases.
 
 ## Constraints
 
-- Developer Edition limits: five customer licenses, capped Einstein and Data 360 usage, four full Salesforce licenses (three in use) for persona testing.
+- Developer Edition limits: five customer licenses, capped Einstein and Data 360 usage, and four full Salesforce licenses, all in use since Steward CI took the last one in Phase 2. Apex tests that need a second user use a Salesforce Platform license (six free).
 - Customer licenses can't be given opportunity access, and each customer user can reach at most 10 custom objects (S-04, S-08).
 - Stripe test mode needs a free Stripe account. No real cards or money.
 - Every Apex class, component, prompt template and subagent ships with a plain-English explainer, so each one can be walked through in an interview.

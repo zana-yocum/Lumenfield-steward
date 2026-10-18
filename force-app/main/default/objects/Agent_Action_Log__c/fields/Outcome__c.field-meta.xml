@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Outcome__c</fullName>
+    <description>ST-11, GR-06. Completed, Declined by Policy, Handed Off or Failed. Set from the outcome code the service returned (StewardOutcome).</description>
+    <externalId>false</externalId>
+    <label>Outcome</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Completed</fullName>
+                <default>false</default>
+                <label>Completed</label>
+            </value>
+            <value>
+                <fullName>Declined by Policy</fullName>
+                <default>false</default>
+                <label>Declined by Policy</label>
+            </value>
+            <value>
+                <fullName>Handed Off</fullName>
+                <default>false</default>
+                <label>Handed Off</label>
+            </value>
+            <value>
+                <fullName>Failed</fullName>
+                <default>false</default>
+                <label>Failed</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

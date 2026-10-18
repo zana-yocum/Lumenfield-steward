@@ -10,9 +10,12 @@ How a change gets from a branch to the org, what protects each step, and how it 
 feature branch ── pull request ──► Validate  (.github/workflows/validate.yml)
                                      1. Formatting check (Prettier, code files only)
                                      2. Component tests (Jest), once components exist
-                                     3. Static analysis (Code Analyzer); critical or high findings stop it
-                                     4. Sign in to the org as Steward CI (JWT)
-                                     5. Check-only deployment with local Apex tests; job ID kept 10 days
+                                     3. Tests of the coverage gate script itself
+                                     4. Static analysis (Code Analyzer); critical or high findings stop it
+                                     5. Sign in to the org as Steward CI (JWT)
+                                     6. Check-only deployment with local Apex tests
+                                     7. Coverage gate: every Steward class at 90% or more
+                                     8. Job ID kept 10 days, only if everything above passed
 
                merge to main ────► Deploy  (.github/workflows/deploy.yml, only when force-app/ changed)
                                      1. Find the pull request behind the merge and its passing validation
@@ -34,7 +37,21 @@ The `main` branch is protected by a ruleset: a pull request is required, the `va
 | A key leaks from a workflow run | The key is written to the runner's temporary folder and deleted straight after sign-in. GitHub doesn't give secrets to pull requests from forks |
 | The pipeline's sign-in is misused | Only users with the `PS_Steward_CI` permission set can use the Steward CI app, and only one user has it. JWT only, refresh tokens expire after 90 days, sessions after 15 minutes |
 | Two deployments collide | Deployments run one at a time (`concurrency: deploy-org`) |
-| A broken pipeline change slips in | Workflow files go through pull requests like everything else. The first versions were checked with actionlint |
+| A class ships with thin tests | The coverage gate fails the pull request when any Steward class is below 90% on its own. A failed gate means the job ID isn't kept, so the merge has nothing to deploy |
+| The coverage gate passes by mistake | It fails closed: a class the org reported no coverage for counts as 0%, and a result with no test data fails the check. The script has its own tests, run on every pull request |
+| A broken pipeline change slips in | Workflow files go through pull requests like everything else, and each version is checked with actionlint before it's committed |
+
+## The coverage gate
+
+The org's own rule is 75% coverage across all Apex. Steward's is stricter: every class and trigger in `force-app` at 90% or more, each on its own (ST-13, NFR-03).
+
+`scripts/check_coverage.py` reads the coverage the org returns with the check-only deployment (`validate.json`, the `--json` output of `sf project deploy validate`). It finds every class and trigger in `force-app` and compares each with the gate. It skips test classes, interfaces and enums, which have nothing to cover, and an exception class with an empty body. It fails the step with one error per class below the gate and adds a coverage table to the run's summary page. It rounds down when it reports, so 89.96% shows as 89.9%, not a passing-looking 90.0%.
+
+Its tests are in `tests/pipeline/test_check_coverage.py`. To run them locally from the repo root: `python -m unittest discover -s tests/pipeline -v`.
+
+## Code Analyzer settings
+
+The pipeline runs Code Analyzer's Recommended rules. Changes to the defaults live in `code-analyzer.yml` at the repo root, each with a comment giving the reason. There's one so far. `ApexUnitTestClassShouldHaveRunAs` is moved out of the default run: access tests run as a user created for the test, and business-logic tests run as the pipeline user on purpose, because no Salesforce license is free for a test admin.
 
 ## Secrets
 
@@ -52,7 +69,8 @@ Stored in GitHub: Settings → Secrets and variables → Actions.
 - **One org.** Validation and deployment hit the same Developer Edition org. A team would validate against a UAT sandbox, then quick-deploy the same package to production.
 - **Up-to-date rule and doc commits.** Committing docs straight to `main` puts any open pull request behind; it then needs **Update branch** and a fresh validation before it can merge.
 - **Actions pinned to major versions** for readability. A stricter setup pins each action to a commit SHA.
-- **Coverage gate.** The 90% per-class coverage check (ST-13) arrives with the first Apex class in Phase 3.
+- **Coverage measures lines run, not checks made.** A test can run a line without asserting anything about it. That's why NFR-03 also requires every test method to assert an outcome. Review enforces that, not the gate.
+- **Graph Engine data-flow rules aren't run yet.** They start from entry points such as invocable and Aura-enabled methods, and Steward has none until the agent actions in Phase 6.
 - **Agent releases.** Publishing and activating agent versions joins the deploy workflow in Phase 6 (S-10).
 
 ## Rotating the key

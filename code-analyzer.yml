@@ -1,0 +1,12 @@
+# Code Analyzer settings for Steward (ST-13). The pipeline runs the Recommended rules, and critical
+# or high findings stop a pull request. Every change to the defaults is listed here with its reason.
+rules:
+  pmd:
+    # Tests that are about access run as a user created in the test, through System.runAs: a
+    # user who can't see the household, then the same user given read sharing. Tests of business
+    # logic run as the pipeline user on purpose, because no Salesforce license is free for a test
+    # admin. A rule that asks for runAs in every test method would only add empty runAs blocks,
+    # so it's left out of the default run rather than suppressed class by class.
+    # Run it on demand with --rule-selector pmd:ApexUnitTestClassShouldHaveRunAs.
+    ApexUnitTestClassShouldHaveRunAs:
+      tags: ["BestPractices", "Apex"]

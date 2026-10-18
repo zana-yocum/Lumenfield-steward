@@ -33,20 +33,27 @@ Accord's IDs (`US-xx`, `D-xx`, `DEF-xx`) keep their meaning. Steward's carry an 
 | Callout client | `<Provider>Client` | `StripeClient` |
 | Async job | `<Purpose>Job` | `PaymentReconciliationJob` |
 | Trigger and handler | `<Object>Trigger`, `<Object>TriggerHandler`; one trigger per object | `PaymentReceivedTrigger` |
-| Policy values | `PolicySettings` (the only class that reads `Policy_Setting__mdt`) | `PolicySettings.number('Promise_Window_Days')` |
+| Policy values | `PolicySettings` (the only class that reads `Policy_Setting__mdt`) | `PolicySettings.getWholeNumber(PolicySettings.PROMISE_WINDOW_DAYS)` |
+| Shared rules split out of a service | A noun for what it decides | `ArrangementEligibility`, `AmountDueComparison` |
 | Test class | `<Class>Test` | `PaymentArrangementServiceTest` |
 | Test data | `StewardTestData` | — |
-| Exception | `<Domain>Exception` | `PaymentArrangementException` |
+| Exception | `<Domain>Exception`; an inner class when only one class throws it | `PolicySettings.PolicySettingException` |
 
 **Rules**
-- Every class declares `with sharing` or `inherited sharing`. `without sharing` appears only in an inner class named `Elevated`, with a comment citing the decision that allows it. So far that's only S-08.
+- Every class declares `with sharing` or `inherited sharing`. `without sharing` appears only in an inner class named `Elevated`, with a comment citing the decision that allows it.
 - Queries use `WITH USER_MODE`. DML uses `Database.insert(records, AccessLevel.USER_MODE)` and its update and upsert equivalents.
-- No limits, day counts or percentages in code. They come from `Policy_Setting__mdt` through `PolicySettings`.
-- Agent actions are thin: get the verified account from the session (S-07), call a service, write one `Agent_Action_Log__c` record, return a typed result. They never take an account or contact ID as an input.
-- Actions return outcome codes, not sentences: `COMPLETED`, `DECLINED_POLICY`, `HANDOFF` or `FAILED`, plus a reason code such as `DATE_OUTSIDE_WINDOW`. The agent puts them into words (GR-04).
+- Three named exceptions, and no others without a decision first: the commitments read (S-08) and the action log write (S-09), each in an `Elevated` inner class, and the dispute case insert (S-14), one system-mode statement after the caller's create access has been applied with `Security.stripInaccessible`.
+- Every service checks the household with `HouseholdScope` before reading anything else, and answers `NOT_FOUND` for a household or record out of reach, the same as one that doesn't exist (ST-12).
+- No limits, day counts or percentages in code. They come from `Policy_Setting__mdt` through `PolicySettings`, and a missing setting throws instead of falling back to a default.
+- Agent actions are thin: get the verified account from the session (S-07), call a service, write one log record through `AgentActionLogger`, return a typed result. They never take an account or contact ID as an input.
+- Actions return outcome codes, not sentences: `COMPLETED`, `DECLINED_POLICY`, `HANDOFF` or `FAILED`, plus a reason code such as `DATE_OUTSIDE_WINDOW`. Every result extends `StewardOutcome.Result`. The agent puts them into words (GR-04).
 - Services take lists, and nothing queries or saves inside a loop.
-- Tests build their data with `StewardTestData` in `@TestSetup`, assert outcomes with a message, use `System.runAs` as a customer or the agent user to prove access (ST-12), and mock callouts with `HttpCalloutMock`. No `SeeAllData`.
-- Formatting by Prettier with the Apex plugin. Code Analyzer must report nothing at severity 1 or 2.
+- Request classes take at most three constructor parameters, the ones every request needs. Optional inputs are public fields set afterwards (`request.description = ...`).
+- Free text a customer typed passes through `SensitiveText.redact` before it's saved anywhere.
+- When a test reads back what a service stored, the query says `WITH SYSTEM_MODE`. The test checks what was saved, not who may see it. A plain query in a test checks field-level security, so it can't read a field nobody has access to yet, such as a field added in the same pull request. That's what failed the first Phase 3 validation.
+- Tests build their data with `StewardTestData`, mostly in `@TestSetup`, with answers known in advance and asserted to the cent. A test that creates a user doesn't insert other records first; anything else it needs comes from the setup. They assert outcomes with a message, prove access with `System.runAs` (ST-12), and mock callouts with `HttpCalloutMock`. No `SeeAllData`. Until Phase 4 the runAs user is a Standard Platform User stand-in, because no Salesforce license is free. From Phase 4 it's a customer user, and from Phase 6 the agent user.
+- Every Steward class reaches 90% coverage on its own (ST-13, NFR-03). The pull request's validation enforces it with `scripts/check_coverage.py`.
+- Formatting by Prettier with the Apex plugin. Code Analyzer must report nothing at severity 1 or 2. Any change to its default rules goes in `code-analyzer.yml` with a comment giving the reason.
 - Prettier formats code only (Apex, JavaScript, HTML, CSS). Metadata XML stays exactly as Salesforce retrieves it, so a retrieve never creates formatting noise in a pull request.
 
 ---
