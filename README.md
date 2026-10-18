@@ -28,7 +28,7 @@ The same way as Accord: requirements before configuration, decisions written dow
 |---|---|---|
 | 1 | Requirements: 18 stories, 6 agent guardrails, 11 decisions | Done, 2026-10-16 |
 | 2 | Pipeline: validate on every pull request, quick deploy on merge, CI sign-in by certificate | Done, 2026-10-17 |
-| 3 | Apex services and the agent action log: 13 classes, 82 tests, a 90% per-class coverage gate | Built, 2026-10-18 |
+| 3 | Apex services and the agent action log: 13 classes, 83 tests, a 90% per-class coverage gate | Built, 2026-10-18 |
 | 4 | Customer portal | Next |
 | 5 | Rep assistant | Planned |
 | 6 | Service agent | Planned |

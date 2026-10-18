@@ -2,6 +2,10 @@
  * ST-11, S-09, GR-06. Proves every outcome is logged with its label, card numbers never reach the
  * log, a log is written even when the caller can't see the account, and a bad entry is reported
  * instead of breaking the action. Includes the 200-record bulk test (NFR-02).
+ *
+ * Read-backs use WITH SYSTEM_MODE. They check what was stored, and no profile or permission set
+ * has field access to the log yet: supervisors get it in Phase 6. A plain query in a test checks
+ * field-level security, so it can't see the new fields (found in the first Phase 3 validation).
  */
 @IsTest
 private class AgentActionLoggerTest {
@@ -36,7 +40,12 @@ private class AgentActionLoggerTest {
 
     Assert.areEqual(
       'Failed',
-      [SELECT Outcome__c FROM Agent_Action_Log__c WHERE Id = :save.getId()]
+      [
+        SELECT Outcome__c
+        FROM Agent_Action_Log__c
+        WHERE Id = :save.getId()
+        WITH SYSTEM_MODE
+      ]
       .Outcome__c,
       'Never lost: recorded as a failure'
     );
@@ -80,6 +89,7 @@ private class AgentActionLoggerTest {
         Reason_Code__c,
         Conversation_Id__c
       FROM Agent_Action_Log__c
+      WITH SYSTEM_MODE
     ]) {
       byOutcome.put(row.Outcome__c, row);
       Assert.areEqual(accountId, row.Account__c, 'The household is recorded');
@@ -128,6 +138,7 @@ private class AgentActionLoggerTest {
       SELECT Action__c, Details__c
       FROM Agent_Action_Log__c
       WHERE Id = :save.getId()
+      WITH SYSTEM_MODE
     ];
     Assert.isFalse(
       row.Details__c.contains('4111'),
@@ -156,6 +167,7 @@ private class AgentActionLoggerTest {
       SELECT Outcome__c, Details__c
       FROM Agent_Action_Log__c
       WHERE Id = :save.getId()
+      WITH SYSTEM_MODE
     ];
     Assert.areEqual('Failed', row.Outcome__c, 'Kept, as a failure');
     Assert.isTrue(
@@ -189,7 +201,12 @@ private class AgentActionLoggerTest {
     );
     Assert.areEqual(
       1,
-      [SELECT COUNT() FROM Agent_Action_Log__c WHERE Account__c = :accountId],
+      [
+        SELECT COUNT()
+        FROM Agent_Action_Log__c
+        WHERE Account__c = :accountId
+        WITH SYSTEM_MODE
+      ],
       'The declined request is on record'
     );
   }
@@ -207,7 +224,7 @@ private class AgentActionLoggerTest {
     Assert.isFalse(save.isSuccess(), 'A contact ID in the account field fails');
     Assert.areEqual(
       0,
-      [SELECT COUNT() FROM Agent_Action_Log__c],
+      [SELECT COUNT() FROM Agent_Action_Log__c WITH SYSTEM_MODE],
       'Nothing is saved, and nothing was thrown'
     );
   }
@@ -241,7 +258,7 @@ private class AgentActionLoggerTest {
     Assert.areEqual(1, dmlStatements, 'All 200 in a single save');
     Assert.areEqual(
       200,
-      [SELECT COUNT() FROM Agent_Action_Log__c],
+      [SELECT COUNT() FROM Agent_Action_Log__c WITH SYSTEM_MODE],
       'All 200 saved'
     );
   }

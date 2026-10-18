@@ -6,18 +6,16 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ---
 
-## Phase 3 — Apex services — built 2026-10-18
+## Phase 3 — Apex services — built 2026-10-18, first validation fixed
 
-Built and checked before delivery (`CHANGELOG.md` v0.3): 13 Apex classes, 12 test classes with 82 tests, `Agent_Action_Log__c`, the 90% per-class coverage gate, 14 explainers, and decision S-14. Not yet passed in the org. That evidence comes from the pull request's validation.
+Built and checked before delivery (`CHANGELOG.md` v0.3): 13 Apex classes, 12 test classes with 83 tests, `Agent_Action_Log__c`, the 90% per-class coverage gate, 14 explainers, and decision S-14.
 
-**Your steps** (about 10 minutes, plus 15 to 20 minutes of waiting)
-- ☐ 1. GitHub Desktop → **Current Branch** → **main** → **Fetch origin**, then **Pull origin** if it offers
-- ☐ 2. **Current Branch** → **New Branch** → `feature/phase-3-apex-services` → **Create Branch**
-- ☐ 3. Extract `steward-phase3.zip` into `C:\Lumenfield-steward` and replace the files when asked
-- ☐ 4. Commit to the branch with the summary `ST-01 ST-02 ST-03 ST-04 ST-06 ST-11 ST-12 ST-13: Apex services, action log and coverage gate`
-- ☐ 5. **Publish branch** → **Preview Pull Request** → **Create pull request**. On GitHub, replace the description with the one Claude gave you, then **Create pull request**
-- ☐ 6. Wait for the **validate** check. The org runs all 82 Apex tests, so it takes longer than Phase 2. Green: go on to step 7. Red: click **Details**, open the step with the red cross, copy its log and send it to Claude
-- ☐ 7. **Merge pull request** → **Confirm merge** → **Delete branch**. On the **Actions** tab, wait for **Deploy** to go green
+**First validation**, 2026-10-18 10:24 (`0Afaj00000oBq9lCAC`): all 36 components deployed, and 78 of 82 tests passed. The 4 failures were all in `AgentActionLoggerTest`: field-level security on the new log fields stopped the tests' plain read-back queries. The run also measured `PaymentArrangementService` at 87.1%, which the coverage gate would have stopped. Both are fixed, and a test that took two minutes is fixed too (details in `CHANGELOG.md` v0.3).
+
+**Your steps**
+- ☑ 1–5. Branch, zip, commit, publish, pull request (2026-10-18)
+- ☐ 6. Update the pull request with the fix. In GitHub Desktop, check **Current Branch** says `feature/phase-3-apex-services`. Extract `steward-phase3-fix1.zip` into `C:\Lumenfield-steward` and replace the files. Commit with the summary `ST-04 ST-11: fix the log tests' read-backs, test a rejected promise save`, then **Push origin**. The **validate** check starts again on its own and takes about 6 minutes
+- ☐ 7. When it's green: **Merge pull request** → **Confirm merge** → **Delete branch**. On the **Actions** tab, wait for **Deploy** to go green
 - ☐ 8. Tags, in PowerShell from `C:\Lumenfield-steward`. This replaces the stray `Push-orgin` tag and tags all three phases. If a delete line says the tag doesn't exist, that's fine; carry on:
   ```powershell
   git checkout main
@@ -32,9 +30,10 @@ Built and checked before delivery (`CHANGELOG.md` v0.3): 13 Apex classes, 12 tes
 - ☐ 9. If not done yet: delete the private key with `Remove-Item C:\Lumenfield-keys\steward-ci.key`. GitHub holds the copy the pipeline needs
 - ☐ 10. If not done yet: Setup → Quick Find **Einstein Setup** → confirm **Turn on Einstein** is on (Phase 5 needs it)
 
-**Mine, after the merge**
-- ☐ Verify in the org: the 26 classes and the log object exist, the deployment ran as Steward CI with all 82 tests passing, and every class met the gate. Record it in `CHANGELOG.md` v0.3 and close this section
-- ☐ Note which path the deploy took. Phase 3 settles it: a quick deploy runs no tests, the fallback runs all 82 again. (Carried from Phase 2, where both paths looked the same because there was no Apex.)
+**Mine**
+- ☐ Read the second validation's results from the org: every test passing, and every class at 90% or more
+- ☐ After the merge, verify in the org: the 26 classes and the log object exist, and the deployment ran as Steward CI. Record it in `CHANGELOG.md` v0.3 and close this section
+- ☐ Note which path the deploy took. Phase 3 settles it: a quick deploy runs no tests, the fallback runs all 83 again. (Carried from Phase 2, where both paths looked the same because there was no Apex.)
 
 **Known and accepted**
 - ⊘ No retrieve manifest for Phase 3: everything was built in source, nothing in Setup
@@ -70,6 +69,8 @@ The first change went through the whole pipeline: pull request #1 validated as S
 - The org has no Apex triggers and no workflow rules. Accord's automation is 9 record-triggered flows and 3 scheduled flows. The scheduled ones (account status, broken-promise count, promise evaluation) don't run during Apex tests, so tests set those fields themselves
 - No household in Accord's data has an escalator step in its statements
 - Salesforce Platform licenses: six, none used. The Standard Platform User profile can read and create accounts and contacts only, with no access to cases or Accord's objects, which makes it a clean "can't see anything" test user
+- From the first validation: a plain query in an Apex test checks field-level security, so it can't read fields nobody has access to (S-09's new log fields). Read-backs now say `WITH SYSTEM_MODE`
+- From the same run: `Security.stripInaccessible` let the pipeline user (System Administrator) create `Case.AccountId`, though the profile's field permission says read-only. Phase 6 checks the agent user (S-14)
 
 **2026-10-16 (Phase 1)**
 - Omni-Channel is on: `sfdc_livemessage` and `sfdc_phone` service channels exist
@@ -128,5 +129,6 @@ The first change went through the whole pipeline: pull request #1 validated as S
 - **Data 360 usage is capped** too, which is why ST-14 is a Should.
 - **Five customer licenses.** The plan uses three test households, which leaves room for a fourth if a test needs one.
 - **No spare Salesforce licenses** now that Steward CI has the fourth. A second persona user would mean switching Test Persona between roles, as Accord did. Apex tests use a Salesforce Platform user instead.
-- **Apex test time.** Every pull request now runs 82 tests in the org, and five of them build 200 households through Accord's flows. If a run nears the CPU limit, the bulk tests are where to look.
+- **Apex test time.** Every pull request now runs 83 tests in the org, and five of them build 200 households through Accord's flows. The first run's tests took about 4 minutes, and the slowest bulk test 21 seconds. If a run nears the CPU limit, the bulk tests are where to look.
+- **Nobody can read the action log's fields yet**, the admin included, until `PS_Steward_Supervisor` in Phase 6. Records are written and counted, but anyone opening one would see only its number and outcome. Expected for now.
 - **Accord's DEF-07 is unfinished** (the Commitments related list isn't on the account layout). That's tracked in Accord's open items. Steward depends only on the `Account__c` field, which is done.

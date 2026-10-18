@@ -495,6 +495,38 @@ private class PaymentArrangementServiceTest {
   }
 
   @IsTest
+  static void aSaveThePlatformRejectsIsReportedNotThrown() {
+    Id householdId = households()[PAST_DUE_190].Id;
+    // Passes every policy check, but is too large for the currency field, so the save fails.
+    Decimal tooLarge = 1000000000000000.00;
+
+    Test.startTest();
+    PaymentArrangementService.ArrangementResult result = createOne(
+      householdId,
+      Date.today().addDays(10),
+      tooLarge
+    );
+    Test.stopTest();
+
+    Assert.areEqual(
+      StewardOutcome.FAILED,
+      result.outcome,
+      'Failed, not thrown'
+    );
+    Assert.areEqual(
+      PaymentArrangementService.SAVE_FAILED,
+      result.reasonCode,
+      'Because the save failed'
+    );
+    Assert.isTrue(
+      String.isNotBlank(result.failureDetail),
+      'The platform\'s message is kept for the log'
+    );
+    Assert.isNull(result.promiseId, 'No promise is reported');
+    Assert.areEqual(0, promiseCount(householdId), 'Nothing saved');
+  }
+
+  @IsTest
   static void neverLeavesBehindAPromiseThatNeedsApproval() {
     List<Account> accounts = households();
     Integer accordsWindow = windowDays();

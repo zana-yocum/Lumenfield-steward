@@ -9,6 +9,8 @@
  */
 @IsTest
 private class AccountSnapshotServiceTest {
+  private static final String ORGANIZATION_NAME = 'Steward Test Organization';
+
   @TestSetup
   static void createData() {
     List<StewardTestData.Household> households = StewardTestData.createHouseholds(
@@ -74,6 +76,14 @@ private class AccountSnapshotServiceTest {
       disputed,
       statements[4],
       'Payment Not Posted'
+    );
+    // Inserted here rather than in the test method: an account insert followed by a user insert in
+    // one test made that test take two minutes in the first Phase 3 validation.
+    insert new Account(
+      Name = ORGANIZATION_NAME,
+      RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
+        .get('Organization')
+        .getRecordTypeId()
     );
   }
 
@@ -246,13 +256,12 @@ private class AccountSnapshotServiceTest {
   @IsTest
   static void outOfReachHouseholdsAreNotFound() {
     Id knownId = households()[0].Id;
-    Account organization = new Account(
-      Name = 'Steward Test Organization',
-      RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-        .get('Organization')
-        .getRecordTypeId()
-    );
-    insert organization;
+    Account organization = [
+      SELECT Id
+      FROM Account
+      WHERE Name = :ORGANIZATION_NAME
+      LIMIT 1
+    ];
     User outsider = StewardTestData.createUserWithoutAccess();
 
     AccountSnapshotService.Snapshot asOutsider;
