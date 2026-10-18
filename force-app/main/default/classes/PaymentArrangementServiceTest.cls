@@ -497,8 +497,9 @@ private class PaymentArrangementServiceTest {
   @IsTest
   static void aSaveThePlatformRejectsIsReportedNotThrown() {
     Id householdId = households()[PAST_DUE_190].Id;
-    // Passes every policy check, but is too large for the currency field, so the save fails.
-    Decimal tooLarge = 1000000000000000.00;
+    // Passes every policy check, but the currency field holds 16 digits before the decimal point
+    // and this has 21, so the save fails. (16 digits fit: the second Phase 3 validation saved one.)
+    Decimal tooLarge = 100000000000000000000.00;
 
     Test.startTest();
     PaymentArrangementService.ArrangementResult result = createOne(

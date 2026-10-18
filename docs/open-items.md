@@ -6,15 +6,18 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ---
 
-## Phase 3 — Apex services — built 2026-10-18, first validation fixed
+## Phase 3 — Apex services — built 2026-10-18, in validation
 
 Built and checked before delivery (`CHANGELOG.md` v0.3): 13 Apex classes, 12 test classes with 83 tests, `Agent_Action_Log__c`, the 90% per-class coverage gate, 14 explainers, and decision S-14.
 
-**First validation**, 2026-10-18 10:24 (`0Afaj00000oBq9lCAC`): all 36 components deployed, and 78 of 82 tests passed. The 4 failures were all in `AgentActionLoggerTest`: field-level security on the new log fields stopped the tests' plain read-back queries. The run also measured `PaymentArrangementService` at 87.1%, which the coverage gate would have stopped. Both are fixed, and a test that took two minutes is fixed too (details in `CHANGELOG.md` v0.3).
+**First validation**, 2026-10-18 10:24 (`0Afaj00000oBq9lCAC`): all 36 components deployed, and 78 of 82 tests passed. The 4 failures were all in `AgentActionLoggerTest`: field-level security on the new log fields stopped the tests' plain read-back queries. The run also measured `PaymentArrangementService` at 87.1%, which the coverage gate would have stopped.
+
+**Second validation**, 10:51 (`0Afaj00000oBuQHCA0`): 82 of 83 passed, and the slow test now takes 1.4 seconds. The one failure was the new test for a rejected save, whose amount was small enough to fit the currency field. The test now uses a bigger amount (details in `CHANGELOG.md` v0.3).
 
 **Your steps**
 - ☑ 1–5. Branch, zip, commit, publish, pull request (2026-10-18)
-- ☐ 6. Update the pull request with the fix. In GitHub Desktop, check **Current Branch** says `feature/phase-3-apex-services`. Extract `steward-phase3-fix1.zip` into `C:\Lumenfield-steward` and replace the files. Commit with the summary `ST-04 ST-11: fix the log tests' read-backs, test a rejected promise save`, then **Push origin**. The **validate** check starts again on its own and takes about 6 minutes
+- ☑ 6. First fix (`steward-phase3-fix1.zip`) committed and pushed, 10:51
+- ☐ 6b. Second fix. In GitHub Desktop, check **Current Branch** says `feature/phase-3-apex-services`. Extract `steward-phase3-fix2.zip` into `C:\Lumenfield-steward` and replace the files. Commit with the summary `ST-04: a bigger amount for the rejected-save test`, then **Push origin**. The **validate** check starts again on its own and takes about 4 minutes
 - ☐ 7. When it's green: **Merge pull request** → **Confirm merge** → **Delete branch**. On the **Actions** tab, wait for **Deploy** to go green
 - ☐ 8. Tags, in PowerShell from `C:\Lumenfield-steward`. This replaces the stray `Push-orgin` tag and tags all three phases. If a delete line says the tag doesn't exist, that's fine; carry on:
   ```powershell

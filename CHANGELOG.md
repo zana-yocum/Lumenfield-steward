@@ -52,6 +52,14 @@ The first run on the pull request (validation `0Afaj00000oBq9lCAC`, 2026-10-18) 
 - **A detail for S-14.** `Case.AccountId` is read-only in the System Administrator profile's field permissions, but the platform's own create check (`Security.stripInaccessible`) left it in place for the pipeline user. So for an admin, the field permission isn't the whole story. Phase 6 checks what the agent user gets. S-14 is unchanged, because it gives the same result either way.
 - Coverage per class from this run, before the fix: 100% for 9 classes; `AccountSnapshotService` 99.0%, `DisputeEvidenceCatalog` 98.3%, `DisputeIntakeService` 92.1% and `PaymentArrangementService` 87.1%. Run on these real numbers, `scripts/check_coverage.py` fails `PaymentArrangementService` and passes the rest.
 
+### The second validation, and one more fix
+The second run (validation `0Afaj00000oBuQHCA0`, 2026-10-18) passed 82 of 83 tests:
+- The four log tests passed.
+- The two-minute test took 1.4 seconds, and the whole test run took 114 seconds instead of 227.
+- The one failure was the new test. Its amount, 1,000,000,000,000,000, has 16 digits, and the currency field holds 16 before the decimal point. So the promise saved, and the test found `COMPLETED` where it expected `FAILED`. The field's definition in the org (precision 18, scale 2) confirms it.
+
+**Fix:** the test now uses 21 digits.
+
 ### Verified in the org
 Filled in after the merge, from the pipeline run and the org. Until then, nothing above counts as passed in the org.
 
