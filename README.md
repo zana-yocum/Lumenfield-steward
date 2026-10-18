@@ -4,7 +4,7 @@ Steward is the second Lumenfield Home Energy project, built on the same Salesfor
 
 **The rule it's built around:** the agent can never do what a person in the same seat can't. It acts only for the logged-in customer's household, every record it creates goes through Accord's policy, and every action it takes, or declines, is logged for a supervisor.
 
-**Status:** Phase 1 of 10 complete (requirements). **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md)
+**Status:** Phase 2 of 10 in progress (pipeline). **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md)
 
 ---
 
@@ -27,7 +27,7 @@ The same way as Accord: requirements before configuration, decisions written dow
 | # | Phase | Status |
 |---|---|---|
 | 1 | Requirements: 18 stories, 6 agent guardrails, 11 decisions | Done, 2026-10-16 |
-| 2 | Setup: pipeline skeleton, CI sign-in, branch and push protection | Next |
+| 2 | Pipeline: validate on every pull request, quick deploy on merge, CI sign-in by certificate | In progress |
 | 3 | Apex services and the agent action log | Planned |
 | 4 | Customer portal | Planned |
 | 5 | Rep assistant | Planned |
@@ -42,13 +42,15 @@ Phases 1–6 and 10 are the core release. Phases 7–9 follow.
 ## Repository
 
 ```
-force-app/main/default/   Steward metadata (source format), from Phase 3
+.github/workflows/        validate.yml (pull requests) and deploy.yml (merges to main)
+force-app/main/default/   Steward metadata (source format)
 manifest/                 Retrieve manifests, one per phase
 tests/agent/              Agent test specs (Phase 10)
 docs/
   brief.md                The problem, scope, architecture and phases
   requirements.md         Stories, guardrails, what each audience can see, traceability
-  decision-log.md         S-01 to S-11
+  decision-log.md         S-01 to S-13
+  pipeline.md             How a change reaches the org, and how the pipeline was set up
   conventions.md          Naming and coding standards
   explainers/             One page per component, from Phase 3
   open-items.md           Everything deferred, flagged or not done yet

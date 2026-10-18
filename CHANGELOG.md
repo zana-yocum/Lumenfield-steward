@@ -2,6 +2,28 @@
 
 Newest first. One entry per phase.
 
+## v0.2 — 2026-10-16 — Phase 2: Pipeline (in progress)
+
+Every org change now goes through a pull request that's validated against the org before it can merge. Phase 2 closes when the first deploy is confirmed in the org.
+
+### Added
+- `.github/workflows/validate.yml`: on every pull request, a Prettier check, Jest (once components exist), Code Analyzer with critical and high findings blocking, sign-in as the Steward CI user by JWT, and a check-only deployment with local Apex tests. The validation's job ID is kept for 10 days
+- `.github/workflows/deploy.yml`: on a merge that changes `force-app/`, finds the pull request's passing validation and quick-deploys it, falling back to a fresh deploy with the same tests if Salesforce won't accept the quick deploy. Refuses changes that didn't come through a validated pull request
+- `docs/pipeline.md`: how a change reaches the org, what protects each step, the secrets, known limits, key rotation, and the setup steps
+- The first change sent through the pipeline: three new `Policy_Setting__mdt` records, `Self_Service_Broken_Promise_Limit` (2), `Self_Service_Min_Coverage_Pct` (100) and `Production_Guarantee_Pct` (90). Moved up from Phase 3 because they're small, real and harmless until Phase 3 code reads them
+- `package-lock.json`, so the pipeline installs exactly the same tool versions every time
+- Decisions S-12 (the pipeline signs in as its own user, with a certificate) and S-13 (pull requests for anything that deploys; docs can go straight to `main`)
+
+### Changed
+- ST-13 criteria: the quick-deploy fallback and the refusal of direct pushes are now acceptance criteria
+- Prettier checks code files only. Metadata XML stays exactly as Salesforce retrieves it, so retrieves don't create formatting noise
+- `@prettier/plugin-xml` removed; nothing uses it now
+
+### Checked before delivery
+- Both workflows pass actionlint, including its shell checks
+- Code Analyzer 5.16 on `force-app/`: 0 violations
+- The three records convert to Metadata API format cleanly (one `CustomMetadata` type, API 68.0)
+
 ## v0.1 — 2026-10-16 — Phase 1: Requirements
 
 Stories, guardrails and decisions, written against what's actually in the org (read 2026-10-16) rather than against assumptions.

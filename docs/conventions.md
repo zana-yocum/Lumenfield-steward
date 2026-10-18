@@ -47,6 +47,7 @@ Accord's IDs (`US-xx`, `D-xx`, `DEF-xx`) keep their meaning. Steward's carry an 
 - Services take lists, and nothing queries or saves inside a loop.
 - Tests build their data with `StewardTestData` in `@TestSetup`, assert outcomes with a message, use `System.runAs` as a customer or the agent user to prove access (ST-12), and mock callouts with `HttpCalloutMock`. No `SeeAllData`.
 - Formatting by Prettier with the Apex plugin. Code Analyzer must report nothing at severity 1 or 2.
+- Prettier formats code only (Apex, JavaScript, HTML, CSS). Metadata XML stays exactly as Salesforce retrieves it, so a retrieve never creates formatting noise in a pull request.
 
 ---
 

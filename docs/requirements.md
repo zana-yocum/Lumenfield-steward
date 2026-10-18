@@ -330,14 +330,15 @@ Every agent story inherits these six rules. They all come from one principle: **
 
 **Acceptance criteria**
 - **Given** a pull request to `main`, **when** it opens, **then** GitHub Actions runs Salesforce Code Analyzer, the Jest tests, and a check-only deploy to the org with local Apex tests, and the pull request can't merge unless all three pass.
-- **Given** a merge to `main`, **when** its validation passed, **then** the workflow quick-deploys that validated deployment instead of deploying again.
+- **Given** a merge to `main`, **when** its validation passed, **then** the workflow quick-deploys that validated deployment instead of deploying again. If Salesforce won't accept the quick deploy, it deploys again with the same tests, and the log says which path it took.
+- **Given** a change to `force-app/` pushed straight to `main`, **when** the deploy workflow runs, **then** it refuses to deploy and says why.
 - **Given** a Steward Apex class below 90% coverage, **when** the pull request runs, **then** the check fails.
 - **Given** a change to the agent's Agent Script, **when** it merges, **then** it deploys through the same pipeline, and the new version is published and activated only after the agent test suites pass.
 - **Given** configuration that can only be built in Setup (site pages, the messaging channel, Data 360), **when** it changes, **then** it's retrieved into the repo and committed the same day, so the repo stays the record of what's in the org.
 - **Given** a key or password, **when** anyone tries to push it, **then** GitHub push protection blocks it. Runtime secrets live in External Credentials; the pipeline's live in GitHub encrypted secrets.
 - **Given** a failing test, **when** the pull request runs, **then** nothing deploys.
 
-**Notes:** The pipeline validates against the same Developer Edition org it deploys to. A real team would validate in a sandbox first (S-05).
+**Notes:** The pipeline validates against the same Developer Edition org it deploys to. A real team would validate in a sandbox first (S-05). How it works and how it was set up: `docs/pipeline.md` (S-12, S-13).
 
 ---
 
@@ -457,7 +458,7 @@ Planned components now; built components and test evidence are filled in as each
 | ST-10 | 5 | `Steward_Followup_Draft` prompt template | UAT-S10 |
 | ST-11 | 3, 6 | `Agent_Action_Log__c`, `AgentActionLogger`, Steward Agent dashboard | Apex tests, UAT-S11 |
 | ST-12 | 3, 4, 6, 10 | Session identity (S-07), `PS_Steward_Agent`, `docs/security-model.md` | Apex scoping tests, cross-household agent suite |
-| ST-13 | 2, 10 | `.github/workflows/`, branch protection, push protection | Pipeline run evidence |
+| ST-13 | 2, 10 | `validate.yml`, `deploy.yml`, `Steward_CI` external client app, `PS_Steward_CI`, `Protect main` ruleset, push protection | Pipeline run evidence |
 | ST-14 | 8 | Ingestion API stream, identity resolution, `Production_vs_Guarantee` calculated insight, `ProductionGuaranteeService` | UAT-S14 |
 | ST-15 | 9 | `customerTimeline` component, `CustomerTimelineController` | Jest, Apex tests, UAT-S15 |
 | ST-16 | 6 | Agent Script welcome message and scope instructions | Agent suite, UAT-S16 |
