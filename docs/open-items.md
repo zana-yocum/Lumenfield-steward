@@ -26,8 +26,8 @@ Pull request #2 passed its third validation, merged, and the pipeline quick-depl
   git tag -f v0.1 d4afaa0
   git tag -f v0.2 a32a79a
   git tag -f v0.3 6790b1f
-  git push https://Zana-yocum@github.com/Zana-yocum/lumenfield-steward.git v0.1 v0.2 v0.3
-  git push https://Zana-yocum@github.com/Zana-yocum/lumenfield-steward.git --delete Push-orgin
+  git push https://Zana-yocum@github.com/zana-yocum/Lumenfield-steward.git v0.1 v0.2 v0.3
+  git push https://Zana-yocum@github.com/zana-yocum/Lumenfield-steward.git --delete Push-orgin
   ```
 - ☐ 9. If not done yet: delete the private key with `Remove-Item C:\Lumenfield-keys\steward-ci.key`. GitHub holds the copy the pipeline needs
 - ☐ 10. If not done yet: Setup → Quick Find **Einstein Setup** → confirm **Turn on Einstein** is on (Phase 5 needs it)
