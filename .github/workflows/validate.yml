@@ -1,7 +1,8 @@
-# ST-13 · S-05 · S-12
+# ST-13 · S-05 · S-12 · NFR-03
 # Runs on every pull request to main. Checks formatting, runs component tests and
 # static analysis, then asks the org to validate the deployment with local Apex
-# tests. Nothing is deployed here; the validation's job ID is kept for the merge.
+# tests and checks every Steward class is at 90% coverage or more. Nothing is
+# deployed here; the validation's job ID is kept for the merge.
 name: Validate
 
 on:
@@ -46,6 +47,9 @@ jobs:
           else
             echo "No Lightning web components yet, so there's nothing to test."
           fi
+
+      - name: Test the coverage gate script
+        run: python3 -m unittest discover -s tests/pipeline -v
 
       - name: Install the Salesforce CLI and Code Analyzer
         run: |
@@ -97,6 +101,13 @@ jobs:
           fi
           jq -r '.result.id' validate.json > validation-id.txt
           echo "Validation job ID: $(cat validation-id.txt)"
+
+      # The org's own rule is 75% across all code. Steward's is 90% for every class on its
+      # own (ST-13, NFR-03). If this fails, the job ID isn't kept, so nothing can deploy.
+      - name: Coverage gate (90% per class)
+        env:
+          COVERAGE_GATE_PCT: "90"
+        run: python3 scripts/check_coverage.py validate.json force-app "$COVERAGE_GATE_PCT"
 
       - name: Keep the validation job ID for the merge
         uses: actions/upload-artifact@v6

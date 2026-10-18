@@ -4,7 +4,7 @@ Steward is the second Lumenfield Home Energy project, built on the same Salesfor
 
 **The rule it's built around:** the agent can never do what a person in the same seat can't. It acts only for the logged-in customer's household, every record it creates goes through Accord's policy, and every action it takes, or declines, is logged for a supervisor.
 
-**Status:** Phase 2 of 10 complete (pipeline). Next: Apex services. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md)
+**Status:** Phase 3 of 10 built: the Apex services the agent and portal will call, and the agent action log. Next: the customer portal. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
 
 ---
 
@@ -28,8 +28,8 @@ The same way as Accord: requirements before configuration, decisions written dow
 |---|---|---|
 | 1 | Requirements: 18 stories, 6 agent guardrails, 11 decisions | Done, 2026-10-16 |
 | 2 | Pipeline: validate on every pull request, quick deploy on merge, CI sign-in by certificate | Done, 2026-10-17 |
-| 3 | Apex services and the agent action log | Next |
-| 4 | Customer portal | Planned |
+| 3 | Apex services and the agent action log: 13 classes, 82 tests, a 90% per-class coverage gate | Built, 2026-10-18 |
+| 4 | Customer portal | Next |
 | 5 | Rep assistant | Planned |
 | 6 | Service agent | Planned |
 | 7 | Payments | Planned |
@@ -44,18 +44,29 @@ Phases 1–6 and 10 are the core release. Phases 7–9 follow.
 ```
 .github/workflows/        validate.yml (pull requests) and deploy.yml (merges to main)
 force-app/main/default/   Steward metadata (source format)
+  classes/                Apex services and their tests
+  objects/                Agent_Action_Log__c
+  customMetadata/         Steward's policy settings
 manifest/                 Retrieve manifests, one per phase
-tests/agent/              Agent test specs (Phase 10)
+scripts/                  check_coverage.py, the 90% per-class coverage gate
+tests/
+  agent/                  Agent test specs (Phase 10)
+  pipeline/               Tests for the pipeline's own scripts
 docs/
   brief.md                The problem, scope, architecture and phases
   requirements.md         Stories, guardrails, what each audience can see, traceability
-  decision-log.md         S-01 to S-13
+  decision-log.md         S-01 to S-14
   pipeline.md             How a change reaches the org, and how the pipeline was set up
   conventions.md          Naming and coding standards
-  explainers/             One page per component, from Phase 3
+  explainers/             One page per Apex class, written for an interview walkthrough
   open-items.md           Everything deferred, flagged or not done yet
+code-analyzer.yml         Changes to Code Analyzer's default rules, each with its reason
 CHANGELOG.md
 ```
+
+## The Apex, in one paragraph
+
+Every service checks the household first, in user mode, so an ID from someone else's household gets the same answer as an ID that doesn't exist. Services return outcome codes and figures, never sentences, so the agent can only word what the records say. Every limit comes from Accord's policy records, and writes go through Accord's own flows and rules. If Accord would send a new promise for approval, the service rolls it back rather than leave a supervisor something to approve. Only three operations run outside user mode, and each is a named decision with its own tests: the commitments read (S-08), the action log write (S-09) and the dispute insert (S-14). The [explainers](docs/explainers/README.md) walk through each class.
 
 Component descriptions cite stories (`ST-xx`) and decisions (`S-xx`), so anything in `force-app/` can be traced back to why it exists.
 

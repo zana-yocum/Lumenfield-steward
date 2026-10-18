@@ -13,12 +13,13 @@ The decisions that shape Steward, the options considered, and why one was chosen
 | S-05 | The pipeline validates against the org; no scratch orgs | Decided |
 | S-06 | What the agent may never do | Decided |
 | S-07 | The model never chooses whose data to read | Decided · mechanism confirmed in Phase 6 |
-| S-08 | Customers see commitments through a scoped read service | Proposed · Phase 4 |
-| S-09 | Agent outcomes are logged to a custom object | Proposed · Phase 3 |
+| S-08 | Customers see commitments through a scoped read service | Proposed · built in Phase 3, confirmed in Phase 4 |
+| S-09 | Agent outcomes are logged to a custom object | Decided |
 | S-10 | The agent's definition lives in Git and ships through the pipeline | Decided |
 | S-11 | The portal is an LWR site | Proposed · Phase 4 |
 | S-12 | The pipeline signs in as its own user, with a certificate | Decided |
 | S-13 | Pull requests are required for anything that deploys | Decided |
+| S-14 | Dispute cases are saved in system mode, with the caller's create access applied to every other field | Decided |
 
 ---
 
@@ -147,12 +148,14 @@ The agent never:
 
 **Why:** Option 3 keeps one source of truth and exposes the minimum. Accord's DEF-07 lookup (`Commitment__c.Account__c`) makes the household filter a single field.
 
-**Consequences:** This is the one exception to user mode (NFR-01). It lives in an inner class with a comment citing S-08, and tests prove that a customer, the agent, and a portal call carrying another household's ID each get only their own household's commitments.
+**Consequences:** This is one of three named exceptions to user mode (NFR-01), with S-09 and S-14. It lives in an inner class with a comment citing S-08, and tests prove that a customer, the agent, and a portal call carrying another household's ID each get only their own household's commitments.
+
+**Built in Phase 3** as `CommitmentReadService`. The user-mode household check runs first, and the elevated read is a single query in an inner `Elevated` class that selects only the five customer fields. `CommitmentReadServiceTest` runs as a user with no access to commitments or opportunities: given read access to one household, the user gets that household's commitments through the service, while the user's own query on `Commitment__c` is blocked and a second household stays not found. Phase 4 confirms in the org that customer licenses can't be given opportunity access, which is what makes the service necessary.
 
 ---
 
 ### S-09 — Agent outcomes are logged to a custom object
-**Status:** Proposed · confirm in Phase 3
+**Status:** Decided · confirmed in Phase 3
 
 **Context:** Supervisors need to see what the agent did, including requests it declined, where nothing else in the org changes (ST-11).
 
@@ -164,6 +167,8 @@ The agent never:
 **Why:** A declined request is a business event, and the reason ("date outside the 30-day window") is what a supervisor needs. Only the action knows it. Option 2 turns it into a reportable record.
 
 **Consequences:** Every action writes a log record, failures included, and never stores sensitive text. Built-in analytics, where available, supplement it. Payment callouts log failures to `Integration_Log__c` the same way.
+
+**Confirmed in Phase 3.** `Agent_Action_Log__c` has six fields: account, action, outcome, reason code, details and conversation ID. The outcome is a required, restricted picklist with exactly the four outcome codes' labels, so the dashboard can't drift from what the services return. `AgentActionLogger` writes in system mode from an inner class without sharing. That's the second named exception to user mode (NFR-01), and it's deliberate: a declined request about an account the caller can't see must still be recorded, and the agent user then needs no access to the log object at all. Reading works the other way: the object is Private, and only supervisors and admins get read access, through permission sets in Phase 6. Card numbers are removed before saving (`SensitiveText`), and a log that fails to save is reported, never thrown, so logging can't break the action a customer is waiting on.
 
 ---
 
@@ -225,3 +230,19 @@ The agent never:
 **Why:** The rule that matters is that nothing reaches the org without validation. The deploy workflow enforces it directly: it runs only when `force-app/` changes, and it refuses any change that didn't come through a pull request with a passing validation. Documentation doesn't touch the org.
 
 **Consequences:** The ruleset on `main` requires a pull request and the `validate` check, with the repository admin allowed to bypass it for doc commits. A direct push that changes `force-app/` fails the deploy workflow with a message saying why. Doc commits put open pull requests behind `main`, so they need updating before they merge.
+
+---
+
+### S-14 — Dispute cases are saved in system mode, with the caller's create access applied to every other field
+**Status:** Decided
+
+**Context:** A dispute has to be created on the household's account. The account is what ties the case to the customer, and Accord's `Case_BeforeSave_StampEntitlement` flow uses it to find the SLA entitlement while the case is being created. But `Case.AccountId` is read-only in all 42 profiles and permission sets in the org that include it, System Administrator among them (read 2026-10-18). A user-mode insert that sets the account fails for every user, including the pipeline user that runs the tests.
+
+**Options**
+1. Grant edit on `Case.AccountId` to whoever creates disputes: the agent's permission set in Phase 6, plus System Administrator so the tests can run in user mode. That widens access on a field nobody in the org can edit today. It also isn't limited to new cases: anyone with edit can move an existing case to another account.
+2. Leave the account blank and rely on the contact. The household would then depend on the contact's account rather than on the verified household (S-07), and the SLA would depend on the platform filling in the account before Accord's flow looks for the entitlement.
+3. Save the case in system mode, after applying the caller's own create access to the Case object and to every other field it sets (`Security.stripInaccessible`). **← decided**
+
+**Why:** Option 3 changes nobody's access. All system mode adds is the one field nobody can set, on a record the caller is otherwise allowed to create in full, and the account it sets is always the verified household, already checked in user mode. Option 1 would give the agent a standing ability to move cases between households, which is exactly the reach S-06 rules out.
+
+**Consequences:** `DisputeIntakeService` refuses with `ACCESS_DENIED`, and saves nothing, when the caller can't create cases or set any field other than the account. A test proves it for a user with no Case access. This is the third named exception to user mode (NFR-01), after S-08 and S-09. It's one statement with a comment citing S-14. The agent user still needs Case create and access to the dispute fields, and read access through sharing to see the case number once the case is in the queue (Phase 6). If edit on `Case.AccountId` is ever granted for another reason, the insert can move to user mode and this exception can be removed.

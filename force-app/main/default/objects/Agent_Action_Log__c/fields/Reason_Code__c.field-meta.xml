@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Reason_Code__c</fullName>
+    <description>ST-11. Why the outcome happened, as the service&apos;s reason code: DATE_OUTSIDE_WINDOW, EXISTING_DISPUTE, NOT_FOUND and so on. The policy reason a supervisor needs.</description>
+    <externalId>false</externalId>
+    <label>Reason Code</label>
+    <length>80</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

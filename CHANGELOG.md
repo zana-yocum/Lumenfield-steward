@@ -2,6 +2,51 @@
 
 Newest first. One entry per phase.
 
+## v0.3 — 2026-10-18 — Phase 3: Apex services and the agent action log
+
+The services the portal and the agent will call, with the action log the supervisor's dashboard will read. Every service checks the household first, in user mode, and returns outcome codes and figures rather than sentences. Every limit comes from Accord's policy records. Every write goes through Accord's own flows and rules. Only three operations run outside user mode, and each is a named decision with its own tests (S-08, S-09, S-14). No agent, portal or permission set yet: those are Phases 4 and 6.
+
+### Added
+- **Services, one per story:** `AccountSnapshotService` (ST-01), `CommitmentReadService` (ST-02, S-08), `StatementExplanationService` with `AmountDueComparison` (ST-03), `PaymentArrangementService` with `ArrangementEligibility` (ST-04), and `DisputeIntakeService` with `DisputeEvidenceCatalog` (ST-06)
+- **Shared building blocks:** `HouseholdScope`, the household check every service runs first (ST-12). `PolicySettings`, the only reader of `Policy_Setting__mdt`. `StewardOutcome`, the outcome and reason codes. `SensitiveText`, which removes card numbers before anything is saved
+- **The action log** (ST-11, S-09): the `Agent_Action_Log__c` object (six fields, Private, outcome as a required restricted picklist) and `AgentActionLogger`
+- **Tests:** 12 test classes with 82 test methods, and `StewardTestData`. Known answers are asserted to the cent: $310.00 owed and $190.00 past due; an escalator step of exactly $3.48 at the agreement's anniversary; a $40 posted credit leaving $83.48. Each service has a scoping test that runs as a user who can't see the household, and a 200-record bulk test with its query count asserted
+- **The 90% per-class coverage gate** (ST-13): `scripts/check_coverage.py`, its 12 tests in `tests/pipeline/`, and two new steps in `validate.yml`. The gate reads the coverage from the check-only deployment and fails closed. If it fails, the validation's job ID isn't kept, so the merge has nothing to deploy
+- `code-analyzer.yml`: one documented change to Code Analyzer's defaults
+- 14 explainers in `docs/explainers/`, one per class plus the test data factory (NFR-04)
+- Decision S-14: dispute cases are saved in system mode, with the caller's create access applied to every other field
+
+### Changed
+- S-09 (agent outcomes logged to a custom object) is decided. S-08 is built and still confirmed in Phase 4
+- NFR-01 names its three exceptions: S-08, S-09 and S-14
+- `docs/conventions.md`: the real `PolicySettings` method names, the three exceptions, `HouseholdScope` first, request constructors limited to three parameters, the coverage gate, and `code-analyzer.yml`
+- `docs/requirements.md`: a "Built so far" column in the traceability table. ST-04's notes record the minimum-amount floor and the rollback. The new policy settings are recorded as created in Phase 2, not Phase 3
+- `docs/pipeline.md`: the coverage gate, Code Analyzer settings, and two new known limits
+- Version 0.3.0
+
+### Found in the org while building, and what it changed
+- **`Case.AccountId` is read-only in all 42 profiles and permission sets** that include it, System Administrator among them. Accord's entitlement flow needs the account when a case is created. A user-mode insert would fail for every user, so the dispute insert is the one system-mode write, after the caller's own create access is applied to every other field (S-14).
+- **Accord's `Out_of_Policy__c` formula** sends any promise for less than the past-due balance to approval. So the self-service minimum can be raised by its setting but never lowered below the full balance.
+- **Accord's promise flow moves an out-of-policy promise to Pending Approval** instead of failing the save. `PaymentArrangementService` reads every new promise back, and rolls back any save that left one needing approval (GR-03).
+- **Assignment rules don't run on cases Apex creates** unless asked. The dispute service sets the default-rule option, and a test checks the case lands in the Dispute Specialists queue.
+- **`VR_Account_PrimaryContactRequired` blocks account updates** without a primary contact, including the roll-up recalculations statements trigger. Test households get their contact before anything else.
+- **No household in Accord's data has an escalator step yet.** The known-answer test builds its own. Two demo statements are an open item for the agent phases.
+- **No Salesforce license is free** for a test user. Access tests run as a Standard Platform User (six licenses free), which can read accounts only where sharing allows.
+
+### Checked before delivery
+- Prettier: every Apex file passes
+- Every class and test type-checked against Accord's schema with the Apex language server, against a copy of the org's objects and fields: no errors
+- Every query's fields checked against the org's schema
+- Every field the code writes checked writable in the org, with no formula, roll-up or auto-number field assigned. Every required field on the objects the tests insert is set
+- Field-level security for the System Administrator profile, which the pipeline user runs the tests with: every field the services read or write in user mode is open to it, apart from `Case.AccountId`, which S-14 handles
+- Every active validation rule and record-triggered flow on the objects the tests insert read from the org, and the test data checked against each: 11 validation rules and 9 flows. The org has no Apex triggers or workflow rules
+- Code Analyzer 5.16 on `force-app/`: 0 violations at any severity
+- The coverage gate's 12 tests pass. Run against the real classes, it gates the 13 production classes and skips the 13 test classes
+- Both workflows pass actionlint, including its shell checks
+
+### Verified in the org
+Filled in after the merge, from the pipeline run and the org. Until then, nothing above counts as passed in the org.
+
 ## v0.2 — 2026-10-17 — Phase 2: Pipeline
 
 Every org change now goes through a pull request that's validated against the org before it can merge. The first change went through end to end on 2026-10-17: validated on pull request #1, merged, deployed by the pipeline, and confirmed in the org.
