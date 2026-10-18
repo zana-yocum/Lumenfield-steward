@@ -19,19 +19,11 @@ Pull request #2 passed its third validation, merged, and the pipeline quick-depl
 
 **Your steps**
 - ☑ 1–7. Branch, zip, commit, publish, pull request, two fixes, merge (2026-10-18)
-- ☐ 8. Close-out commit, then tags. In GitHub Desktop: **Current Branch** → `main`, then **Fetch origin**, then **Pull origin** when it appears. Extract `steward-phase3-close.zip` into `C:\Lumenfield-steward` and replace the files. Commit to `main` with the summary `Phase 3 closed: Apex services verified in the org`, then **Push origin**. Docs go straight to `main` (S-13), so nothing validates or deploys. Then in PowerShell from `C:\Lumenfield-steward`. This replaces the stray `Push-orgin` tag and tags all three phases, with v0.3 on the commit you just pushed. If a delete line says the tag doesn't exist, that's fine; carry on:
-  ```powershell
-  git checkout main
-  git pull
-  git push origin --delete Push-orgin
-  git tag -d Push-orgin
-  git tag v0.1 d4afaa0
-  git tag v0.2 a32a79a
-  git tag v0.3
-  git push origin v0.1 v0.2 v0.3
-  ```
-- ☐ 9. If not done yet: delete the private key with `Remove-Item C:\Lumenfield-keys\steward-ci.key`. GitHub holds the copy the pipeline needs
-- ☐ 10. If not done yet: Setup → Quick Find **Einstein Setup** → confirm **Turn on Einstein** is on (Phase 5 needs it)
+- ☑ 8a. Close-out commit pushed from GitHub Desktop (`6790b1f`, 11:28 AM CT). Its files match what was prepared
+- ☑ 8b. Claude connected to GitHub: account linked and the Claude GitHub App installed on `lumenfield-steward` (2026-10-18). Claude can push branches and open pull requests. It can't push or delete tags (refused, 403), so tags stay with you
+- ☑ 8c. Tags pushed with your `Zana-yocum` account, 11:45 AM CT: `v0.1` on `d4afaa0`, `v0.2` on `a32a79a` and `v0.3` on `6790b1f`. The stray `Push-orgin` tag is deleted. The first try was refused because the command line signs in to GitHub as a different account; naming `Zana-yocum@` in the address fixed it. Tags stay with you, so each phase ends with two lines in PowerShell from `C:\Lumenfield-steward`: `git tag v0.4 <commit>`, then `git push https://Zana-yocum@github.com/zana-yocum/Lumenfield-steward.git v0.4`
+- ☑ 9. Private key deleted from `C:\Lumenfield-keys` (11:47 AM CT, by you). The only copy left is the `SF_PRIVATE_KEY` GitHub secret the pipeline uses
+- ☑ 10. **Turn on Einstein** confirmed on in Einstein Setup (11:47 AM CT, checked by hand: the switch can't be read through the API). Phase 5 needs it
 
 **Known and accepted**
 - ⊘ No retrieve manifest for Phase 3: everything was built in source, nothing in Setup
