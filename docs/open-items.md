@@ -6,20 +6,20 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ---
 
-## Phase 3 — Apex services — built 2026-10-18, in validation
+## Phase 3 — Apex services — closed 2026-10-18
 
-Built and checked before delivery (`CHANGELOG.md` v0.3): 13 Apex classes, 12 test classes with 83 tests, `Agent_Action_Log__c`, the 90% per-class coverage gate, 14 explainers, and decision S-14.
+Pull request #2 passed its third validation, merged, and the pipeline quick-deployed it as Steward CI. The 26 classes and the action log are in the org, all 83 tests passed, and every class is at 90% or more (details in `CHANGELOG.md` v0.3).
 
-**First validation**, 2026-10-18 10:24 (`0Afaj00000oBq9lCAC`): all 36 components deployed, and 78 of 82 tests passed. The 4 failures were all in `AgentActionLoggerTest`: field-level security on the new log fields stopped the tests' plain read-back queries. The run also measured `PaymentArrangementService` at 87.1%, which the coverage gate would have stopped.
-
-**Second validation**, 10:51 (`0Afaj00000oBuQHCA0`): 82 of 83 passed, and the slow test now takes 1.4 seconds. The one failure was the new test for a rejected save, whose amount was small enough to fit the currency field. The test now uses a bigger amount (details in `CHANGELOG.md` v0.3).
+- ☑ Built and checked before delivery: 13 Apex classes, 12 test classes with 83 tests, `Agent_Action_Log__c`, the 90% per-class coverage gate, 14 explainers, and decision S-14
+- ☑ First validation, 10:24 AM CT (`0Afaj00000oBq9lCAC`): 78 of 82 tests passed. Fixed: the log tests' read-backs, `PaymentArrangementService` at 87.1%, and a test that took two minutes
+- ☑ Second validation, 10:51 (`0Afaj00000oBuQHCA0`): 82 of 83 passed. Fixed: the rejected-save test's amount fit the currency field
+- ☑ Third validation, 11:03 (`0Afaj00000oBwtVCAS`): 83 of 83 passed, 36 of 36 components. The lowest class is `DisputeIntakeService` at 92.1%
+- ☑ Merged, and deployed at 11:04 (`0Afaj00000oBxXpCAK`) by quick deploy: no tests, 7 seconds. That settles which path the deploy takes, carried from Phase 2
+- ☑ Verified in the org: the 26 classes, Active at API 68.0, and `Agent_Action_Log__c` with its six fields, all last changed by Steward CI
 
 **Your steps**
-- ☑ 1–5. Branch, zip, commit, publish, pull request (2026-10-18)
-- ☑ 6. First fix (`steward-phase3-fix1.zip`) committed and pushed, 10:51
-- ☐ 6b. Second fix. In GitHub Desktop, check **Current Branch** says `feature/phase-3-apex-services`. Extract `steward-phase3-fix2.zip` into `C:\Lumenfield-steward` and replace the files. Commit with the summary `ST-04: a bigger amount for the rejected-save test`, then **Push origin**. The **validate** check starts again on its own and takes about 4 minutes
-- ☐ 7. When it's green: **Merge pull request** → **Confirm merge** → **Delete branch**. On the **Actions** tab, wait for **Deploy** to go green
-- ☐ 8. Tags, in PowerShell from `C:\Lumenfield-steward`. This replaces the stray `Push-orgin` tag and tags all three phases. If a delete line says the tag doesn't exist, that's fine; carry on:
+- ☑ 1–7. Branch, zip, commit, publish, pull request, two fixes, merge (2026-10-18)
+- ☐ 8. Close-out commit, then tags. In GitHub Desktop: **Current Branch** → `main`, then **Fetch origin**, then **Pull origin** when it appears. Extract `steward-phase3-close.zip` into `C:\Lumenfield-steward` and replace the files. Commit to `main` with the summary `Phase 3 closed: Apex services verified in the org`, then **Push origin**. Docs go straight to `main` (S-13), so nothing validates or deploys. Then in PowerShell from `C:\Lumenfield-steward`. This replaces the stray `Push-orgin` tag and tags all three phases, with v0.3 on the commit you just pushed. If a delete line says the tag doesn't exist, that's fine; carry on:
   ```powershell
   git checkout main
   git pull
@@ -33,14 +33,10 @@ Built and checked before delivery (`CHANGELOG.md` v0.3): 13 Apex classes, 12 tes
 - ☐ 9. If not done yet: delete the private key with `Remove-Item C:\Lumenfield-keys\steward-ci.key`. GitHub holds the copy the pipeline needs
 - ☐ 10. If not done yet: Setup → Quick Find **Einstein Setup** → confirm **Turn on Einstein** is on (Phase 5 needs it)
 
-**Mine**
-- ☐ Read the second validation's results from the org: every test passing, and every class at 90% or more
-- ☐ After the merge, verify in the org: the 26 classes and the log object exist, and the deployment ran as Steward CI. Record it in `CHANGELOG.md` v0.3 and close this section
-- ☐ Note which path the deploy took. Phase 3 settles it: a quick deploy runs no tests, the fallback runs all 83 again. (Carried from Phase 2, where both paths looked the same because there was no Apex.)
-
 **Known and accepted**
 - ⊘ No retrieve manifest for Phase 3: everything was built in source, nothing in Setup
 - ⊘ Graph Engine data-flow rules: they start from entry points (invocable and Aura-enabled methods), and Steward has none yet. Run them once the Phase 6 actions exist
+- ⊘ 22 of 864 lines no test reaches yet. Seven are `PaymentArrangementService`'s safety net, which Accord's current rules can't trigger. Thirteen are in `DisputeIntakeService`: a caller who can create cases but not one of the dispute fields, a rejected save, and an over-long description. The field-level refusal is checked with the agent user in Phase 6 (below)
 
 ---
 
@@ -74,6 +70,8 @@ The first change went through the whole pipeline: pull request #1 validated as S
 - Salesforce Platform licenses: six, none used. The Standard Platform User profile can read and create accounts and contacts only, with no access to cases or Accord's objects, which makes it a clean "can't see anything" test user
 - From the first validation: a plain query in an Apex test checks field-level security, so it can't read fields nobody has access to (S-09's new log fields). Read-backs now say `WITH SYSTEM_MODE`
 - From the same run: `Security.stripInaccessible` let the pipeline user (System Administrator) create `Case.AccountId`, though the profile's field permission says read-only. Phase 6 checks the agent user (S-14)
+- From the second validation: `Promise_Amount__c` is Currency(16, 2), which means 16 digits before the decimal point (precision 18 in the API). A 16-digit amount saved, so the rejected-save test uses 21
+- From the merge: a quick deploy shows in the org's deployment history as a deployment that ran no tests and took seconds, with the same package as the validation it reused (`0Afaj00000oBxXpCAK`: 60 files, 7 seconds)
 
 **2026-10-16 (Phase 1)**
 - Omni-Channel is on: `sfdc_livemessage` and `sfdc_phone` service channels exist
@@ -98,7 +96,6 @@ The first change went through the whole pipeline: pull request #1 validated as S
 - ☐ Account owners must have a role before a contact can become a customer user. The admin holds the Collections Supervisor role, so households the admin owns should already qualify; confirm on the test households
 - ☐ Review the text of the 31 commitments' `Terms__c` before customers can see it (ST-02). It was written by sales reps for internal readers. If any is unsuitable, add a customer-facing summary field instead
 - ☐ Confirm in the org that customer licenses can't be given opportunity access (S-08) and that Enhanced Chat works in an LWR site (S-11)
-- ☐ Carry the Phase 3 verification evidence into the repo with the Phase 4 pull request, if it hasn't gone in already
 
 **Phase 6 — Service agent**
 - ☐ Confirm how the logged-in customer's identity reaches the agent (S-07)
@@ -116,6 +113,7 @@ The first change went through the whole pipeline: pull request #1 validated as S
   - **Promise to Pay:** read and create `Promise_Date__c`, `Promise_Amount__c`, `Status__c`; read `Grace_Ends__c`
   - **Case:** create, plus create on `Disputed_Statement__c`, `Service_Contract__c`, `Dispute_Reason__c`, Origin, Subject, Description and Contact. Without them `DisputeIntakeService` answers `ACCESS_DENIED`. Also read access to Billing Dispute cases through sharing, so the agent can read back the case number once the case is in the Dispute Specialists queue
   - **Nothing on** `Commitment__c`, `Opportunity` or `Agent_Action_Log__c`: the services handle those (S-08, S-09)
+- ☐ S-14 with the agent user, two checks. First, what its create access to `Case.AccountId` really is: if it can set the field, the dispute insert moves to user mode and the exception goes. Second, a dispute from a user who can create cases but not one of the dispute fields comes back `ACCESS_DENIED` naming that field, with nothing saved. Phase 3 could only test a user with no Case access (no Salesforce license is free), and the third validation shows the field-level lines never ran
 - ☐ `PS_Steward_Supervisor`: read on `Agent_Action_Log__c`, for the Steward Agent dashboard (ST-11). Reps get nothing on it
 - ☐ When a service returns `HANDOFF`, the reason code goes into the handoff summary, so the rep knows which limit was hit (ST-07)
 - ☐ Run Code Analyzer's Graph Engine rules once the actions exist
@@ -132,6 +130,6 @@ The first change went through the whole pipeline: pull request #1 validated as S
 - **Data 360 usage is capped** too, which is why ST-14 is a Should.
 - **Five customer licenses.** The plan uses three test households, which leaves room for a fourth if a test needs one.
 - **No spare Salesforce licenses** now that Steward CI has the fourth. A second persona user would mean switching Test Persona between roles, as Accord did. Apex tests use a Salesforce Platform user instead.
-- **Apex test time.** Every pull request now runs 83 tests in the org, and five of them build 200 households through Accord's flows. The first run's tests took about 4 minutes, and the slowest bulk test 21 seconds. If a run nears the CPU limit, the bulk tests are where to look.
+- **Apex test time.** Every pull request now runs 83 tests in the org, and five of them build 200 households through Accord's flows. Phase 3's three runs took 227, 114 and 149 seconds of test time. In the third, the slowest test, opening 200 disputes, took 32 seconds. If a run nears the CPU limit, the bulk tests are where to look.
 - **Nobody can read the action log's fields yet**, the admin included, until `PS_Steward_Supervisor` in Phase 6. Records are written and counted, but anyone opening one would see only its number and outcome. Expected for now.
 - **Accord's DEF-07 is unfinished** (the Commitments related list isn't on the account layout). That's tracked in Accord's open items. Steward depends only on the `Account__c` field, which is done.

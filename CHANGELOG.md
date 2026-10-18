@@ -4,7 +4,7 @@ Newest first. One entry per phase.
 
 ## v0.3 — 2026-10-18 — Phase 3: Apex services and the agent action log
 
-The services the portal and the agent will call, with the action log the supervisor's dashboard will read. Every service checks the household first, in user mode, and returns outcome codes and figures rather than sentences. Every limit comes from Accord's policy records. Every write goes through Accord's own flows and rules. Only three operations run outside user mode, and each is a named decision with its own tests (S-08, S-09, S-14). No agent, portal or permission set yet: those are Phases 4 and 6.
+The services the portal and the agent will call, with the action log the supervisor's dashboard will read. Every service checks the household first, in user mode, and returns outcome codes and figures rather than sentences. Every limit comes from Accord's policy records. Every write goes through Accord's own flows and rules. Only three operations run outside user mode, and each is a named decision with its own tests (S-08, S-09, S-14). No agent, portal or permission set yet: those are Phases 4 and 6. It went through end to end on 2026-10-18: pull request #2 passed its third validation, merged, was quick-deployed by the pipeline and was confirmed in the org.
 
 ### Added
 - **Services, one per story:** `AccountSnapshotService` (ST-01), `CommitmentReadService` (ST-02, S-08), `StatementExplanationService` with `AmountDueComparison` (ST-03), `PaymentArrangementService` with `ArrangementEligibility` (ST-04), and `DisputeIntakeService` with `DisputeEvidenceCatalog` (ST-06)
@@ -61,7 +61,14 @@ The second run (validation `0Afaj00000oBuQHCA0`, 2026-10-18) passed 82 of 83 tes
 **Fix:** the test now uses 21 digits.
 
 ### Verified in the org
-Filled in after the merge, from the pipeline run and the org. Until then, nothing above counts as passed in the org.
+- Validation `0Afaj00000oBwtVCAS`, the third run on pull request #2: check-only with local tests, run as Steward CI, 2026-10-18 11:00–11:03 AM CT. 36 of 36 components and 83 of 83 tests passed, 0 errors
+- Coverage per class from that run, every class above the gate: 100% for 9 classes; `AccountSnapshotService` 99.0% (108 of 109 lines), `DisputeEvidenceCatalog` 98.3% (58 of 59), `PaymentArrangementService` 93.0% (94 of 101) and `DisputeIntakeService` 92.1% (153 of 166). 97.4% across all 864 lines. Run on these numbers, `scripts/check_coverage.py` passes all 13 classes
+- The pull request's whole `validate` run passed, coverage gate included. The deploy workflow only goes ahead when it finds a successful `validate` run for the pull request's final commit, and the job ID that run keeps once the gate has passed
+- Deployment `0Afaj00000oBxXpCAK`: run as Steward CI when pull request #2 merged, 11:04 AM CT. 36 of 36 components in 7 seconds, no tests run, and the same 60-file package as the validation. That's the quick deploy; the fallback would have run all 83 tests again. Phase 2 couldn't tell the two paths apart, because it had no Apex
+- In the org: the 26 classes (13 production classes, 12 test classes and `StewardTestData`), Active at API 68.0, and `Agent_Action_Log__c` with its six fields, all last changed by Steward CI at 11:04 AM CT
+- What merged is what was validated: the merge commit's files are identical to the pull request's final commit
+- Test time: 149 seconds in all. The slowest test, opening 200 disputes, took 32 seconds. The one that took two minutes in the first run took 1.6 seconds
+- Lines no test reaches yet, 22 of 864. Seven are `PaymentArrangementService`'s safety net, described above. Thirteen are in `DisputeIntakeService`: the refusal for a caller who can create cases but not one of the dispute fields, a save the platform rejects, and a description longer than the field. Phase 3's tests refuse a user with no Case access at all. A user with Case access but one field missing needs a Salesforce license, and none is free, so Phase 6 checks that refusal with the agent user
 
 ## v0.2 — 2026-10-17 — Phase 2: Pipeline
 

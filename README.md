@@ -4,7 +4,7 @@ Steward is the second Lumenfield Home Energy project, built on the same Salesfor
 
 **The rule it's built around:** the agent can never do what a person in the same seat can't. It acts only for the logged-in customer's household, every record it creates goes through Accord's policy, and every action it takes, or declines, is logged for a supervisor.
 
-**Status:** Phase 3 of 10 built: the Apex services the agent and portal will call, and the agent action log. Next: the customer portal. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
+**Status:** Phase 3 of 10 done: the Apex services the agent and portal will call, and the agent action log, deployed through the pipeline and verified in the org. Next: the customer portal. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
 
 ---
 
@@ -28,7 +28,7 @@ The same way as Accord: requirements before configuration, decisions written dow
 |---|---|---|
 | 1 | Requirements: 18 stories, 6 agent guardrails, 11 decisions | Done, 2026-10-16 |
 | 2 | Pipeline: validate on every pull request, quick deploy on merge, CI sign-in by certificate | Done, 2026-10-17 |
-| 3 | Apex services and the agent action log: 13 classes, 83 tests, a 90% per-class coverage gate | Built, 2026-10-18 |
+| 3 | Apex services and the agent action log: 13 classes, 83 tests, a 90% per-class coverage gate | Done, 2026-10-18 |
 | 4 | Customer portal | Next |
 | 5 | Rep assistant | Planned |
 | 6 | Service agent | Planned |
