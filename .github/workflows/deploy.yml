@@ -1,0 +1,87 @@
+# ST-13 · S-05 · S-12 · S-13
+# Runs when a merge to main changes org metadata. Finds the pull request behind the
+# merge and quick-deploys the validation that passed on it. If Salesforce won't accept
+# the quick deploy, it deploys again with the same tests. A change to force-app/ that
+# didn't come through a validated pull request is refused.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "force-app/**"
+
+permissions:
+  contents: read
+  actions: read # read the pull request's validation run
+  pull-requests: read # find the pull request behind this merge
+
+concurrency:
+  group: deploy-org
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Install the Salesforce CLI
+        run: |
+          npm install --global @salesforce/cli
+          sf --version
+
+      - name: Find the pull request and its validation
+        id: find
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          pr=$(gh api "repos/$REPO/commits/$SHA/pulls" --jq '[.[] | select(.merged_at != null)][0].number // empty')
+          if [ -z "$pr" ]; then
+            echo "::error::This change reached main without a merged pull request. Org changes have to come through a pull request (ST-13, S-13)."
+            exit 1
+          fi
+          head=$(gh api "repos/$REPO/pulls/$pr" --jq '.head.sha')
+          run=$(gh run list --workflow validate.yml --commit "$head" --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+          if [ -z "$run" ]; then
+            echo "::error::Pull request #$pr has no passing validation for its final commit ($head)."
+            exit 1
+          fi
+          gh run download "$run" --name validation-id --dir "$RUNNER_TEMP/validation"
+          job_id=$(cat "$RUNNER_TEMP/validation/validation-id.txt")
+          echo "Pull request #$pr was validated in run $run as job $job_id"
+          echo "job_id=$job_id" >> "$GITHUB_OUTPUT"
+
+      - name: Sign in to the org as Steward CI (JWT)
+        env:
+          SF_CLIENT_ID: ${{ secrets.SF_CLIENT_ID }}
+          SF_PRIVATE_KEY: ${{ secrets.SF_PRIVATE_KEY }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_INSTANCE_URL: ${{ secrets.SF_INSTANCE_URL }}
+        run: |
+          key_file="$RUNNER_TEMP/steward-ci.key"
+          printf '%s\n' "$SF_PRIVATE_KEY" > "$key_file"
+          sf org login jwt --client-id "$SF_CLIENT_ID" --jwt-key-file "$key_file" \
+            --username "$SF_USERNAME" --instance-url "$SF_INSTANCE_URL" --alias ci --set-default
+          rm -f "$key_file"
+
+      - name: Deploy
+        env:
+          JOB_ID: ${{ steps.find.outputs.job_id }}
+        run: |
+          if sf project deploy quick --job-id "$JOB_ID" --wait 60; then
+            echo "Deployed by quick deploy of validation $JOB_ID."
+          else
+            echo "::warning::Salesforce didn't accept a quick deploy of $JOB_ID. Deploying again with local Apex tests."
+            sf project deploy start --source-dir force-app --test-level RunLocalTests --wait 60
+          fi

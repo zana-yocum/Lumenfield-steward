@@ -85,7 +85,8 @@ GitHub ── Actions: Code Analyzer · Jest · validate + local tests ── qu
 ## Requirements and decisions
 
 - **[Requirements](requirements.md):** 18 stories (11 Must, 6 Should, 1 Could), six agent guardrails, ten non-functional requirements, and what each audience can see.
-- **[Decision log](decision-log.md):** S-01 to S-11. Decided: Apex for actions with Accord keeping the policy (S-03), validating against the org instead of scratch orgs (S-05), what the agent may never do (S-06), identity from the login and never from the model (S-07), the Agent Script in Git (S-10). The rest are starting positions confirmed in the phase that builds them.
+- **[Decision log](decision-log.md):** S-01 to S-13. Decided: Apex for actions with Accord keeping the policy (S-03), validating against the org instead of scratch orgs (S-05), what the agent may never do (S-06), identity from the login and never from the model (S-07), the Agent Script in Git (S-10), the pipeline's own sign-in (S-12), and pull requests for anything that deploys (S-13). The rest are starting positions confirmed in the phase that builds them.
+- **[Pipeline](pipeline.md):** how a change reaches the org, and how the pipeline was set up.
 - **[Conventions](conventions.md):** naming and coding standards.
 
 ---

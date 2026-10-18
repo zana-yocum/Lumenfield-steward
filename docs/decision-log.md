@@ -17,6 +17,8 @@ The decisions that shape Steward, the options considered, and why one was chosen
 | S-09 | Agent outcomes are logged to a custom object | Proposed · Phase 3 |
 | S-10 | The agent's definition lives in Git and ships through the pipeline | Decided |
 | S-11 | The portal is an LWR site | Proposed · Phase 4 |
+| S-12 | The pipeline signs in as its own user, with a certificate | Decided |
+| S-13 | Pull requests are required for anything that deploys | Decided |
 
 ---
 
@@ -193,3 +195,33 @@ The agent never:
 **Why:** Steward's portal pages are mostly its own components (ST-01, ST-02, ST-15), so Aura's ready-made components matter less than LWR's speed.
 
 **Consequences:** Phase 4 confirms everything the portal needs, including the Enhanced Chat deployment, works in an LWR site before building it.
+
+---
+
+### S-12 — The pipeline signs in as its own user, with a certificate
+**Status:** Decided
+
+**Context:** The pipeline has to sign in to the org with nobody there to type a password.
+
+**Options**
+1. An SFDX auth URL from the admin's own login, stored as one secret. Quickest, but it's the admin's session: if the admin's access changes, the pipeline breaks, and every deployment looks like a change the admin made by hand.
+2. JWT bearer flow through an External Client App, signed in as a dedicated Steward CI user that's pre-authorized through one permission set. **← decided**
+
+**Why:** The private key lives only in a GitHub secret and, for a moment, in the runner's temporary folder; the certificate in Salesforce can be replaced without touching anyone's login. A separate user makes pipeline deployments easy to tell apart from manual changes in the Setup Audit Trail, and only users holding `PS_Steward_CI` can use the app.
+
+**Consequences:** The Steward CI user takes the org's last free Salesforce license. It has the System Administrator profile, because deployments need that access; what limits it is that only this one user can use the app, and only with the key. The key is generated outside the repo folder and rotated by uploading a new certificate (`docs/pipeline.md`).
+
+---
+
+### S-13 — Pull requests are required for anything that deploys
+**Status:** Decided
+
+**Context:** Branch rules can require a pull request for every change to `main`, or let the admin commit some changes directly.
+
+**Options**
+1. Pull requests for everything, including the open-items updates written at the end of every sitting.
+2. Pull requests for org changes; documentation can be committed straight to `main` by the admin. **← decided**
+
+**Why:** The rule that matters is that nothing reaches the org without validation. The deploy workflow enforces it directly: it runs only when `force-app/` changes, and it refuses any change that didn't come through a pull request with a passing validation. Documentation doesn't touch the org.
+
+**Consequences:** The ruleset on `main` requires a pull request and the `validate` check, with the repository admin allowed to bypass it for doc commits. A direct push that changes `force-app/` fails the deploy workflow with a message saying why. Doc commits put open pull requests behind `main`, so they need updating before they merge.
