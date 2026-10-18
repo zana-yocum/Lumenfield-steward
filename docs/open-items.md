@@ -6,6 +6,23 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ---
 
+## Phase 4 — Customer portal — started 2026-10-18
+
+Two pull requests. 4a turns on Digital Experiences and adds the retrieve workflow (S-15). 4b builds the site's pages, the controllers, the sharing set and `PS_Steward_Customer`, with their tests. Claude now pushes the branches and opens the pull requests (Phase 3, step 8b).
+
+**Your steps**
+- ☑ 1. Yes to turning on Digital Experiences, which Salesforce can't turn off again (12:00 PM CT)
+- ☐ 2. At the end, log in to the portal as each test customer and take screenshots. Steps to follow
+
+**Mine**
+- ☐ 4a through the pipeline: Digital Experiences on, `retrieve.yml`
+- ☐ Create the site from the Build Your Own (LWR) template and retrieve it into the repo
+- ☐ 4b: pages for My Account, Statements, What We Promised You and Disputes; Apex controllers over the Phase 3 services; the sharing set; `PS_Steward_Customer`; Jest, accessibility and Apex tests
+- ☐ Customer users for three test households: Sandra Barnett (behind on payments, with a commitment), Tanya Lattimore (current, with a commitment) and Angela Coffey (nothing on record)
+- ☐ Confirm S-08 and S-11 in the org, verify everything after the deploy, and finish `CHANGELOG.md` v0.4
+
+---
+
 ## Phase 3 — Apex services — closed 2026-10-18
 
 Pull request #2 passed its third validation, merged, and the pipeline quick-deployed it as Steward CI. The 26 classes and the action log are in the org, all 83 tests passed, and every class is at 90% or more (details in `CHANGELOG.md` v0.3).
@@ -84,9 +101,9 @@ The first change went through the whole pipeline: pull request #1 validated as S
 - ☑ Escalator known-answer data: the dataset has no escalator step, so `StatementExplanationServiceTest` builds its own household ($120.00, then $123.48 at the first anniversary)
 
 **Phase 4 — Portal**
-- ☐ Setup → Digital Experiences → Settings → **Enable Digital Experiences**
-- ☐ Account owners must have a role before a contact can become a customer user. The admin holds the Collections Supervisor role, so households the admin owns should already qualify; confirm on the test households
-- ☐ Review the text of the 31 commitments' `Terms__c` before customers can see it (ST-02). It was written by sales reps for internal readers. If any is unsuitable, add a customer-facing summary field instead
+- → Turning on Digital Experiences moved into the pipeline: Phase 4a, approved 2026-10-18
+- ☑ Account owners must have a role before a contact can become a customer user. All 88 households are owned by the admin, who holds the Collections Supervisor role (read 2026-10-18)
+- ☑ The 31 commitments' `Terms__c` reviewed (ST-02, 2026-10-18). Each is one of four plain sentences in the rep's voice. Nothing internal or unsuitable, so the portal shows them as recorded and no customer-facing field is needed
 - ☐ Confirm in the org that customer licenses can't be given opportunity access (S-08) and that Enhanced Chat works in an LWR site (S-11)
 
 **Phase 6 — Service agent**

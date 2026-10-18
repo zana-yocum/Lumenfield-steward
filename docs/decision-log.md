@@ -20,6 +20,7 @@ The decisions that shape Steward, the options considered, and why one was chosen
 | S-12 | The pipeline signs in as its own user, with a certificate | Decided |
 | S-13 | Pull requests are required for anything that deploys | Decided |
 | S-14 | Dispute cases are saved in system mode, with the caller's create access applied to every other field | Decided |
+| S-15 | Configuration built outside source is retrieved by the pipeline | Decided |
 
 ---
 
@@ -246,3 +247,18 @@ The agent never:
 **Why:** Option 3 changes nobody's access, and it works however the platform answers for a given user. All system mode adds is the one field the agent and customers can't count on setting, on a record the caller is otherwise allowed to create in full. The account it sets is always the verified household, already checked in user mode. Option 1 would give the agent a standing ability to move cases between households, which is exactly the reach S-06 rules out.
 
 **Consequences:** `DisputeIntakeService` refuses with `ACCESS_DENIED`, and saves nothing, when the caller can't create cases or set any field other than the account. A test proves it for a user with no Case access, and it passed in the org on 2026-10-18. The field-level refusal has no test yet: it needs a user who can create cases but not one of the dispute fields, and no Salesforce license is free to make one. Phase 6 checks it with the agent user. This is the third named exception to user mode (NFR-01), after S-08 and S-09. It's one statement with a comment citing S-14. The agent user still needs Case create and access to the dispute fields, and read access through sharing to see the case number once the case is in the queue (Phase 6). Phase 6 also checks what the agent user's create access to `Case.AccountId` really is. If the agent can set it, or edit on it is granted for another reason, the insert can move to user mode and this exception can be removed.
+
+---
+
+### S-15 — Configuration built outside source is retrieved by the pipeline
+**Status:** Decided
+
+**Context:** Some configuration doesn't start in source. The portal site is created from Salesforce's Build Your Own (LWR) template, which generates its pages, theme and settings, and a later change might be made in Experience Builder or Setup. ST-13 requires all of it in the repo the same day, so the repo stays the record of what's in the org.
+
+**Options**
+1. Retrieve on a laptop with the Salesforce CLI and commit by hand, as Accord did.
+2. A workflow that retrieves as Steward CI and pushes the result to a branch of its own. **← decided**
+
+**Why:** Option 2 uses the same identity and tool versions as the deploys, leaves a run log for every retrieve, and needs nothing installed or signed in on anyone's computer. Option 1 depends on whoever runs it having the CLI signed in to the right org.
+
+**Consequences:** `retrieve.yml` runs by hand, on the branch that holds the manifest, and pushes `retrieve/<run number>`. It can't change `main`: the ruleset doesn't let it. GitHub doesn't start workflows from pushes made with its own token, so a retrieved branch doesn't validate by itself. Its files reach `main` in an ordinary pull request, which does.
