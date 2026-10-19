@@ -1,6 +1,13 @@
 import { LightningElement, api } from "lwc";
 import { NavigationMixin } from "lightning/navigation";
-import { PAGES, formatDate, formatMoney, recordPage } from "c/portalShared";
+import {
+  LABELS,
+  PAGES,
+  format,
+  formatDate,
+  formatMoney,
+  recordPage
+} from "c/portalShared";
 
 /**
  * ST-01. One statement as the customer sees it: its dates and amounts, its status, the payments
@@ -17,6 +24,7 @@ export default class PortalStatementCard extends NavigationMixin(
   /** On the statement's own page, whose heading already names it. */
   @api hideTitle = false;
 
+  labels = LABELS;
   detailUrl;
   disputeUrl;
 
@@ -42,7 +50,11 @@ export default class PortalStatementCard extends NavigationMixin(
   }
 
   get title() {
-    return `Statement ${this.statement.statementNumber}`;
+    return format(LABELS.statementNumbered, this.statement.statementNumber);
+  }
+
+  get disputeLinkText() {
+    return format(LABELS.disputeLink, this.statement.disputeCaseNumber);
   }
 
   get hasDispute() {
@@ -52,12 +64,12 @@ export default class PortalStatementCard extends NavigationMixin(
   get details() {
     const s = this.statement;
     return [
-      { label: "Statement date", value: formatDate(s.statementDate) },
-      { label: "Due date", value: formatDate(s.dueDate) },
-      { label: "Amount due", value: formatMoney(s.amountDue) },
-      { label: "Paid", value: formatMoney(s.amountPaid) },
-      { label: "Credits applied", value: formatMoney(s.creditsApplied) },
-      { label: "Balance", value: formatMoney(s.balance) }
+      { label: LABELS.statementDate, value: formatDate(s.statementDate) },
+      { label: LABELS.dueDate, value: formatDate(s.dueDate) },
+      { label: LABELS.amountDue, value: formatMoney(s.amountDue) },
+      { label: LABELS.paid, value: formatMoney(s.amountPaid) },
+      { label: LABELS.creditsApplied, value: formatMoney(s.creditsApplied) },
+      { label: LABELS.balance, value: formatMoney(s.balance) }
     ];
   }
 

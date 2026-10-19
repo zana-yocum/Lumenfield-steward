@@ -2,7 +2,7 @@
   <section class="page">
     <h1 class="page-title">{title}</h1>
     <template lwc:if={loading}>
-      <p role="status">Loading the statement…</p>
+      <p role="status">{labels.statementLoading}</p>
     </template>
     <template lwc:elseif={problem}>
       <p class="notice" role="alert">{problem}</p>
@@ -14,7 +14,7 @@
       ></c-portal-statement-card>
     </template>
     <p>
-      <a href={statementsUrl} onclick={handleBack}>Back to all statements</a>
+      <a href={statementsUrl} onclick={handleBack}>{labels.backToStatements}</a>
     </p>
   </section>
 </template>

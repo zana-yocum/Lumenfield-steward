@@ -2,7 +2,7 @@
   <section class="page">
     <h1 class="page-title">{title}</h1>
     <template lwc:if={loading}>
-      <p role="status">Loading the dispute…</p>
+      <p role="status">{labels.disputeLoading}</p>
     </template>
     <template lwc:elseif={problem}>
       <p class="notice" role="alert">{problem}</p>
@@ -16,7 +16,7 @@
           </div>
         </template>
         <div>
-          <dt>Statement</dt>
+          <dt>{labels.statement}</dt>
           <dd>
             <a href={statementUrl} onclick={handleStatement}
               >{dispute.statementNumber}</a
@@ -24,7 +24,7 @@
           </dd>
         </div>
       </dl>
-      <h2 class="section-title">What to send</h2>
+      <h2 class="section-title">{labels.whatToSend}</h2>
       <ul class="bullets">
         <template for:each={evidence} for:item="item">
           <li key={item.key}>
@@ -33,10 +33,10 @@
         </template>
       </ul>
       <template lwc:if={isOpen}>
-        <h2 class="section-title">Upload your evidence</h2>
-        <p class="lead">PDF files or photos. You can add several at once.</p>
+        <h2 class="section-title">{labels.uploadHeading}</h2>
+        <p class="lead">{labels.uploadLead}</p>
         <lightning-file-upload
-          label="Add files"
+          label={labels.addFiles}
           name="evidence"
           record-id={caseId}
           accept={acceptedFormats}
@@ -46,11 +46,11 @@
         <p class="upload-message" role="status">{uploadMessage}</p>
       </template>
       <template lwc:else>
-        <p>This dispute is closed, so it can't take new files.</p>
+        <p>{labels.disputeClosed}</p>
       </template>
     </template>
     <p>
-      <a href={disputesUrl} onclick={handleBack}>Back to your disputes</a>
+      <a href={disputesUrl} onclick={handleBack}>{labels.backToDisputes}</a>
     </p>
   </section>
 </template>

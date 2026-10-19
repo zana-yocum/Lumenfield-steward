@@ -3,14 +3,15 @@ import { CurrentPageReference, NavigationMixin } from "lightning/navigation";
 import getStatement from "@salesforce/apex/PortalAccountController.getStatement";
 import {
   CONNECTION_PROBLEM,
+  LABELS,
   PAGES,
+  format,
   namedPage,
   problemMessage,
   recordIdFrom
 } from "c/portalShared";
 
-const NOT_YOURS =
-  "We can't show this statement. It isn't on your account, or it doesn't exist.";
+const NOT_YOURS = LABELS.statementNotYours;
 
 /**
  * ST-01, ST-12. A statement's own page. The ID comes from the address (?recordId=…), so the server
@@ -20,6 +21,7 @@ const NOT_YOURS =
 export default class PortalStatementDetail extends NavigationMixin(
   LightningElement
 ) {
+  labels = LABELS;
   loading = true;
   statementId;
   statement;
@@ -74,8 +76,8 @@ export default class PortalStatementDetail extends NavigationMixin(
 
   get title() {
     return this.statement
-      ? `Statement ${this.statement.statementNumber}`
-      : "Statement";
+      ? format(LABELS.statementNumbered, this.statement.statementNumber)
+      : LABELS.statement;
   }
 
   handleBack(event) {

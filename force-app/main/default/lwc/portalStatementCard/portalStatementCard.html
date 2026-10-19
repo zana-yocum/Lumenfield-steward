@@ -16,10 +16,8 @@
     </div>
     <template lwc:if={hasDispute}>
       <p class="dispute">
-        In dispute:
-        <a href={disputeUrl} onclick={handleOpenDispute}
-          >case {statement.disputeCaseNumber}</a
-        >
+        {labels.inDispute}
+        <a href={disputeUrl} onclick={handleOpenDispute}>{disputeLinkText}</a>
       </p>
     </template>
     <dl class="details">
@@ -31,10 +29,10 @@
       </template>
     </dl>
     <template lwc:if={hideTitle}>
-      <h2 class="payments-title">Payments</h2>
+      <h2 class="payments-title">{labels.payments}</h2>
     </template>
     <template lwc:else>
-      <h3 class="payments-title">Payments</h3>
+      <h3 class="payments-title">{labels.payments}</h3>
     </template>
     <template lwc:if={hasPayments}>
       <ul class="bullets">
@@ -44,7 +42,7 @@
       </ul>
     </template>
     <template lwc:else>
-      <p>No payments on this statement yet.</p>
+      <p>{labels.noPayments}</p>
     </template>
   </article>
 </template>

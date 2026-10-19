@@ -62,7 +62,7 @@ describe("c-portal-statement-card", () => {
       }
     });
     const dispute = element.shadowRoot.querySelector(".dispute a");
-    expect(dispute.textContent).toBe("case 00001001");
+    expect(dispute.textContent).toBe("dispute 00001001");
     expect(dispute.getAttribute("href")).toBe("https://www.example.com");
   });
 

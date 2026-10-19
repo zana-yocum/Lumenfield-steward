@@ -1,4 +1,5 @@
 // NFR-05: every component test can also check accessibility, with @sa11y/jest's toBeAccessible.
+// The portal's custom labels are mocked with their values from the repo (jest/setupLabels.js).
 // The portal's components import @salesforce/community/basePath, which Jest can't resolve alone,
 // and the shared stylesheet c/portalStyles, a CSS-only module the default resolver skips.
 const { jestConfig } = require("@salesforce/sfdx-lwc-jest/config");
@@ -12,6 +13,7 @@ module.exports = {
   },
   setupFilesAfterEnv: [
     ...jestConfig.setupFilesAfterEnv,
-    "<rootDir>/jest/setupAccessibility.js"
+    "<rootDir>/jest/setupAccessibility.js",
+    "<rootDir>/jest/setupLabels.js"
   ]
 };

@@ -72,7 +72,7 @@ describe("c-portal-commitments", () => {
       "No special terms were recorded when you signed."
     );
     const link = element.shadowRoot.querySelector("a");
-    expect(link.textContent).toBe("open a dispute");
+    expect(link.textContent).toBe("Open a dispute");
     expect(link.getAttribute("href")).toBe("https://www.example.com");
     await expect(element).toBeAccessible();
   });

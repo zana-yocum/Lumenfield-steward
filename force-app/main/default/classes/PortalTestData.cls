@@ -10,7 +10,7 @@ public class PortalTestData {
    * Test customers get login licenses, so the org's member licenses stay free for the demo
    * customers.
    */
-  public static final String CUSTOMER_PROFILE = 'Customer Community Login User';
+  public static final String CUSTOMER_PROFILE = 'Steward Customer Login';
   public static final String CUSTOMER_PERMISSION_SET = 'PS_Steward_Customer';
 
   private static Integer sequence = 0;

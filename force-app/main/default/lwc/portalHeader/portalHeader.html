@@ -5,9 +5,9 @@
       href={homeUrl}
       data-page={homePage}
       onclick={handleNavigate}
-      >Lumenfield Home Energy</a
+      >{labels.brand}</a
     >
-    <nav class="nav" aria-label="Customer portal">
+    <nav class="nav" aria-label={labels.navLabel}>
       <ul class="nav-list">
         <template for:each={links} for:item="link">
           <li key={link.name}>
@@ -22,7 +22,7 @@
           </li>
         </template>
         <li>
-          <a class="nav-link" href={logoutUrl}>Log out</a>
+          <a class="nav-link" href={logoutUrl}>{labels.logOut}</a>
         </li>
       </ul>
     </nav>

@@ -1,6 +1,6 @@
 <template>
   <template lwc:if={loading}>
-    <p role="status">Loading the form…</p>
+    <p role="status">{labels.formLoading}</p>
   </template>
   <template lwc:elseif={problem}>
     <p class="notice" role="alert">{problem}</p>
@@ -24,12 +24,12 @@
             href={result.caseUrl}
             data-id={result.caseId}
             onclick={handleOpenCase}
-            >Go to dispute {result.caseNumber}</a
+            >{result.caseLinkText}</a
           >
         </p>
       </template>
       <lightning-button
-        label="Open another dispute"
+        label={labels.openAnother}
         onclick={handleStartAgain}
       ></lightning-button>
     </div>
@@ -40,7 +40,7 @@
         <lightning-radio-group
           data-field="statement"
           name="statement"
-          label="Which statement is wrong?"
+          label={labels.whichStatement}
           options={statementOptions}
           value={statementId}
           onchange={handleStatement}
@@ -50,8 +50,8 @@
           class="field"
           data-field="reason"
           name="reason"
-          label="What's wrong with it?"
-          placeholder="Choose a reason"
+          label={labels.whatsWrong}
+          placeholder={labels.chooseReason}
           options={reasonOptions}
           value={reason}
           onchange={handleReason}
@@ -59,7 +59,7 @@
         ></lightning-combobox>
         <template lwc:if={evidence}>
           <div class="field">
-            <p class="evidence-title">What you'll need to send</p>
+            <p class="evidence-title">{labels.whatYoullNeed}</p>
             <ul class="bullets">
               <template for:each={evidence} for:item="item">
                 <li key={item.key}>{item.text}</li>
@@ -70,8 +70,8 @@
         <lightning-textarea
           class="field"
           name="description"
-          label="Anything else we should know? (optional)"
-          field-level-help="Please don't include card or bank account numbers."
+          label={labels.anythingElse}
+          field-level-help={labels.noCardNumbers}
           max-length="2000"
           value={description}
           onchange={handleDescription}
@@ -79,17 +79,17 @@
         <lightning-button
           class="field"
           variant="brand"
-          label="Open the dispute"
+          label={labels.openTheDispute}
           disabled={submitting}
           onclick={handleSubmit}
         ></lightning-button>
       </div>
     </template>
     <template lwc:else>
-      <p>There are no statements you can open a new dispute on.</p>
+      <p>{labels.noOpenChoices}</p>
     </template>
     <template lwc:if={hasDisputedStatements}>
-      <p class="evidence-title">Already in dispute</p>
+      <p class="evidence-title">{labels.alreadyInDispute}</p>
       <ul class="bullets">
         <template for:each={disputedStatements} for:item="statement">
           <li key={statement.statementId}>
@@ -98,7 +98,7 @@
               href={statement.disputeUrl}
               data-id={statement.disputeCaseId}
               onclick={handleOpenCase}
-              >dispute {statement.disputeCaseNumber}</a
+              >{statement.disputeLinkText}</a
             >
           </li>
         </template>

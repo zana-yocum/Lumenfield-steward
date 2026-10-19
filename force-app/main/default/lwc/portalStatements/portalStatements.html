@@ -1,16 +1,14 @@
 <template>
   <section class="page">
-    <h1 class="page-title">Statements</h1>
+    <h1 class="page-title">{labels.statements}</h1>
     <template lwc:if={loading}>
-      <p role="status">Loading your statements…</p>
+      <p role="status">{labels.statementsLoading}</p>
     </template>
     <template lwc:elseif={problem}>
       <p class="notice" role="alert">{problem}</p>
     </template>
     <template lwc:elseif={hasStatements}>
-      <p class="lead">
-        Newest first. Each statement lists the payments made against it.
-      </p>
+      <p class="lead">{labels.statementsLead}</p>
       <ul class="plain-list">
         <template for:each={statements} for:item="statement">
           <li key={statement.statementId}>
@@ -23,7 +21,7 @@
       </ul>
     </template>
     <template lwc:else>
-      <p>You don't have any statements yet.</p>
+      <p>{labels.noStatements}</p>
     </template>
   </section>
 </template>

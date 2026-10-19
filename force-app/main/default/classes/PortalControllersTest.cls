@@ -281,10 +281,7 @@ private class PortalControllersTest {
   @IsTest
   static void theFormListsTheReasonsAndTheHouseholdsStatements() {
     Account householdA = household(0);
-    Id disputedStatement = statementOf(
-      householdA,
-      StewardTestData.STATEMENT_PAID
-    );
+    Id disputedStatement = disputedStatementOf(householdA);
     User customer = customerOf(householdA, null);
     PortalDisputesController.DisputeForm form;
     Test.startTest();
@@ -373,8 +370,7 @@ private class PortalControllersTest {
     Account householdB = household(1);
     Id otherStatement = statementOf(
       householdB,
-      StewardTestData.STATEMENT_PAST_DUE,
-      1
+      StewardTestData.STATEMENT_PAST_DUE
     );
     User customer = customerOf(householdA, null);
     DisputeIntakeService.DisputeResult result;
@@ -403,7 +399,7 @@ private class PortalControllersTest {
   @IsTest
   static void aSecondDisputePointsToTheFirst() {
     Account householdA = household(0);
-    Id statementId = statementOf(householdA, StewardTestData.STATEMENT_PAID);
+    Id statementId = disputedStatementOf(householdA);
     Id existing = disputeOf(householdA);
     User customer = customerOf(householdA, null);
     DisputeIntakeService.DisputeResult result;
@@ -429,8 +425,7 @@ private class PortalControllersTest {
     Account householdB = household(1);
     Id statementId = statementOf(
       householdB,
-      StewardTestData.STATEMENT_PAST_DUE,
-      1
+      StewardTestData.STATEMENT_PAST_DUE
     );
     Id withoutReason = customerAccessWithoutReason();
     User customer = customerOf(householdB, withoutReason);
@@ -578,24 +573,29 @@ private class PortalControllersTest {
     ];
   }
 
+  // A statement by status. Opening a dispute changes its statement's status to In Dispute, so
+  // each household has exactly one statement in each status the tests ask for.
   private static Id statementOf(Account household, String status) {
-    return statementOf(household, status, 0);
-  }
-
-  private static Id statementOf(
-    Account household,
-    String status,
-    Integer index
-  ) {
     return [
       SELECT Id
       FROM Billing_Statement__c
       WHERE Account__c = :household.Id AND Status__c = :status
       ORDER BY Due_Date__c DESC
       LIMIT 1
-      OFFSET :index
     ]
     .Id;
+  }
+
+  private static Id disputedStatementOf(Account household) {
+    return [
+      SELECT Disputed_Statement__c
+      FROM Case
+      WHERE
+        AccountId = :household.Id
+        AND RecordType.DeveloperName = :StewardTestData.DISPUTE_RECORD_TYPE
+      LIMIT 1
+    ]
+    .Disputed_Statement__c;
   }
 
   private static Id disputeOf(Account household) {

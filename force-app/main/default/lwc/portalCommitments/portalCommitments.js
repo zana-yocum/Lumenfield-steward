@@ -3,6 +3,7 @@ import { NavigationMixin } from "lightning/navigation";
 import getMyCommitments from "@salesforce/apex/PortalCommitmentsController.getMyCommitments";
 import {
   CONNECTION_PROBLEM,
+  LABELS,
   PAGES,
   formatMoney,
   namedPage,
@@ -19,6 +20,7 @@ import {
 export default class PortalCommitments extends NavigationMixin(
   LightningElement
 ) {
+  labels = LABELS;
   loading = true;
   commitments = [];
   problem;
@@ -34,10 +36,7 @@ export default class PortalCommitments extends NavigationMixin(
   async load() {
     try {
       const result = await getMyCommitments();
-      this.problem = problemMessage(
-        result,
-        "We couldn't find an account for your login."
-      );
+      this.problem = problemMessage(result, LABELS.noAccount);
       this.commitments = this.problem
         ? []
         : (result.commitments ?? []).map((commitment, index) => ({
@@ -45,12 +44,12 @@ export default class PortalCommitments extends NavigationMixin(
             type: commitment.commitmentType,
             terms: commitment.terms,
             details: [
-              { label: "Value", value: formatMoney(commitment.value) },
+              { label: LABELS.value, value: formatMoney(commitment.value) },
               {
-                label: "Months covered",
-                value: commitment.monthsCovered ?? "Not applicable"
+                label: LABELS.monthsCovered,
+                value: commitment.monthsCovered ?? LABELS.notApplicable
               },
-              { label: "Status", value: commitment.status }
+              { label: LABELS.status, value: commitment.status }
             ]
           }));
     } catch {

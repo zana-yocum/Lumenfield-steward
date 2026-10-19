@@ -1,17 +1,14 @@
 <template>
   <section class="page">
-    <h1 class="page-title">Disputes</h1>
-    <p class="lead">
-      If a statement looks wrong, tell us here. A dispute specialist reviews
-      every dispute, and we'll tell you exactly what to send.
-    </p>
-    <h2 class="section-title">Open a dispute</h2>
+    <h1 class="page-title">{labels.disputes}</h1>
+    <p class="lead">{labels.disputesLead}</p>
+    <h2 class="section-title">{labels.openADispute}</h2>
     <c-portal-dispute-form
       ondisputeopened={handleOpened}
     ></c-portal-dispute-form>
-    <h2 class="section-title">Your disputes</h2>
+    <h2 class="section-title">{labels.yourDisputes}</h2>
     <template lwc:if={loading}>
-      <p role="status">Loading your disputes…</p>
+      <p role="status">{labels.disputesLoading}</p>
     </template>
     <template lwc:elseif={problem}>
       <p class="notice" role="alert">{problem}</p>
@@ -43,7 +40,7 @@
       </ul>
     </template>
     <template lwc:else>
-      <p>You haven't opened any disputes.</p>
+      <p>{labels.noDisputes}</p>
     </template>
   </section>
 </template>

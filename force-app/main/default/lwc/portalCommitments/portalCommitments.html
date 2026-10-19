@@ -1,11 +1,9 @@
 <template>
   <section class="page">
-    <h1 class="page-title">What we promised you</h1>
-    <p class="lead">
-      The special terms recorded on your agreement when you signed.
-    </p>
+    <h1 class="page-title">{labels.whatWePromised}</h1>
+    <p class="lead">{labels.promisesLead}</p>
     <template lwc:if={loading}>
-      <p role="status">Loading what was recorded…</p>
+      <p role="status">{labels.promisesLoading}</p>
     </template>
     <template lwc:elseif={problem}>
       <p class="notice" role="alert">{problem}</p>
@@ -25,24 +23,23 @@
                 </template>
               </dl>
               <p class="terms">
-                <span class="terms-label">As recorded at signing:</span>
+                <span class="terms-label">{labels.asRecorded}</span>
                 “{commitment.terms}”
               </p>
             </article>
           </li>
         </template>
       </ul>
+      <p>{labels.promisesWrong}</p>
       <p>
-        If something you were promised is missing or wrong,
-        <a href={disputesUrl} onclick={handleDisputes}>open a dispute</a>.
+        <a href={disputesUrl} onclick={handleDisputes}>{labels.openADispute}</a>
       </p>
     </template>
     <template lwc:else>
-      <p>No special terms were recorded when you signed.</p>
+      <p>{labels.noPromises}</p>
+      <p>{labels.noPromisesHelp}</p>
       <p>
-        If you were told about a credit or other terms at signing,
-        <a href={disputesUrl} onclick={handleDisputes}>open a dispute</a> and
-        choose “Promised Credit Not Applied”.
+        <a href={disputesUrl} onclick={handleDisputes}>{labels.openADispute}</a>
       </p>
     </template>
   </section>

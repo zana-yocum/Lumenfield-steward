@@ -4,13 +4,13 @@ import { CurrentPageReference, NavigationMixin } from "lightning/navigation";
 // Log out link.
 // eslint-disable-next-line @lwc/lwc-platform/no-community-import
 import basePath from "@salesforce/community/basePath";
-import { PAGES, namedPage } from "c/portalShared";
+import { LABELS, PAGES, namedPage } from "c/portalShared";
 
 const LINKS = [
-  { name: PAGES.account, label: "My account" },
-  { name: PAGES.statements, label: "Statements", detail: PAGES.statement },
-  { name: PAGES.promises, label: "What we promised you" },
-  { name: PAGES.disputes, label: "Disputes", detail: PAGES.dispute }
+  { name: PAGES.account, label: LABELS.myAccount },
+  { name: PAGES.statements, label: LABELS.statements, detail: PAGES.statement },
+  { name: PAGES.promises, label: LABELS.whatWePromised },
+  { name: PAGES.disputes, label: LABELS.disputes, detail: PAGES.dispute }
 ];
 
 /**
@@ -19,6 +19,7 @@ const LINKS = [
  * page counts as being in Statements or Disputes.
  */
 export default class PortalHeader extends NavigationMixin(LightningElement) {
+  labels = LABELS;
   urls = {};
   currentName;
 

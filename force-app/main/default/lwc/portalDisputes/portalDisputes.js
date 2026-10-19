@@ -3,7 +3,9 @@ import { NavigationMixin } from "lightning/navigation";
 import getMyDisputes from "@salesforce/apex/PortalDisputesController.getMyDisputes";
 import {
   CONNECTION_PROBLEM,
+  LABELS,
   PAGES,
+  format,
   formatDate,
   problemMessage,
   recordPage
@@ -14,6 +16,7 @@ import {
  * newest first, each linking to its own page. The list reloads when the form opens a new dispute.
  */
 export default class PortalDisputes extends NavigationMixin(LightningElement) {
+  labels = LABELS;
   loading = true;
   disputes = [];
   problem;
@@ -25,10 +28,7 @@ export default class PortalDisputes extends NavigationMixin(LightningElement) {
   async load() {
     try {
       const result = await getMyDisputes();
-      this.problem = problemMessage(
-        result,
-        "We couldn't find an account for your login."
-      );
+      this.problem = problemMessage(result, LABELS.noAccount);
       this.disputes = this.problem ? [] : this.toRows(result.disputes ?? []);
     } catch {
       this.problem = CONNECTION_PROBLEM;
@@ -41,13 +41,13 @@ export default class PortalDisputes extends NavigationMixin(LightningElement) {
     const rows = disputes.map((dispute) => ({
       key: dispute.caseId,
       caseId: dispute.caseId,
-      title: `Dispute ${dispute.caseNumber}`,
+      title: format(LABELS.disputeNumbered, dispute.caseNumber),
       url: undefined,
       details: [
-        { label: "Status", value: dispute.status },
-        { label: "Reason", value: dispute.reason },
-        { label: "Statement", value: dispute.statementNumber },
-        { label: "Opened", value: formatDate(dispute.openedDate) }
+        { label: LABELS.status, value: dispute.status },
+        { label: LABELS.reason, value: dispute.reason },
+        { label: LABELS.statement, value: dispute.statementNumber },
+        { label: LABELS.opened, value: formatDate(dispute.openedDate) }
       ]
     }));
     rows.forEach((row) => {

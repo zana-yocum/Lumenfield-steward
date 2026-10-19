@@ -1,8 +1,25 @@
+import { LABELS } from "./labels";
+
 /**
  * ST-01, ST-02, ST-06, NFR-05, NFR-07. Shared by the portal's components: the pages they link to,
- * the outcome codes the server returns, and the words a customer sees when something isn't there
- * or goes wrong. A customer never sees an error's details, only a reference to quote.
+ * the outcome codes the server returns, the portal's text (custom labels, in LABELS), and the words
+ * a customer sees when something isn't there or goes wrong. A customer never sees an error's
+ * details, only a reference to quote.
  */
+
+export { LABELS };
+
+/**
+ * Fills a label's placeholders: format("Dispute {0} is open", "00001002").
+ * @param {string} label the label, with {0}, {1}… where values go
+ * @param {...*} values the values, in placeholder order
+ * @returns {string} the finished text
+ */
+export function format(label, ...values) {
+  return (label ?? "").replace(/\{(\d+)\}/g, (placeholder, index) =>
+    String(values[index] ?? "")
+  );
+}
 
 /**
  * The portal's pages, by the API names of their routes. The last two show one record each: a
@@ -65,12 +82,7 @@ export const REASON = {
 };
 
 /** Shown when the request never got an answer: the connection, not the server. */
-export const CONNECTION_PROBLEM =
-  "We couldn't reach our system just now. Check your connection and try again.";
-
-const NOT_A_CUSTOMER =
-  "This page is for Lumenfield customers. Log in with your customer account to see it.";
-const TRY_AGAIN = "We couldn't show this just now. Please try again later.";
+export const CONNECTION_PROBLEM = LABELS.connectionProblem;
 
 /**
  * What to tell the customer about a result that isn't a success.
@@ -80,23 +92,23 @@ const TRY_AGAIN = "We couldn't show this just now. Please try again later.";
  */
 export function problemMessage(result, notFound) {
   if (!result) {
-    return TRY_AGAIN;
+    return LABELS.tryAgain;
   }
   if (result.outcome === OUTCOME.completed) {
     return null;
   }
   if (result.outcome === OUTCOME.failed) {
     return result.reference
-      ? `Something went wrong on our side. If you contact us, quote reference ${result.reference}.`
-      : "Something went wrong on our side. Please try again later.";
+      ? format(LABELS.failedWithReference, result.reference)
+      : LABELS.failedNoReference;
   }
   if (result.reasonCode === REASON.invalidRequest) {
-    return NOT_A_CUSTOMER;
+    return LABELS.notACustomer;
   }
   if (result.reasonCode === REASON.notFound) {
-    return notFound || TRY_AGAIN;
+    return notFound || LABELS.tryAgain;
   }
-  return TRY_AGAIN;
+  return LABELS.tryAgain;
 }
 
 const currency = new Intl.NumberFormat("en-US", {

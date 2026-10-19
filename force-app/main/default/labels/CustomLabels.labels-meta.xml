@@ -1,0 +1,771 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Steward_Portal_Account_Loading</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Loading your account…</shortDescription>
+        <value>Loading your account…</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Add_Files</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Add files</shortDescription>
+        <value>Add files</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Already_In_Dispute</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Already in dispute</shortDescription>
+        <value>Already in dispute</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Amount_Due</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Amount due</shortDescription>
+        <value>Amount due</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Amount_On_Date</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: … on …</shortDescription>
+        <value>{0} on {1}</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Anything_Else</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Anything else we should know? (optional)</shortDescription>
+        <value>Anything else we should know? (optional)</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Arrangement_Text</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: You've arranged to pay … by …. Status: ….</shortDescription>
+        <value>You've arranged to pay {0} by {1}. Status: {2}.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Arrangement_Title</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Your payment arrangement</shortDescription>
+        <value>Your payment arrangement</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_As_Recorded</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: As recorded at signing:</shortDescription>
+        <value>As recorded at signing:</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Back_To_Disputes</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Back to your disputes</shortDescription>
+        <value>Back to your disputes</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Back_To_Statements</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Back to all statements</shortDescription>
+        <value>Back to all statements</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Balance</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Balance</shortDescription>
+        <value>Balance</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Brand</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Lumenfield Home Energy</shortDescription>
+        <value>Lumenfield Home Energy</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Choose_Reason</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Choose a reason</shortDescription>
+        <value>Choose a reason</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Connection_Problem</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: We couldn't reach our system just now. Check your connection and try ag…</shortDescription>
+        <value>We couldn't reach our system just now. Check your connection and try again.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Could_Not_Open</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: We couldn't open the dispute</shortDescription>
+        <value>We couldn't open the dispute</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Credits_Applied</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Credits applied</shortDescription>
+        <value>Credits applied</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Current_Balance</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Current balance</shortDescription>
+        <value>Current balance</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Declined_Invalid_Reason</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Choose one of the reasons in the list.</shortDescription>
+        <value>Choose one of the reasons in the list.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Declined_Not_Found</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: We couldn't find that statement on your account.</shortDescription>
+        <value>We couldn't find that statement on your account.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Declined_Statement_Required</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Choose the statement the dispute is about.</shortDescription>
+        <value>Choose the statement the dispute is about.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Dispute</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Dispute</shortDescription>
+        <value>Dispute</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Dispute_Closed</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: This dispute is closed, so it can't take new files.</shortDescription>
+        <value>This dispute is closed, so it can't take new files.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Dispute_Link</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: dispute …</shortDescription>
+        <value>dispute {0}</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Dispute_Loading</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Loading the dispute…</shortDescription>
+        <value>Loading the dispute…</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Dispute_Not_Yours</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: We can't show this dispute. It isn't on your account, or it doesn't exi…</shortDescription>
+        <value>We can't show this dispute. It isn't on your account, or it doesn't exist.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Dispute_Numbered</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Dispute …</shortDescription>
+        <value>Dispute {0}</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Disputes</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Disputes</shortDescription>
+        <value>Disputes</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Disputes_Lead</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: If a statement looks wrong, tell us here. A dispute specialist reviews …</shortDescription>
+        <value>If a statement looks wrong, tell us here. A dispute specialist reviews every dispute, and we'll tell you exactly what to send.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Disputes_Loading</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Loading your disputes…</shortDescription>
+        <value>Loading your disputes…</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Due_Date</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Due date</shortDescription>
+        <value>Due date</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Evidence_Optional</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: … (optional)</shortDescription>
+        <value>{0} (optional)</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Evidence_Required</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: … (required)</shortDescription>
+        <value>{0} (required)</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Existing_Heading</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: This statement already has an open dispute</shortDescription>
+        <value>This statement already has an open dispute</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Existing_Text</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Dispute … is already open for it.</shortDescription>
+        <value>Dispute {0} is already open for it.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Failed_No_Reference</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Something went wrong on our side. Please try again later.</shortDescription>
+        <value>Something went wrong on our side. Please try again later.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Failed_With_Reference</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Something went wrong on our side. If you contact us, quote reference ….</shortDescription>
+        <value>Something went wrong on our side. If you contact us, quote reference {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Form_Loading</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Loading the form…</shortDescription>
+        <value>Loading the form…</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Go_To_Dispute</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Go to dispute …</shortDescription>
+        <value>Go to dispute {0}</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_In_Dispute</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: In dispute:</shortDescription>
+        <value>In dispute:</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Log_Out</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Log out</shortDescription>
+        <value>Log out</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Months_Covered</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Months covered</shortDescription>
+        <value>Months covered</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_My_Account</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: My account</shortDescription>
+        <value>My account</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Nav_Label</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Customer portal</shortDescription>
+        <value>Customer portal</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Next_Payment_Due</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Next payment due</shortDescription>
+        <value>Next payment due</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_No_Account</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: We couldn't find an account for your login.</shortDescription>
+        <value>We couldn't find an account for your login.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_No_Card_Numbers</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Please don't include card or bank account numbers.</shortDescription>
+        <value>Please don't include card or bank account numbers.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_No_Disputes</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: You haven't opened any disputes.</shortDescription>
+        <value>You haven't opened any disputes.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_No_Open_Choices</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: There are no statements you can open a new dispute on.</shortDescription>
+        <value>There are no statements you can open a new dispute on.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_No_Payments</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: No payments on this statement yet.</shortDescription>
+        <value>No payments on this statement yet.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_No_Promises</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: No special terms were recorded when you signed.</shortDescription>
+        <value>No special terms were recorded when you signed.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_No_Promises_Help</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: If you were told about a credit or other terms at signing, open a dispu…</shortDescription>
+        <value>If you were told about a credit or other terms at signing, open a dispute and choose “Promised Credit Not Applied”.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_No_Statements</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: You don't have any statements yet.</shortDescription>
+        <value>You don't have any statements yet.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_None</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: None</shortDescription>
+        <value>None</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Not_A_Customer</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: This page is for Lumenfield customers. Log in with your customer accoun…</shortDescription>
+        <value>This page is for Lumenfield customers. Log in with your customer account to see it.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Not_Applicable</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Not applicable</shortDescription>
+        <value>Not applicable</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Nothing_Due</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Nothing due</shortDescription>
+        <value>Nothing due</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Oldest_Unpaid</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Oldest unpaid statement</shortDescription>
+        <value>Oldest unpaid statement</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Open_A_Dispute</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Open a dispute</shortDescription>
+        <value>Open a dispute</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Open_Another</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Open another dispute</shortDescription>
+        <value>Open another dispute</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Open_The_Dispute</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Open the dispute</shortDescription>
+        <value>Open the dispute</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Opened</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Opened</shortDescription>
+        <value>Opened</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Opened_Heading</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Dispute … is open</shortDescription>
+        <value>Dispute {0} is open</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Opened_Text</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: A dispute specialist will review it. Send the items below from the disp…</shortDescription>
+        <value>A dispute specialist will review it. Send the items below from the dispute's page.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Optional</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Optional</shortDescription>
+        <value>Optional</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Paid</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Paid</shortDescription>
+        <value>Paid</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Past_Due</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Past due</shortDescription>
+        <value>Past due</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Payments</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Payments</shortDescription>
+        <value>Payments</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Promises_Lead</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: The special terms recorded on your agreement when you signed.</shortDescription>
+        <value>The special terms recorded on your agreement when you signed.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Promises_Loading</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Loading what was recorded…</shortDescription>
+        <value>Loading what was recorded…</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Promises_Wrong</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: If something you were promised is missing or wrong, you can open a disp…</shortDescription>
+        <value>If something you were promised is missing or wrong, you can open a dispute.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Reason</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Reason</shortDescription>
+        <value>Reason</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Required</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Required</shortDescription>
+        <value>Required</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_See_Statements</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: See your statements and payments</shortDescription>
+        <value>See your statements and payments</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Statement</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Statement</shortDescription>
+        <value>Statement</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Statement_Date</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Statement date</shortDescription>
+        <value>Statement date</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Statement_Loading</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Loading the statement…</shortDescription>
+        <value>Loading the statement…</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Statement_Not_Yours</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: We can't show this statement. It isn't on your account, or it doesn't e…</shortDescription>
+        <value>We can't show this statement. It isn't on your account, or it doesn't exist.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Statement_Numbered</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Statement …</shortDescription>
+        <value>Statement {0}</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Statement_Option</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Statement …, …, …</shortDescription>
+        <value>Statement {0}, {1}, {2}</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Statements</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Statements</shortDescription>
+        <value>Statements</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Statements_Lead</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Newest first. Each statement lists the payments made against it.</shortDescription>
+        <value>Newest first. Each statement lists the payments made against it.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Statements_Loading</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Loading your statements…</shortDescription>
+        <value>Loading your statements…</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Status</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Status</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Try_Again</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: We couldn't show this just now. Please try again later.</shortDescription>
+        <value>We couldn't show this just now. Please try again later.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Upload_Heading</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Upload your evidence</shortDescription>
+        <value>Upload your evidence</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Upload_Lead</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: PDF files or photos. You can add several at once.</shortDescription>
+        <value>PDF files or photos. You can add several at once.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Upload_Thanks_Many</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Thank you. We've received your … files.</shortDescription>
+        <value>Thank you. We've received your {0} files.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Upload_Thanks_One</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Thank you. We've received your file.</shortDescription>
+        <value>Thank you. We've received your file.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Value</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Value</shortDescription>
+        <value>Value</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_What_To_Send</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: What to send</shortDescription>
+        <value>What to send</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_What_We_Promised</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: What we promised you</shortDescription>
+        <value>What we promised you</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_What_Youll_Need</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: What you'll need to send</shortDescription>
+        <value>What you'll need to send</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Whats_Wrong</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: What's wrong with it?</shortDescription>
+        <value>What's wrong with it?</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Which_Statement</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Which statement is wrong?</shortDescription>
+        <value>Which statement is wrong?</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Your_Disputes</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Your disputes</shortDescription>
+        <value>Your disputes</value>
+    </labels>
+</CustomLabels>

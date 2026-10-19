@@ -4,9 +4,11 @@ import getDisputeForm from "@salesforce/apex/PortalDisputesController.getDispute
 import openDispute from "@salesforce/apex/PortalDisputesController.openDispute";
 import {
   CONNECTION_PROBLEM,
+  LABELS,
   PAGES,
   OUTCOME,
   REASON,
+  format,
   formatDate,
   formatMoney,
   problemMessage,
@@ -14,9 +16,9 @@ import {
 } from "c/portalShared";
 
 const DECLINED = {
-  [REASON.notFound]: "We couldn't find that statement on your account.",
-  [REASON.statementRequired]: "Choose the statement the dispute is about.",
-  [REASON.invalidReason]: "Choose one of the reasons in the list."
+  [REASON.notFound]: LABELS.declinedNotFound,
+  [REASON.statementRequired]: LABELS.declinedStatementRequired,
+  [REASON.invalidReason]: LABELS.declinedInvalidReason
 };
 
 /**
@@ -29,6 +31,7 @@ const DECLINED = {
 export default class PortalDisputeForm extends NavigationMixin(
   LightningElement
 ) {
+  labels = LABELS;
   loading = true;
   problem;
   reasons = [];
@@ -54,15 +57,21 @@ export default class PortalDisputeForm extends NavigationMixin(
   async load() {
     try {
       const form = await getDisputeForm();
-      this.problem = problemMessage(
-        form,
-        "We couldn't find an account for your login."
-      );
+      this.problem = problemMessage(form, LABELS.noAccount);
       if (!this.problem) {
         this.reasons = form.reasons ?? [];
         this.statements = (form.statements ?? []).map((statement) => ({
           ...statement,
-          label: `Statement ${statement.statementNumber}, ${formatDate(statement.statementDate)}, ${formatMoney(statement.amountDue)}`
+          label: format(
+            LABELS.statementOption,
+            statement.statementNumber,
+            formatDate(statement.statementDate),
+            formatMoney(statement.amountDue)
+          ),
+          disputeLinkText: format(
+            LABELS.disputeLink,
+            statement.disputeCaseNumber
+          )
         }));
         this.linkDisputedStatements();
       }
@@ -122,7 +131,10 @@ export default class PortalDisputeForm extends NavigationMixin(
   toEvidence(items) {
     return (items ?? []).map((item, index) => ({
       key: `evidence-${index}`,
-      text: `${item.item} (${item.required ? "required" : "optional"})`
+      text: format(
+        item.required ? LABELS.evidenceRequired : LABELS.evidenceOptional,
+        item.item
+      )
     }));
   }
 
@@ -160,7 +172,7 @@ export default class PortalDisputeForm extends NavigationMixin(
       this.showResult(result);
     } catch {
       this.result = {
-        heading: "We couldn't open the dispute",
+        heading: LABELS.couldNotOpen,
         text: CONNECTION_PROBLEM
       };
     } finally {
@@ -172,8 +184,8 @@ export default class PortalDisputeForm extends NavigationMixin(
   showResult(result) {
     if (result.outcome === OUTCOME.completed) {
       this.result = {
-        heading: `Dispute ${result.caseNumber} is open`,
-        text: "A dispute specialist will review it. Send the items below from the dispute's page.",
+        heading: format(LABELS.openedHeading, result.caseNumber),
+        text: LABELS.openedText,
         evidence: this.toEvidence(result.evidence),
         caseId: result.caseId,
         caseNumber: result.caseNumber
@@ -182,8 +194,8 @@ export default class PortalDisputeForm extends NavigationMixin(
       this.dispatchEvent(new CustomEvent("disputeopened"));
     } else if (result.reasonCode === REASON.existingDispute) {
       this.result = {
-        heading: "This statement already has an open dispute",
-        text: `Dispute ${result.caseNumber} is already open for it.`,
+        heading: LABELS.existingHeading,
+        text: format(LABELS.existingText, result.caseNumber),
         caseId: result.caseId,
         caseNumber: result.caseNumber
       };
@@ -193,12 +205,12 @@ export default class PortalDisputeForm extends NavigationMixin(
       DECLINED[result.reasonCode]
     ) {
       this.result = {
-        heading: "We couldn't open the dispute",
+        heading: LABELS.couldNotOpen,
         text: DECLINED[result.reasonCode]
       };
     } else {
       this.result = {
-        heading: "We couldn't open the dispute",
+        heading: LABELS.couldNotOpen,
         text: problemMessage(result, DECLINED[REASON.notFound])
       };
     }
@@ -209,7 +221,11 @@ export default class PortalDisputeForm extends NavigationMixin(
     this[NavigationMixin.GenerateUrl](recordPage(caseId, PAGES.dispute)).then(
       (url) => {
         if (this.result?.caseId === caseId) {
-          this.result = { ...this.result, caseUrl: url };
+          this.result = {
+            ...this.result,
+            caseUrl: url,
+            caseLinkText: format(LABELS.goToDispute, this.result.caseNumber)
+          };
         }
       }
     );

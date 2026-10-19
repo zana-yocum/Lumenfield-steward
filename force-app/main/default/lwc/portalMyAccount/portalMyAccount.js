@@ -3,7 +3,9 @@ import { NavigationMixin } from "lightning/navigation";
 import getMyAccount from "@salesforce/apex/PortalAccountController.getMyAccount";
 import {
   CONNECTION_PROBLEM,
+  LABELS,
   PAGES,
+  format,
   formatDate,
   formatMoney,
   namedPage,
@@ -16,6 +18,7 @@ import {
  * read back by AccountSnapshotService for the logged-in household; nothing is calculated here.
  */
 export default class PortalMyAccount extends NavigationMixin(LightningElement) {
+  labels = LABELS;
   loading = true;
   account;
   problem;
@@ -33,10 +36,7 @@ export default class PortalMyAccount extends NavigationMixin(LightningElement) {
   async load() {
     try {
       const result = await getMyAccount();
-      this.problem = problemMessage(
-        result,
-        "We couldn't find an account for your login."
-      );
+      this.problem = problemMessage(result, LABELS.noAccount);
       this.account = this.problem ? null : result;
     } catch {
       this.problem = CONNECTION_PROBLEM;
@@ -48,17 +48,23 @@ export default class PortalMyAccount extends NavigationMixin(LightningElement) {
   get figures() {
     const a = this.account;
     return [
-      { label: "Current balance", value: formatMoney(a.currentBalance) },
-      { label: "Past due", value: formatMoney(a.pastDueBalance) },
+      { label: LABELS.currentBalance, value: formatMoney(a.currentBalance) },
+      { label: LABELS.pastDue, value: formatMoney(a.pastDueBalance) },
       {
-        label: "Oldest unpaid statement",
-        value: a.oldestPastDueDate ? formatDate(a.oldestPastDueDate) : "None"
+        label: LABELS.oldestUnpaid,
+        value: a.oldestPastDueDate
+          ? formatDate(a.oldestPastDueDate)
+          : LABELS.none
       },
       {
-        label: "Next payment due",
+        label: LABELS.nextPaymentDue,
         value: a.nextDueDate
-          ? `${formatMoney(a.nextDueAmount)} on ${formatDate(a.nextDueDate)}`
-          : "Nothing due"
+          ? format(
+              LABELS.amountOnDate,
+              formatMoney(a.nextDueAmount),
+              formatDate(a.nextDueDate)
+            )
+          : LABELS.nothingDue
       }
     ];
   }
@@ -66,10 +72,12 @@ export default class PortalMyAccount extends NavigationMixin(LightningElement) {
   get promise() {
     const p = this.account?.openPromise;
     return p
-      ? {
-          text: `You've arranged to pay ${formatMoney(p.amount)} by ${formatDate(p.promiseDate)}.`,
-          status: p.status
-        }
+      ? format(
+          LABELS.arrangementText,
+          formatMoney(p.amount),
+          formatDate(p.promiseDate),
+          p.status
+        )
       : null;
   }
 

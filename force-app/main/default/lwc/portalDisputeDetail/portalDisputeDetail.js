@@ -3,7 +3,9 @@ import { CurrentPageReference, NavigationMixin } from "lightning/navigation";
 import getDispute from "@salesforce/apex/PortalDisputesController.getDispute";
 import {
   CONNECTION_PROBLEM,
+  LABELS,
   PAGES,
+  format,
   formatDate,
   namedPage,
   problemMessage,
@@ -11,8 +13,7 @@ import {
   recordPage
 } from "c/portalShared";
 
-const NOT_YOURS =
-  "We can't show this dispute. It isn't on your account, or it doesn't exist.";
+const NOT_YOURS = LABELS.disputeNotYours;
 
 /**
  * ST-06, ST-12. A dispute's own page: its status, reason, statement and opening date, the evidence
@@ -23,6 +24,7 @@ const NOT_YOURS =
 export default class PortalDisputeDetail extends NavigationMixin(
   LightningElement
 ) {
+  labels = LABELS;
   loading = true;
   caseId;
   dispute;
@@ -76,7 +78,7 @@ export default class PortalDisputeDetail extends NavigationMixin(
         this.evidence = (result.evidence ?? []).map((item, index) => ({
           key: `evidence-${index}`,
           text: item.item,
-          need: item.required ? "Required" : "Optional"
+          need: item.required ? LABELS.required : LABELS.optional
         }));
         this.linkStatement();
       }
@@ -103,15 +105,17 @@ export default class PortalDisputeDetail extends NavigationMixin(
   }
 
   get title() {
-    return this.dispute ? `Dispute ${this.dispute.caseNumber}` : "Dispute";
+    return this.dispute
+      ? format(LABELS.disputeNumbered, this.dispute.caseNumber)
+      : LABELS.dispute;
   }
 
   get details() {
     const d = this.dispute;
     return [
-      { label: "Status", value: d.status },
-      { label: "Reason", value: d.reason },
-      { label: "Opened", value: formatDate(d.openedDate) }
+      { label: LABELS.status, value: d.status },
+      { label: LABELS.reason, value: d.reason },
+      { label: LABELS.opened, value: formatDate(d.openedDate) }
     ];
   }
 
@@ -123,8 +127,8 @@ export default class PortalDisputeDetail extends NavigationMixin(
     const count = event.detail.files.length;
     this.uploadMessage =
       count === 1
-        ? "Thank you. We've received your file."
-        : `Thank you. We've received your ${count} files.`;
+        ? LABELS.uploadThanksOne
+        : format(LABELS.uploadThanksMany, count);
   }
 
   handleStatement(event) {
