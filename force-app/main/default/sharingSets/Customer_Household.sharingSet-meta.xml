@@ -12,7 +12,7 @@
         <objectField>Customer_Household__c</objectField>
         <userField>Account</userField>
     </accessMappings>
-    <description>ST-01, ST-06, ST-12, S-04, S-16. A customer reads their own household and its billing disputes. Statements, payments and promises follow the account as its detail records. Disputes are matched on Customer_Household__c, never AccountId, so default reviews stay internal.</description>
+    <description>ST-01, ST-06, ST-12, S-04, S-16. Customers read their own household, whose statements, payments and promises follow it, and its billing disputes, matched on Customer_Household__c so default reviews stay internal.</description>
     <name>Customer_Household</name>
     <profiles>customer community login user</profiles>
     <profiles>customer community user</profiles>

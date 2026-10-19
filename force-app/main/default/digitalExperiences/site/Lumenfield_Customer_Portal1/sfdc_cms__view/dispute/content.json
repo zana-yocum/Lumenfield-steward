@@ -21,7 +21,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:stewardDisputeDetail",
+              "definition" : "c:portalDisputeDetail",
               "id" : "d254c9c3-326f-442c-877b-042258642b0f",
               "type" : "component"
             } ],

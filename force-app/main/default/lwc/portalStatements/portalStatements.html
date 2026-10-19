@@ -1,0 +1,29 @@
+<template>
+  <section class="page">
+    <h1 class="page-title">Statements</h1>
+    <template lwc:if={loading}>
+      <p role="status">Loading your statements…</p>
+    </template>
+    <template lwc:elseif={problem}>
+      <p class="notice" role="alert">{problem}</p>
+    </template>
+    <template lwc:elseif={hasStatements}>
+      <p class="lead">
+        Newest first. Each statement lists the payments made against it.
+      </p>
+      <ul class="plain-list">
+        <template for:each={statements} for:item="statement">
+          <li key={statement.statementId}>
+            <c-portal-statement-card
+              statement={statement}
+              link-to-detail
+            ></c-portal-statement-card>
+          </li>
+        </template>
+      </ul>
+    </template>
+    <template lwc:else>
+      <p>You don't have any statements yet.</p>
+    </template>
+  </section>
+</template>

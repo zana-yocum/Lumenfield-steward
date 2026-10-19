@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <description>The portal's What We Promised You page: the terms recorded at signing, through the scoped read service (ST-02, S-08).</description>
+    <isExposed>true</isExposed>
+    <masterLabel>Portal What We Promised You</masterLabel>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+</LightningComponentBundle>

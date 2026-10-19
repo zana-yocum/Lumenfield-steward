@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <description>One statement with its payments and any open dispute, for the portal's Statements and statement pages (ST-01).</description>
+    <isExposed>false</isExposed>
+    <masterLabel>Portal Statement Card</masterLabel>
+</LightningComponentBundle>

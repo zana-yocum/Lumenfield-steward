@@ -26,7 +26,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:stewardPortalHeader",
+              "definition" : "c:portalHeader",
               "id" : "c0fb5ce3-0646-42ab-b84b-d5e1d8ae6b0a",
               "type" : "component"
             } ],

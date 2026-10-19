@@ -9,9 +9,6 @@
         <assignmentItems>
             <assignToReference>$Record.Customer_Household__c</assignToReference>
             <operator>Assign</operator>
-            <value>
-                <elementReference>$GlobalConstant.EmptyString</elementReference>
-            </value>
         </assignmentItems>
     </assignments>
     <assignments>
