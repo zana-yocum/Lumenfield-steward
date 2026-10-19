@@ -1,0 +1,5 @@
+{
+  "apiName" : "Statements__c",
+  "type" : "sfdc_cms__route",
+  "path" : "routes"
+}

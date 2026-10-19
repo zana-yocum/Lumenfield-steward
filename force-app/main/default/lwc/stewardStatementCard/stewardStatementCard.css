@@ -1,0 +1,27 @@
+@import "c/stewardPortalStyles";
+
+.card-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.payments-title {
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Status is text, never color alone; the border only frames it. */
+.status {
+  padding: 0.125rem 0.5rem;
+  border: 1px solid #706e6b;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+}
+
+.dispute {
+  margin-top: 0.5rem;
+}

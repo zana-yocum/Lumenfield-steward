@@ -1,8 +1,9 @@
-# ST-13 · S-05 · S-12 · S-13
+# ST-13 · S-05 · S-12 · S-13 · S-17
 # Runs when a merge to main changes org metadata. Finds the pull request behind the
 # merge and quick-deploys the validation that passed on it. If Salesforce won't accept
 # the quick deploy, it deploys again with the same tests. A change to force-app/ that
-# didn't come through a validated pull request is refused.
+# didn't come through a validated pull request is refused. When the pull request
+# changed anything the customer portal shows, the portal is published afterwards.
 name: Deploy
 
 on:
@@ -61,6 +62,7 @@ jobs:
           job_id=$(cat "$RUNNER_TEMP/validation/validation-id.txt")
           echo "Pull request #$pr was validated in run $run as job $job_id"
           echo "job_id=$job_id" >> "$GITHUB_OUTPUT"
+          echo "pr=$pr" >> "$GITHUB_OUTPUT"
 
       - name: Sign in to the org as Steward CI (JWT)
         env:
@@ -85,3 +87,41 @@ jobs:
             echo "::warning::Salesforce didn't accept a quick deploy of $JOB_ID. Deploying again with local Apex tests."
             sf project deploy start --source-dir force-app --test-level RunLocalTests --wait 60
           fi
+
+      # An LWR site serves the copy that was last published, so new pages and component
+      # changes reach customers only when it's published again. Publishing runs in the
+      # background in the org; the step waits for it and fails if it doesn't finish.
+      - name: Publish the customer portal if it changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ steps.find.outputs.pr }}
+          SITE: Lumenfield Customer Portal
+        run: |
+          shown='^force-app/main/default/(digitalExperiences|digitalExperienceConfigs|lwc|navigationMenus|networks|sites)/'
+          if ! gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[].filename' | grep -qE "$shown"; then
+            echo "Pull request #$PR changed nothing the portal shows, so the portal isn't republished."
+            exit 0
+          fi
+          job=$(sf community publish --name "$SITE" --json | jq -r '.result.jobId // empty')
+          if [ -z "$job" ]; then
+            echo "::error::Salesforce didn't start publishing $SITE."
+            exit 1
+          fi
+          echo "Publishing $SITE as background job $job."
+          for _ in $(seq 1 40); do
+            status=$(sf data query --query "SELECT Status FROM BackgroundOperation WHERE Id = '$job'" --json | jq -r '.result.records[0].Status // empty')
+            case "$status" in
+              Complete)
+                echo "$SITE is published."
+                exit 0
+                ;;
+              Error | Canceled)
+                echo "::error::Publishing $SITE ended with status $status. See Setup > Background Jobs."
+                exit 1
+                ;;
+            esac
+            sleep 15
+          done
+          echo "::error::Publishing $SITE didn't finish within 10 minutes. See Setup > Background Jobs."
+          exit 1

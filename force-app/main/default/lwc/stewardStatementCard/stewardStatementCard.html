@@ -1,0 +1,50 @@
+<template>
+  <article class="card">
+    <div class="card-top">
+      <template lwc:if={hideTitle}>
+        <span class="status">{statement.status}</span>
+      </template>
+      <template lwc:else>
+        <h2 class="card-title">
+          <template lwc:if={linkToDetail}>
+            <a href={detailUrl} onclick={handleOpenStatement}>{title}</a>
+          </template>
+          <template lwc:else>{title}</template>
+        </h2>
+        <span class="status">{statement.status}</span>
+      </template>
+    </div>
+    <template lwc:if={hasDispute}>
+      <p class="dispute">
+        In dispute:
+        <a href={disputeUrl} onclick={handleOpenDispute}
+          >case {statement.disputeCaseNumber}</a
+        >
+      </p>
+    </template>
+    <dl class="details">
+      <template for:each={details} for:item="detail">
+        <div key={detail.label}>
+          <dt>{detail.label}</dt>
+          <dd>{detail.value}</dd>
+        </div>
+      </template>
+    </dl>
+    <template lwc:if={hideTitle}>
+      <h2 class="payments-title">Payments</h2>
+    </template>
+    <template lwc:else>
+      <h3 class="payments-title">Payments</h3>
+    </template>
+    <template lwc:if={hasPayments}>
+      <ul class="bullets">
+        <template for:each={payments} for:item="payment">
+          <li key={payment.key}>{payment.text}</li>
+        </template>
+      </ul>
+    </template>
+    <template lwc:else>
+      <p>No payments on this statement yet.</p>
+    </template>
+  </article>
+</template>

@@ -1,0 +1,30 @@
+<template>
+  <section class="page">
+    <h1 class="page-title">My account</h1>
+    <template lwc:if={loading}>
+      <p role="status">Loading your account…</p>
+    </template>
+    <template lwc:elseif={problem}>
+      <p class="notice" role="alert">{problem}</p>
+    </template>
+    <template lwc:else>
+      <dl class="details">
+        <template for:each={figures} for:item="figure">
+          <div key={figure.label} class="card">
+            <dt>{figure.label}</dt>
+            <dd class="figure">{figure.value}</dd>
+          </div>
+        </template>
+      </dl>
+      <template lwc:if={promise}>
+        <h2 class="section-title">Your payment arrangement</h2>
+        <p>{promise.text} Status: {promise.status}.</p>
+      </template>
+      <p class="lead">
+        <a href={statementsUrl} onclick={handleStatements}
+          >See your statements and payments</a
+        >
+      </p>
+    </template>
+  </section>
+</template>

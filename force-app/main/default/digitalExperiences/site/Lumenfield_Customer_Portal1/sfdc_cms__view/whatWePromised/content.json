@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "What We Promised You",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"fd99a2bd-48d5-4ab3-9a2a-a542532efec3\",\"columns\":[{\"UUID\":\"b5f39c25-df5c-4926-a862-052937803c96\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":null}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "c:stewardCommitments",
+              "id" : "d45da436-297a-4f0c-a1f8-065b4cfae7aa",
+              "type" : "component"
+            } ],
+            "id" : "b5f39c25-df5c-4926-a862-052937803c96",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "fd99a2bd-48d5-4ab3-9a2a-a542532efec3",
+          "type" : "component"
+        } ],
+        "id" : "615ab24d-553f-42f2-bea9-261284bc3382",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "What we promised you",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "bcc0c02d-78fa-4959-8264-ba3a1ddafd31",
+          "type" : "component"
+        } ],
+        "id" : "5065a72b-8518-4191-a891-a1f04402cc54",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "4e7220c9-1e9e-40a7-8802-2783a268f143",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "Inner",
+    "viewType" : "custom-what-we-promised"
+  },
+  "urlName" : "what-we-promised"
+}

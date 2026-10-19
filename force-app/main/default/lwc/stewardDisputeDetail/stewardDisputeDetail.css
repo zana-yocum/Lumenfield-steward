@@ -1,0 +1,9 @@
+@import "c/stewardPortalStyles";
+
+.need {
+  font-weight: 700;
+}
+
+.upload-message {
+  margin-top: 0.5rem;
+}

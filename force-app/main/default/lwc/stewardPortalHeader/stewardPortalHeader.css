@@ -1,0 +1,45 @@
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #c9c9c9;
+}
+
+.brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #032d60;
+  text-decoration: none;
+}
+
+.nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* WCAG 2.2 target size: every link is at least 24 pixels tall and wide. */
+.nav-link {
+  display: inline-block;
+  min-height: 24px;
+  min-width: 24px;
+  padding: 0.25rem 0;
+  color: #0b5cab;
+}
+
+.brand:focus-visible,
+.nav-link:focus-visible {
+  outline: 2px solid #0b5cab;
+  outline-offset: 2px;
+}
+
+.nav-link[aria-current="page"] {
+  font-weight: 700;
+  text-decoration-thickness: 2px;
+}

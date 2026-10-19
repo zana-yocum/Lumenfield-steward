@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <description>The customer portal's header: brand, page links with the current page marked, and Log out (ST-01, ST-02, ST-06, NFR-05).</description>
+    <isExposed>true</isExposed>
+    <masterLabel>Steward Portal Header</masterLabel>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+</LightningComponentBundle>

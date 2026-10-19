@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Disputes",
+  "contentBody" : {
+    "activeViewId" : "disputes",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-disputes",
+    "urlPrefix" : "disputes"
+  },
+  "urlName" : "disputes"
+}

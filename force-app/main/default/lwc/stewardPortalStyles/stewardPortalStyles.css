@@ -1,0 +1,89 @@
+/* NFR-05. Shared by the portal's page components: one column on a 360-pixel phone, readable
+   text, links that look like links, and a visible focus ring. Status is always written out,
+   never shown by color alone. */
+.page {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.page-title {
+  margin-bottom: 1rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.section-title {
+  margin: 1.5rem 0 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.lead {
+  margin-bottom: 1rem;
+}
+
+.notice {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #a96404;
+  background: #fef1e5;
+  color: #181818;
+}
+
+.card {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid #c9c9c9;
+  border-radius: 0.25rem;
+}
+
+.card-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.plain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bullets {
+  margin: 0.25rem 0 0 1.25rem;
+  list-style: disc;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+  margin-top: 0.75rem;
+}
+
+@media (min-width: 48em) {
+  .details {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.details dt {
+  font-size: 0.875rem;
+  color: #3e3e3c;
+}
+
+.details dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+a {
+  color: #0b5cab;
+}
+
+a:focus-visible,
+[tabindex="-1"]:focus-visible {
+  outline: 2px solid #0b5cab;
+  outline-offset: 2px;
+}

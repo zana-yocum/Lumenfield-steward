@@ -1,0 +1,5 @@
+{
+  "apiName" : "statements",
+  "type" : "sfdc_cms__view",
+  "path" : "views"
+}

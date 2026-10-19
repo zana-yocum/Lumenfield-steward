@@ -1,0 +1,5 @@
+{
+  "apiName" : "dispute",
+  "type" : "sfdc_cms__view",
+  "path" : "views"
+}

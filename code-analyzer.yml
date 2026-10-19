@@ -10,3 +10,10 @@ rules:
     # Run it on demand with --rule-selector pmd:ApexUnitTestClassShouldHaveRunAs.
     ApexUnitTestClassShouldHaveRunAs:
       tags: ["BestPractices", "Apex"]
+
+# Jest tests run in Node and are never deployed (.forceignore). Their documented patterns, such as
+# waiting for promises with setTimeout and emitting values from a wire adapter, break rules that
+# are meant for component code, so the tests are left out of the scan.
+ignores:
+  files:
+    - "**/__tests__/**"

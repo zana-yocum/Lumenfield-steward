@@ -45,6 +45,23 @@ public with sharing class AgentActionLogger {
   }
 
   /**
+   * Records one failure and returns the log's number, the reference a customer can quote when
+   * they get in touch (NFR-07).
+   * @param entry what happened
+   * @return the log record's number, such as AAL-000123, or null if it couldn't be saved
+   */
+  public static String logForReference(Entry entry) {
+    Database.SaveResult saved = log(entry);
+    if (saved == null) {
+      return null;
+    }
+    if (!saved.isSuccess()) {
+      return null;
+    }
+    return new Elevated().referenceFor(saved.getId());
+  }
+
+  /**
    * Records actions in one save. Entries that fail to save are reported, not thrown.
    * @param entries what happened; nulls are skipped
    * @return one save result per saved entry, in order
@@ -106,7 +123,24 @@ public with sharing class AgentActionLogger {
   // S-09: the log is written in system mode and without sharing, so a declined or failed request
   // is recorded even when the caller can't see the account it named, and the agent user needs no
   // access to the log object at all. Reading the log stays with supervisors and admins (ST-11).
+  // The one read here is the number of the record just written, so a customer can quote it.
   private without sharing class Elevated {
+    /**
+     * The number of a log record this class just wrote.
+     * @param logId the record's ID
+     * @return its number, or null if it isn't there
+     */
+    public String referenceFor(Id logId) {
+      List<Agent_Action_Log__c> rows = [
+        SELECT Name
+        FROM Agent_Action_Log__c
+        WHERE Id = :logId
+        WITH SYSTEM_MODE
+        LIMIT 1
+      ];
+      return rows.isEmpty() ? null : rows[0].Name;
+    }
+
     /**
      * Saves the rows; a row that fails is reported in its result, never thrown.
      * @param rows the log records

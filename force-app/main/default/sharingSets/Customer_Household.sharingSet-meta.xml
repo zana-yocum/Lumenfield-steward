@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SharingSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <accessMappings>
+        <accessLevel>Read</accessLevel>
+        <object>Account</object>
+        <objectField>Id</objectField>
+        <userField>Account</userField>
+    </accessMappings>
+    <accessMappings>
+        <accessLevel>Read</accessLevel>
+        <object>Case</object>
+        <objectField>Customer_Household__c</objectField>
+        <userField>Account</userField>
+    </accessMappings>
+    <description>ST-01, ST-06, ST-12, S-04, S-16. A customer reads their own household and its billing disputes. Statements, payments and promises follow the account as its detail records. Disputes are matched on Customer_Household__c, never AccountId, so default reviews stay internal.</description>
+    <name>Customer_Household</name>
+    <profiles>customer community login user</profiles>
+    <profiles>customer community user</profiles>
+</SharingSet>

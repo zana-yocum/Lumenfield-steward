@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <description>A dispute's own page in the portal: status, reason, evidence list and an upload area, found by the ID in the address only among the household's disputes (ST-06, ST-12).</description>
+    <isExposed>true</isExposed>
+    <masterLabel>Steward Dispute Detail</masterLabel>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+</LightningComponentBundle>
