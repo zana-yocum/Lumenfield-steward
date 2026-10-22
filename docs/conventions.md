@@ -47,7 +47,7 @@ Accord's IDs (`US-xx`, `D-xx`, `DEF-xx`) keep their meaning. Steward's carry an 
 - No limits, day counts or percentages in code. They come from `Policy_Setting__mdt` through `PolicySettings`, and a missing setting throws instead of falling back to a default.
 - Agent actions are thin: get the verified account from the session (S-07), call a service, write one log record through `AgentActionLogger`, return a typed result. They never take an account or contact ID as an input.
 - Portal controllers are thin the same way: the household comes from `PortalHousehold.current()`, never from the page, and a record ID from the address is looked for only among the household's own records. A failure goes through `PortalFailure`: the details to the action log, a reference (the log's number) to the customer (NFR-07).
-- Values a record can derive from another record are stamped by a before-save flow, not set by the caller, such as a dispute's agreement and household (S-16, S-19). The flow has entry criteria, so it runs only when the answer can change.
+- Values a record can derive from another record are stamped by a before-save flow, not set by the caller, such as a dispute's agreement and household (S-16, S-19). The flow has entry criteria, so it runs only when the answer can change or is wrong.
 - Actions return outcome codes, not sentences: `COMPLETED`, `DECLINED_POLICY`, `HANDOFF` or `FAILED`, plus a reason code such as `DATE_OUTSIDE_WINDOW`. Every result extends `StewardOutcome.Result`. The agent puts them into words (GR-04).
 - Services take lists, and nothing queries or saves inside a loop.
 - Request classes take at most three constructor parameters, the ones every request needs. Optional inputs are public fields set afterwards (`request.description = ...`).
@@ -114,7 +114,7 @@ Accord's IDs (`US-xx`, `D-xx`, `DEF-xx`) keep their meaning. Steward's carry an 
 | Permission sets | `PS_Steward_<Audience>`: `PS_Steward_Customer`, `PS_Steward_Agent`, `PS_Steward_Rep_Assistant`, `PS_Steward_Supervisor` |
 | Permission set groups | Accord's groups gain Steward permission sets. No new groups unless a new persona appears |
 | Sharing set | `Customer_Household`, one set covering every object customers can see |
-| Customer profiles | `Steward Customer` (Customer Community) for customers, `Steward Customer Login` (Customer Community Login) for test customers. Custom, with no access of their own; access comes from `PS_Steward_Customer` (S-18) |
+| Customer profiles | `Steward Customer` (Customer Community) for customers, `Steward Customer Login` (Customer Community Login) for test customers. Custom, with every object their license grants by default switched off in source; access comes from `PS_Steward_Customer` (S-18) |
 | External Credential | `<Provider>_<Environment>`: `Stripe_Test` |
 | Named Credential | `<Provider>_API`: `Stripe_API` |
 | External Client App for the pipeline | `Steward_CI` |

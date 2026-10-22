@@ -25,6 +25,34 @@ The customer portal: an LWR site where a household sees its balance, statements,
 - `docs/conventions.md`, `docs/pipeline.md` and `docs/requirements.md` for the portal
 - Version 0.4.0
 
+### Pull request #5's validations
+- **First** (`0Afaj00000oE785CAC`): two components refused. The household flow cleared its lookup with `$GlobalConstant.EmptyString`, which a before-save flow can't use on a lookup; it now leaves the value blank. The sharing set's description was over 255 characters
+- **Second** (`0Afaj00000oE7PpCAK`): every component accepted; 14 of 99 tests failed. The org won't create users on the standard external profiles (S-18), and four tests looked up statements by a status Accord changes to In Dispute when a dispute opens
+- **Third** (`0Afaj00000oE8FRCA0`): 5 of 108 tests failed. Customer licenses can't use service contracts, so every dispute a customer opened failed before it was saved (S-19). A file an external user uploads needs the site's network, as the upload area gives it
+- **Fourth** (`0Afaj00000odYOQCA2`): 112 of 113 passed, every new class at 100%. One test read the new case's owner by name and got nothing; it now compares the queue's ID
+- **Fifth** (`0Afaj00000odfg1CAA`): 114 of 114 tests, 203 components, every class at 90% or more. The lowest is `PaymentArrangementService` at 93.0%; `DisputeIntakeService` rose from 92.1% to 96.9% with the field-level refusal now tested
+
+### Deployed and verified, 2026-10-21
+- Merged at 8:27 PM CT and quick-deployed as Steward CI (`0Afaj00000odaQECAY`, no second test run). The pipeline then published the portal (background job `08Paj00001BNs04EAD`, finished 8:30 PM)
+- In the org: the site is Live; the 11 components, both flows (Active) and both custom profiles were last changed by Steward CI
+- Demo customers created with `scripts/apex/create-demo-customers.apex`: Sandra Barnett, Tanya Lattimore and Angela Coffey, each on Steward Customer with `PS_Steward_Customer`, usernames and emails on example.com, no welcome email
+
+### Found in the org while building
+- **The org won't create users on the standard external profiles** while "Allow using standard external profiles" is off. Custom profiles instead (S-18)
+- **A profile created from source starts with its license's defaults**: the custom profiles got the same 25 objects as the standard ones. Pull request #6 switches each off (S-18)
+- **Customer licenses can't use service contracts.** The dispute's agreement is now stamped by a flow (S-19)
+- **Accord sets a statement to In Dispute** when a dispute opens, so a test can't find a disputed statement by its old status
+- **A before-save flow can't clear a lookup with `$GlobalConstant.EmptyString`**; an assignment with no value clears it
+- **A sharing set's description is capped at 255 characters**
+- **A file an external user uploads belongs to the site's network**, so a test of the upload sets it
+- **Anonymous Apex runs with the runner's field access**, so it can't touch a field no profile can see. The backfill saves each dispute and lets the flow stamp it
+- **The first retrieve brought back personal details** (the site's email sender and admin), now caught by `scripts/check_personal_details.sh`
+
+### Pull request #6
+- Both customer profiles switch off every object their license grants by default (S-18)
+- `Case_BeforeSave_StampCustomerHousehold` also runs when a dispute's household doesn't match its account, so any save repairs it. `DisputeStatusServiceTest` proves it (S-16)
+- `scripts/apex/backfill-customer-household.apex` saves each billing dispute once, for the flow to stamp
+
 ### Added in pull request #4
 - `settings/Communities.settings-meta.xml` turns on Digital Experiences (S-04, S-11). Salesforce can't turn it off again. It's been in the plan since Phase 1, and the admin approved it before the merge
 - `.github/workflows/retrieve.yml` and decision S-15: configuration built outside source is retrieved as Steward CI into a branch of its own, and reaches `main` through a pull request (ST-13)

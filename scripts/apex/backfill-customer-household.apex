@@ -1,17 +1,11 @@
-// S-16. One-time, after the Phase 4b deploy: stamps Customer_Household__c on the Billing Dispute
-// cases that existed before Case_BeforeSave_StampCustomerHousehold, so their customers can see
-// them in the portal. New and changed cases are stamped by the flow. Safe to run again: it only
-// touches disputes with no household yet. Default reviews are never stamped.
+// S-16. One-time, after the Phase 4 close-out deploy: saves every Billing Dispute case once, so
+// Case_BeforeSave_StampCustomerHousehold stamps the household on the disputes that existed before
+// it. The script doesn't name the field: no profile can see it, and anonymous Apex runs with the
+// runner's field access. Safe to run again: a dispute already stamped is left as it is.
 List<Case> disputes = [
-  SELECT Id, AccountId
+  SELECT Id
   FROM Case
-  WHERE
-    RecordType.DeveloperName = 'Billing_Dispute'
-    AND Customer_Household__c = NULL
-    AND AccountId != NULL
+  WHERE RecordType.DeveloperName = 'Billing_Dispute'
 ];
-for (Case dispute : disputes) {
-  dispute.Customer_Household__c = dispute.AccountId;
-}
 update disputes;
-System.debug('Billing disputes stamped: ' + disputes.size());
+System.debug(disputes.size());

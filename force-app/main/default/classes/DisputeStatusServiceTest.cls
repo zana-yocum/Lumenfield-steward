@@ -211,6 +211,46 @@ private class DisputeStatusServiceTest {
     );
   }
 
+  // S-16. Any save puts a dispute's household right, even an attempt to clear it. That's how the
+  // disputes from before the flow were backfilled. A default review stays without one.
+  @IsTest
+  static void anySaveRepairsADisputesHousehold() {
+    Account householdA = household(0);
+    Id disputeId = caseOf(householdA, PAYMENT_NOT_POSTED);
+    Id reviewId = [
+      SELECT Id
+      FROM Case
+      WHERE
+        AccountId = :householdA.Id
+        AND RecordType.DeveloperName = :PortalTestData.DEFAULT_REVIEW_RECORD_TYPE
+      WITH SYSTEM_MODE
+    ]
+    .Id;
+    Test.startTest();
+    update new List<Case>{
+      new Case(Id = disputeId, Customer_Household__c = null),
+      new Case(Id = reviewId)
+    };
+    Test.stopTest();
+    Map<Id, Case> saved = new Map<Id, Case>(
+      [
+        SELECT Customer_Household__c
+        FROM Case
+        WHERE Id IN (:disputeId, :reviewId)
+        WITH SYSTEM_MODE
+      ]
+    );
+    Assert.areEqual(
+      householdA.Id,
+      saved.get(disputeId).Customer_Household__c,
+      'The dispute keeps its household'
+    );
+    Assert.isNull(
+      saved.get(reviewId).Customer_Household__c,
+      'The default review stays without one'
+    );
+  }
+
   @IsTest
   static void theFlowStampsTheHouseholdOnDisputesOnly() {
     Account householdA = household(0);

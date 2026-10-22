@@ -1,7 +1,8 @@
 // S-04, S-18. One-time, after the Phase 4b deploy: makes the three demo households' primary
 // contacts customer users, on the Steward Customer profile with PS_Steward_Customer. All data is
 // invented, and usernames and emails are on example.com. No welcome email is sent. Safe to run
-// again: a contact that already has a user is skipped.
+// again: a contact that already has a user is skipped. No plus signs: the script was sent through
+// the Tooling API's executeAnonymous in a URL, where a plus sign arrives as a space.
 List<String> households = new List<String>{
   'Sandra Barnett Household',
   'Tanya Lattimore Household',
@@ -30,16 +31,23 @@ for (Account household : [
   }
   String first = household.Primary_Contact__r.FirstName;
   String last = household.Primary_Contact__r.LastName;
-  String handle = (first + '.' + last).toLowerCase().replaceAll('[^a-z.]', '');
+  String handle = String.join(new List<String>{ first, last }, '.')
+    .toLowerCase()
+    .replaceAll('[^a-z.]', '');
   customers.add(
     new User(
       ContactId = household.Primary_Contact__c,
       ProfileId = profileId,
       FirstName = first,
       LastName = last,
-      Email = handle + '@example.com',
-      Username = handle + '.lumenfield@example.com',
-      Alias = (first.left(1) + last).toLowerCase().left(8),
+      Email = String.format('{0}@example.com', new List<Object>{ handle }),
+      Username = String.format(
+        '{0}.lumenfield@example.com',
+        new List<Object>{ handle }
+      ),
+      Alias = String.join(new List<String>{ first.left(1), last }, '')
+        .toLowerCase()
+        .left(8),
       CommunityNickname = handle.left(40),
       TimeZoneSidKey = 'America/New_York',
       LocaleSidKey = 'en_US',
@@ -61,4 +69,4 @@ for (User customer : customers) {
   );
 }
 insert assignments;
-System.debug('Customer users created: ' + customers.size());
+System.debug(customers.size());
