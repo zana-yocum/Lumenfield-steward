@@ -60,6 +60,12 @@ public with sharing class StewardOutcome {
     public String outcome;
     @AuraEnabled
     public String reasonCode;
+    /**
+     * Set only on a failure the portal reports: the action log's number, which the customer can
+     * quote. The error itself stays in the log (NFR-07).
+     */
+    @AuraEnabled
+    public String reference;
 
     /**
      * Sets the outcome and the reason together, so one is never changed without the other.

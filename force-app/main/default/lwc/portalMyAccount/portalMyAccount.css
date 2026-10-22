@@ -1,0 +1,5 @@
+@import "c/portalStyles";
+
+.figure {
+  font-size: var(--portal-font-size-figure);
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <description>Opens a dispute from the portal on one of the household's statements, showing the evidence its reason calls for (ST-06, ST-12, NFR-07).</description>
+    <isExposed>false</isExposed>
+    <masterLabel>Portal Dispute Form</masterLabel>
+</LightningComponentBundle>

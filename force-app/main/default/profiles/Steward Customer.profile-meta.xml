@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Profile xmlns="http://soap.sforce.com/2006/04/metadata">
+    <custom>true</custom>
+    <description>S-04, S-18. Lumenfield customers in the portal, on Customer Community licenses. Steward's access comes from PS_Steward_Customer and the Customer_Household sharing set, not from this profile.</description>
+    <userLicense>Customer Community</userLicense>
+</Profile>

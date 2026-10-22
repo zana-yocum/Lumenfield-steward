@@ -3,7 +3,9 @@
  * the case number with the evidence to send for the reason, required items first. Accord takes
  * over from the save: its flows stamp the SLA entitlement and flag the statement as disputed, and
  * its assignment rule routes the case to Dispute Specialists. The rule is asked for explicitly,
- * because assignment rules don't run on cases Apex creates unless told to.
+ * because assignment rules don't run on cases Apex creates unless told to. The statement's
+ * agreement is copied onto the case by Case_BeforeSave_StampDisputeAgreement, not here: customer
+ * licenses can't read service contracts, so the caller never has to (S-19).
  */
 public with sharing class DisputeIntakeService {
   /** The reason isn't one of the eight dispute reasons. */
@@ -238,7 +240,7 @@ public with sharing class DisputeIntakeService {
       );
       statements = new Map<Id, Billing_Statement__c>(
         [
-          SELECT Id, Account__c, Service_Contract__c, Dispute_Open__c
+          SELECT Id, Account__c, Dispute_Open__c
           FROM Billing_Statement__c
           WHERE Id IN :statementIds AND Account__c IN :visible
           WITH USER_MODE
@@ -295,7 +297,6 @@ public with sharing class DisputeIntakeService {
         AccountId = request.accountId,
         ContactId = households.get(request.accountId).Primary_Contact__c,
         Disputed_Statement__c = statement.Id,
-        Service_Contract__c = statement.Service_Contract__c,
         Dispute_Reason__c = request.reason,
         Origin = ORIGIN_WEB,
         Subject = SUBJECT_PREFIX + request.reason

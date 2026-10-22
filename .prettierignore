@@ -4,3 +4,5 @@
 .sfdx
 node_modules
 coverage
+# Experience Builder writes the site bundle; the next retrieve would undo any formatting (S-15)
+**/digitalExperiences/**

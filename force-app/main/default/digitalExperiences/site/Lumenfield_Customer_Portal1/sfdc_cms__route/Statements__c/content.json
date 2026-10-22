@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Statements",
+  "contentBody" : {
+    "activeViewId" : "statements",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-statements",
+    "urlPrefix" : "statements"
+  },
+  "urlName" : "statements"
+}

@@ -1,0 +1,46 @@
+<template>
+  <section class="page">
+    <h1 class="page-title">{labels.disputes}</h1>
+    <p class="lead">{labels.disputesLead}</p>
+    <h2 class="section-title">{labels.openADispute}</h2>
+    <c-portal-dispute-form
+      ondisputeopened={handleOpened}
+    ></c-portal-dispute-form>
+    <h2 class="section-title">{labels.yourDisputes}</h2>
+    <template lwc:if={loading}>
+      <p role="status">{labels.disputesLoading}</p>
+    </template>
+    <template lwc:elseif={problem}>
+      <p class="notice" role="alert">{problem}</p>
+    </template>
+    <template lwc:elseif={hasDisputes}>
+      <ul class="plain-list">
+        <template for:each={disputes} for:item="dispute">
+          <li key={dispute.key}>
+            <article class="card">
+              <h3 class="card-title">
+                <a
+                  href={dispute.url}
+                  data-id={dispute.caseId}
+                  onclick={handleOpenDispute}
+                  >{dispute.title}</a
+                >
+              </h3>
+              <dl class="details">
+                <template for:each={dispute.details} for:item="detail">
+                  <div key={detail.label}>
+                    <dt>{detail.label}</dt>
+                    <dd>{detail.value}</dd>
+                  </div>
+                </template>
+              </dl>
+            </article>
+          </li>
+        </template>
+      </ul>
+    </template>
+    <template lwc:else>
+      <p>{labels.noDisputes}</p>
+    </template>
+  </section>
+</template>

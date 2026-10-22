@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Profile xmlns="http://soap.sforce.com/2006/04/metadata">
+    <custom>true</custom>
+    <description>S-04, S-18. Test customers, on Customer Community Login licenses so tests never use the member licenses the demo customers hold. Access comes from PS_Steward_Customer, as for real customers.</description>
+    <userLicense>Customer Community Login</userLicense>
+</Profile>

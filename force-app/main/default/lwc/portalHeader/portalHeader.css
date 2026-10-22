@@ -1,0 +1,47 @@
+@import "c/portalStyles";
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--portal-space-2) var(--portal-space-5);
+  padding: var(--portal-space-3) var(--portal-space-4);
+  border-bottom: var(--portal-border-thin) solid var(--portal-color-border);
+}
+
+.brand {
+  font-size: var(--portal-font-size-section-title);
+  font-weight: var(--portal-font-weight-bold);
+  color: var(--portal-color-text-strong);
+  text-decoration: none;
+}
+
+.nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--portal-space-1) var(--portal-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* WCAG 2.2 target size: every link is at least 24 pixels tall and wide. */
+.nav-link {
+  display: inline-block;
+  min-height: var(--portal-target-size);
+  min-width: var(--portal-target-size);
+  padding: var(--portal-space-1) 0;
+  color: var(--portal-color-link);
+}
+
+.brand:focus-visible,
+.nav-link:focus-visible {
+  outline: var(--portal-border-focus) solid var(--portal-color-focus);
+  outline-offset: var(--portal-border-focus);
+}
+
+.nav-link[aria-current="page"] {
+  font-weight: var(--portal-font-weight-bold);
+  text-decoration-thickness: var(--portal-border-focus);
+}

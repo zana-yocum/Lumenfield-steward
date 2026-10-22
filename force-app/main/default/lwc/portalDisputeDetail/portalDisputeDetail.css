@@ -1,0 +1,9 @@
+@import "c/portalStyles";
+
+.need {
+  font-weight: var(--portal-font-weight-bold);
+}
+
+.upload-message {
+  margin-top: var(--portal-space-2);
+}

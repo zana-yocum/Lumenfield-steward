@@ -74,6 +74,12 @@ jobs:
           MANIFEST: ${{ inputs.manifest }}
         run: sf project retrieve start --manifest "$MANIFEST" --wait 30
 
+      # The org fills some settings with a real person's details, such as a new site's email
+      # sender and admin. The repo is public, so the run stops before pushing anything personal.
+      # Found on the first retrieve, 2026-10-18.
+      - name: Check for personal details
+        run: scripts/check_personal_details.sh force-app
+
       - name: Push the result to a new branch
         env:
           MANIFEST: ${{ inputs.manifest }}

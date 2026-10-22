@@ -1,0 +1,27 @@
+@import "c/portalStyles";
+
+.card-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--portal-space-2);
+}
+
+.payments-title {
+  margin-top: var(--portal-space-4);
+  font-size: var(--portal-font-size-body);
+  font-weight: var(--portal-font-weight-bold);
+}
+
+/* Status is text, never color alone; the border only frames it. */
+.status {
+  padding: var(--portal-space-1) var(--portal-space-2);
+  border: var(--portal-border-thin) solid var(--portal-color-border-strong);
+  border-radius: var(--portal-radius-pill);
+  font-size: var(--portal-font-size-small);
+}
+
+.dispute {
+  margin-top: var(--portal-space-2);
+}

@@ -1,0 +1,11 @@
+@import "c/portalStyles";
+
+.terms {
+  margin-top: var(--portal-space-3);
+}
+
+.terms-label {
+  display: block;
+  font-size: var(--portal-font-size-small);
+  color: var(--portal-color-text-label);
+}

@@ -1,0 +1,15 @@
+@import "c/portalStyles";
+
+.field {
+  display: block;
+  margin-top: var(--portal-space-4);
+}
+
+.evidence-title {
+  margin-top: var(--portal-space-2);
+  font-weight: var(--portal-font-weight-bold);
+}
+
+.next {
+  margin: var(--portal-space-3) 0;
+}

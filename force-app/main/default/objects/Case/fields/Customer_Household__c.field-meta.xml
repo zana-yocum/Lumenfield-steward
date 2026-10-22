@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Customer_Household__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>ST-06, ST-12, S-16. The household a billing dispute belongs to. Case_BeforeSave_StampCustomerHousehold sets it on Billing Dispute cases only, so the Customer_Household sharing set shows customers their disputes and never Accord's default reviews. No one needs field access to it: the flow and the sharing set work without it.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Set automatically on billing disputes. It's what lets the household see the dispute in the customer portal.</inlineHelpText>
+    <label>Customer Household</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Customer Disputes</relationshipLabel>
+    <relationshipName>Customer_Disputes</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

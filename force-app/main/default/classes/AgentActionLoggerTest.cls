@@ -229,6 +229,34 @@ private class AgentActionLoggerTest {
     );
   }
 
+  // NFR-07. The portal gives a customer this number to quote when something fails.
+  @IsTest
+  static void aSavedEntryIsReferencedByItsNumber() {
+    Contact notAnAccount = [SELECT Id FROM Contact LIMIT 1];
+
+    Test.startTest();
+    String reference = AgentActionLogger.logForReference(
+      entry(householdId(), StewardOutcome.FAILED, 'UNEXPECTED_ERROR')
+    );
+    String unsaved = AgentActionLogger.logForReference(
+      entry(notAnAccount.Id, StewardOutcome.FAILED, 'UNEXPECTED_ERROR')
+    );
+    Test.stopTest();
+
+    Agent_Action_Log__c saved = [
+      SELECT Name
+      FROM Agent_Action_Log__c
+      WITH SYSTEM_MODE
+      LIMIT 1
+    ];
+    Assert.areEqual(saved.Name, reference, 'The reference is the log number');
+    Assert.isNull(unsaved, 'An entry that couldn\'t be saved has no reference');
+    Assert.isNull(
+      AgentActionLogger.logForReference(null),
+      'Nothing to log, no reference'
+    );
+  }
+
   @IsTest
   static void nothingToLogReturnsNothing() {
     Assert.isTrue(

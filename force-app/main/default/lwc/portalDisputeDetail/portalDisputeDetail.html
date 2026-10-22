@@ -1,0 +1,56 @@
+<template>
+  <section class="page">
+    <h1 class="page-title">{title}</h1>
+    <template lwc:if={loading}>
+      <p role="status">{labels.disputeLoading}</p>
+    </template>
+    <template lwc:elseif={problem}>
+      <p class="notice" role="alert">{problem}</p>
+    </template>
+    <template lwc:else>
+      <dl class="details">
+        <template for:each={details} for:item="detail">
+          <div key={detail.label}>
+            <dt>{detail.label}</dt>
+            <dd>{detail.value}</dd>
+          </div>
+        </template>
+        <div>
+          <dt>{labels.statement}</dt>
+          <dd>
+            <a href={statementUrl} onclick={handleStatement}
+              >{dispute.statementNumber}</a
+            >
+          </dd>
+        </div>
+      </dl>
+      <h2 class="section-title">{labels.whatToSend}</h2>
+      <ul class="bullets">
+        <template for:each={evidence} for:item="item">
+          <li key={item.key}>
+            <span class="need">{item.need}:</span> {item.text}
+          </li>
+        </template>
+      </ul>
+      <template lwc:if={isOpen}>
+        <h2 class="section-title">{labels.uploadHeading}</h2>
+        <p class="lead">{labels.uploadLead}</p>
+        <lightning-file-upload
+          label={labels.addFiles}
+          name="evidence"
+          record-id={caseId}
+          accept={acceptedFormats}
+          multiple
+          onuploadfinished={handleUploadFinished}
+        ></lightning-file-upload>
+        <p class="upload-message" role="status">{uploadMessage}</p>
+      </template>
+      <template lwc:else>
+        <p>{labels.disputeClosed}</p>
+      </template>
+    </template>
+    <p>
+      <a href={disputesUrl} onclick={handleBack}>{labels.backToDisputes}</a>
+    </p>
+  </section>
+</template>

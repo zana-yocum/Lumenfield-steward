@@ -1,7 +1,7 @@
 {
   "name": "lumenfield-steward",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Steward: Agentforce, Apex and Data 360 on the Lumenfield org",
   "scripts": {
     "test": "npm run test:unit",
@@ -11,6 +11,7 @@
     "prettier:verify": "prettier --check --no-error-on-unmatched-pattern \"force-app/**/*.{cls,trigger,js,html,css}\""
   },
   "devDependencies": {
+    "@sa11y/jest": "^7.4.0",
     "@salesforce/sfdx-lwc-jest": "^7.9.0",
     "prettier": "^3.6.2",
     "prettier-plugin-apex": "^2.3.0"

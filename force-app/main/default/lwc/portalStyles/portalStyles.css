@@ -1,0 +1,135 @@
+/* NFR-05. Shared by the portal's components: one column on a 360-pixel phone, readable text,
+   links that look like links, and a visible focus ring. Status is always written out, never shown
+   by color alone.
+
+   Every color, size and space comes from an SLDS global styling hook, through the tokens below,
+   so the components never hard-code a value (docs/conventions.md). The value after each hook is
+   used only where the site doesn't define that hook. */
+:host {
+  --portal-color-text-label: var(--slds-g-color-on-surface-1, #3e3e3c);
+  --portal-color-text-strong: var(--slds-g-color-on-surface-3, #032d60);
+  --portal-color-link: var(--slds-g-color-accent-2, #0b5cab);
+  --portal-color-focus: var(--slds-g-color-border-accent-2, #0b5cab);
+  --portal-color-border: var(--slds-g-color-border-1, #c9c9c9);
+  --portal-color-border-strong: var(--slds-g-color-border-2, #706e6b);
+  --portal-color-notice-accent: var(--slds-g-color-warning-1, #a96404);
+  --portal-color-notice-background: var(
+    --slds-g-color-warning-container-1,
+    #fef1e5
+  );
+  --portal-color-notice-text: var(--slds-g-color-on-warning-1, #181818);
+
+  --portal-space-1: var(--slds-g-spacing-1, 0.25rem);
+  --portal-space-2: var(--slds-g-spacing-2, 0.5rem);
+  --portal-space-3: var(--slds-g-spacing-3, 0.75rem);
+  --portal-space-4: var(--slds-g-spacing-4, 1rem);
+  --portal-space-5: var(--slds-g-spacing-5, 1.5rem);
+
+  --portal-font-size-small: var(--slds-g-font-scale-1, 0.875rem);
+  --portal-font-size-body: var(--slds-g-font-scale-2, 1rem);
+  --portal-font-size-card-title: var(--slds-g-font-scale-3, 1.125rem);
+  --portal-font-size-section-title: var(--slds-g-font-scale-4, 1.25rem);
+  --portal-font-size-figure: var(--slds-g-font-scale-5, 1.5rem);
+  --portal-font-size-page-title: var(--slds-g-font-scale-6, 1.75rem);
+  --portal-font-weight-bold: var(--slds-g-font-weight-7, 700);
+  --portal-line-height-heading: var(--slds-g-font-line-height-2, 1.25);
+
+  --portal-border-thin: var(--slds-g-sizing-border-1, 1px);
+  --portal-border-focus: var(--slds-g-sizing-border-2, 2px);
+  --portal-border-accent: var(--slds-g-sizing-border-4, 4px);
+  --portal-radius-card: var(--slds-g-radius-border-2, 0.25rem);
+  --portal-radius-pill: var(--slds-g-radius-border-4, 1rem);
+  /* WCAG 2.2 target size: 24 pixels. */
+  --portal-target-size: var(--slds-g-sizing-7, 1.5rem);
+
+  /* No SLDS hook: the widest the page's one column gets. */
+  --portal-page-max-width: 64rem;
+}
+
+.page {
+  max-width: var(--portal-page-max-width);
+  margin: 0 auto;
+  padding: var(--portal-space-4);
+}
+
+.page-title {
+  margin-bottom: var(--portal-space-4);
+  font-size: var(--portal-font-size-page-title);
+  font-weight: var(--portal-font-weight-bold);
+  line-height: var(--portal-line-height-heading);
+}
+
+.section-title {
+  margin: var(--portal-space-5) 0 var(--portal-space-3);
+  font-size: var(--portal-font-size-section-title);
+  font-weight: var(--portal-font-weight-bold);
+}
+
+.lead {
+  margin-bottom: var(--portal-space-4);
+}
+
+.notice {
+  margin-bottom: var(--portal-space-4);
+  padding: var(--portal-space-3) var(--portal-space-4);
+  border-left: var(--portal-border-accent) solid
+    var(--portal-color-notice-accent);
+  background: var(--portal-color-notice-background);
+  color: var(--portal-color-notice-text);
+}
+
+.card {
+  margin-bottom: var(--portal-space-4);
+  padding: var(--portal-space-4);
+  border: var(--portal-border-thin) solid var(--portal-color-border);
+  border-radius: var(--portal-radius-card);
+}
+
+.card-title {
+  font-size: var(--portal-font-size-card-title);
+  font-weight: var(--portal-font-weight-bold);
+}
+
+.plain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bullets {
+  margin: var(--portal-space-1) 0 0 var(--portal-space-5);
+  list-style: disc;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--portal-space-2) var(--portal-space-4);
+  margin-top: var(--portal-space-3);
+}
+
+@media (min-width: 48em) {
+  .details {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.details dt {
+  font-size: var(--portal-font-size-small);
+  color: var(--portal-color-text-label);
+}
+
+.details dd {
+  margin: 0;
+  font-weight: var(--portal-font-weight-bold);
+}
+
+a {
+  color: var(--portal-color-link);
+}
+
+a:focus-visible,
+[tabindex="-1"]:focus-visible {
+  outline: var(--portal-border-focus) solid var(--portal-color-focus);
+  outline-offset: var(--portal-border-focus);
+}

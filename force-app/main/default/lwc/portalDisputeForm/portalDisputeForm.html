@@ -1,0 +1,108 @@
+<template>
+  <template lwc:if={loading}>
+    <p role="status">{labels.formLoading}</p>
+  </template>
+  <template lwc:elseif={problem}>
+    <p class="notice" role="alert">{problem}</p>
+  </template>
+  <template lwc:elseif={result}>
+    <div class="card" aria-live="polite">
+      <h3 class="card-title" tabindex="-1" lwc:ref="resultHeading">
+        {result.heading}
+      </h3>
+      <p>{result.text}</p>
+      <template lwc:if={result.evidence}>
+        <ul class="bullets">
+          <template for:each={result.evidence} for:item="item">
+            <li key={item.key}>{item.text}</li>
+          </template>
+        </ul>
+      </template>
+      <template lwc:if={result.caseId}>
+        <p class="next">
+          <a
+            href={result.caseUrl}
+            data-id={result.caseId}
+            onclick={handleOpenCase}
+            >{result.caseLinkText}</a
+          >
+        </p>
+      </template>
+      <lightning-button
+        label={labels.openAnother}
+        onclick={handleStartAgain}
+      ></lightning-button>
+    </div>
+  </template>
+  <template lwc:else>
+    <template lwc:if={hasOpenChoices}>
+      <div class="card">
+        <lightning-radio-group
+          data-field="statement"
+          name="statement"
+          label={labels.whichStatement}
+          options={statementOptions}
+          value={statementId}
+          onchange={handleStatement}
+          required
+        ></lightning-radio-group>
+        <lightning-combobox
+          class="field"
+          data-field="reason"
+          name="reason"
+          label={labels.whatsWrong}
+          placeholder={labels.chooseReason}
+          options={reasonOptions}
+          value={reason}
+          onchange={handleReason}
+          required
+        ></lightning-combobox>
+        <template lwc:if={evidence}>
+          <div class="field">
+            <p class="evidence-title">{labels.whatYoullNeed}</p>
+            <ul class="bullets">
+              <template for:each={evidence} for:item="item">
+                <li key={item.key}>{item.text}</li>
+              </template>
+            </ul>
+          </div>
+        </template>
+        <lightning-textarea
+          class="field"
+          name="description"
+          label={labels.anythingElse}
+          field-level-help={labels.noCardNumbers}
+          max-length="2000"
+          value={description}
+          onchange={handleDescription}
+        ></lightning-textarea>
+        <lightning-button
+          class="field"
+          variant="brand"
+          label={labels.openTheDispute}
+          disabled={submitting}
+          onclick={handleSubmit}
+        ></lightning-button>
+      </div>
+    </template>
+    <template lwc:else>
+      <p>{labels.noOpenChoices}</p>
+    </template>
+    <template lwc:if={hasDisputedStatements}>
+      <p class="evidence-title">{labels.alreadyInDispute}</p>
+      <ul class="bullets">
+        <template for:each={disputedStatements} for:item="statement">
+          <li key={statement.statementId}>
+            {statement.label}:
+            <a
+              href={statement.disputeUrl}
+              data-id={statement.disputeCaseId}
+              onclick={handleOpenCase}
+              >{statement.disputeLinkText}</a
+            >
+          </li>
+        </template>
+      </ul>
+    </template>
+  </template>
+</template>

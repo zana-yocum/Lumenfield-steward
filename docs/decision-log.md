@@ -9,18 +9,22 @@ The decisions that shape Steward, the options considered, and why one was chosen
 | S-01 | The service agent runs as its own least-privilege user | Proposed · Phase 6 |
 | S-02 | Salesforce asks the payment provider; the provider never calls Salesforce | Proposed · Phase 7 |
 | S-03 | Apex for agent actions; Accord's flows keep the policy | Decided |
-| S-04 | Customer Community licenses with sharing sets | Proposed · Phase 4 |
+| S-04 | Customer Community licenses with sharing sets | Decided · confirmed in Phase 4 |
 | S-05 | The pipeline validates against the org; no scratch orgs | Decided |
 | S-06 | What the agent may never do | Decided |
 | S-07 | The model never chooses whose data to read | Decided · mechanism confirmed in Phase 6 |
-| S-08 | Customers see commitments through a scoped read service | Proposed · built in Phase 3, confirmed in Phase 4 |
+| S-08 | Customers see commitments through a scoped read service | Decided · built in Phase 3, confirmed in Phase 4 |
 | S-09 | Agent outcomes are logged to a custom object | Decided |
 | S-10 | The agent's definition lives in Git and ships through the pipeline | Decided |
-| S-11 | The portal is an LWR site | Proposed · Phase 4 |
+| S-11 | The portal is an LWR site | Decided · built in Phase 4; chat placed in Phase 6 |
 | S-12 | The pipeline signs in as its own user, with a certificate | Decided |
 | S-13 | Pull requests are required for anything that deploys | Decided |
 | S-14 | Dispute cases are saved in system mode, with the caller's create access applied to every other field | Decided |
 | S-15 | Configuration built outside source is retrieved by the pipeline | Decided |
+| S-16 | Customers see disputes through `Customer_Household__c`, not the case's account | Decided |
+| S-17 | A record's own portal page is a custom page with the ID in the address | Decided |
+| S-18 | Customers use custom profiles, not the standard external profiles | Decided |
+| S-19 | A dispute's agreement is stamped by a flow, not set by the caller | Decided |
 
 ---
 
@@ -73,7 +77,7 @@ The decisions that shape Steward, the options considered, and why one was chosen
 ---
 
 ### S-04 — Customer Community licenses with sharing sets
-**Status:** Proposed · confirm in Phase 4
+**Status:** Decided · confirmed in Phase 4
 
 **Context:** Customers must see only their own household. The org has five Customer Community and five Customer Community Plus licenses.
 
@@ -84,6 +88,8 @@ The decisions that shape Steward, the options considered, and why one was chosen
 **Why:** "The household" maps exactly onto a sharing set (the record's account is the user's account), and the master-detail records follow the account. Plus adds role-based sharing that nothing here needs.
 
 **Consequences:** Two limits shape the design. Customer licenses can't be given opportunity access (S-08), and each customer user can reach at most 10 custom objects; the portal needs three (Billing Statement, Lease Payment, Promise to Pay). Account owners must have a role before a contact can become a customer user, which is checked in Phase 4.
+
+**Confirmed in Phase 4.** All 88 households are owned by the admin, who holds the Collections Supervisor role, so their contacts can become customer users; the pipeline user has no role, so tests give it one first (`PortalTestData`). The `Customer_Household` sharing set gives a customer their account, and through it their statements, payments and promises, and their billing disputes, matched on `Customer_Household__c` (S-16). Customers use custom profiles on these licenses, not the standard ones (S-18). Two more limits surfaced while building: customer licenses can't use service contracts (S-19), and a file an external user uploads belongs to the site's network.
 
 ---
 
@@ -138,7 +144,7 @@ The agent never:
 ---
 
 ### S-08 — Customers see commitments through a scoped read service
-**Status:** Proposed · confirm in Phase 4
+**Status:** Decided · built in Phase 3, confirmed in Phase 4
 
 **Context:** Commitments are detail records of the opportunity, so seeing one requires access to its opportunity. Customer licenses can't be given opportunity access, and customers shouldn't see the deal record anyway.
 
@@ -152,6 +158,8 @@ The agent never:
 **Consequences:** This is one of three named exceptions to user mode (NFR-01), with S-09 and S-14. It lives in an inner class with a comment citing S-08, and tests prove that a customer, the agent, and a portal call carrying another household's ID each get only their own household's commitments.
 
 **Built in Phase 3** as `CommitmentReadService`. The user-mode household check runs first, and the elevated read is a single query in an inner `Elevated` class that selects only the five customer fields. `CommitmentReadServiceTest` runs as a user with no access to commitments or opportunities: given read access to one household, the user gets that household's commitments through the service, while the user's own query on `Commitment__c` is blocked and a second household stays not found. All seven of its tests passed in the org on 2026-10-18 (validation `0Afaj00000oBwtVCAS`). Phase 4 confirms in the org that customer licenses can't be given opportunity access, which is what makes the service necessary.
+
+**Confirmed in Phase 4.** The org's standard Customer Community Login User profile lists the 25 objects its license allows, and Opportunity isn't one of them (read 2026-10-18). The What we promised you page reads commitments through this service only, and `PortalControllersTest` proves a customer user sees their own household's commitment, with its terms as recorded, and not another household's.
 
 ---
 
@@ -190,7 +198,7 @@ The agent never:
 ---
 
 ### S-11 — The portal is an LWR site
-**Status:** Proposed · confirm in Phase 4
+**Status:** Decided · built in Phase 4; the chat is placed in Phase 6
 
 **Context:** Experience Cloud sites are built on either Lightning Web Runtime (LWR) or the older Aura framework.
 
@@ -201,6 +209,8 @@ The agent never:
 **Why:** Steward's portal pages are mostly its own components (ST-01, ST-02, ST-15), so Aura's ready-made components matter less than LWR's speed.
 
 **Consequences:** Phase 4 confirms everything the portal needs, including the Enhanced Chat deployment, works in an LWR site before building it.
+
+**Confirmed in Phase 4.** The site is Build Your Own (LWR), and every page is Steward's own Lightning web components on custom pages (S-17), with LWR's navigation, page references and file upload. The site's configuration lives in source and is retrieved by the pipeline (S-15). Enhanced Chat is added to an LWR site with Experience Builder's Embedded Messaging component, which Phase 6 places once the agent and its messaging deployment exist.
 
 ---
 
@@ -246,7 +256,7 @@ The agent never:
 
 **Why:** Option 3 changes nobody's access, and it works however the platform answers for a given user. All system mode adds is the one field the agent and customers can't count on setting, on a record the caller is otherwise allowed to create in full. The account it sets is always the verified household, already checked in user mode. Option 1 would give the agent a standing ability to move cases between households, which is exactly the reach S-06 rules out.
 
-**Consequences:** `DisputeIntakeService` refuses with `ACCESS_DENIED`, and saves nothing, when the caller can't create cases or set any field other than the account. A test proves it for a user with no Case access, and it passed in the org on 2026-10-18. The field-level refusal has no test yet: it needs a user who can create cases but not one of the dispute fields, and no Salesforce license is free to make one. Phase 6 checks it with the agent user. This is the third named exception to user mode (NFR-01), after S-08 and S-09. It's one statement with a comment citing S-14. The agent user still needs Case create and access to the dispute fields, and read access through sharing to see the case number once the case is in the queue (Phase 6). Phase 6 also checks what the agent user's create access to `Case.AccountId` really is. If the agent can set it, or edit on it is granted for another reason, the insert can move to user mode and this exception can be removed.
+**Consequences:** `DisputeIntakeService` refuses with `ACCESS_DENIED`, and saves nothing, when the caller can't create cases or set any field other than the account. A test proves it for a user with no Case access, and it passed in the org on 2026-10-18. The field-level refusal had no test in Phase 3, because no license was free for a user who can create cases but not one of the dispute fields. Phase 4 tests it with a customer user whose permission set can't set the dispute reason: refused with `ACCESS_DENIED`, nothing saved, and the log names the field (`PortalControllersTest`, passed in the org on 2026-10-21). This is the third named exception to user mode (NFR-01), after S-08 and S-09. It's one statement with a comment citing S-14. The agent user still needs Case create and access to the dispute fields, and read access through sharing to see the case number once the case is in the queue (Phase 6). Phase 6 also checks what the agent user's create access to `Case.AccountId` really is. If the agent can set it, or edit on it is granted for another reason, the insert can move to user mode and this exception can be removed.
 
 ---
 
@@ -262,3 +272,65 @@ The agent never:
 **Why:** Option 2 uses the same identity and tool versions as the deploys, leaves a run log for every retrieve, and needs nothing installed or signed in on anyone's computer. Option 1 depends on whoever runs it having the CLI signed in to the right org.
 
 **Consequences:** `retrieve.yml` runs by hand, on the branch that holds the manifest, and pushes `retrieve/<run number>`. It can't change `main`: the ruleset doesn't let it. GitHub doesn't start workflows from pushes made with its own token, so a retrieved branch doesn't validate by itself. Its files reach `main` in an ordinary pull request, which does.
+
+---
+
+### S-16 — Customers see disputes through `Customer_Household__c`, not the case's account
+**Status:** Decided
+
+**Context:** A sharing set gives customers records whose field matches their user's account. Matching cases on `AccountId` would also give them Accord's Default Review cases: collections' internal reviews of a delinquent household, opened on the same account. Customers may see their billing disputes and nothing else on Case (ST-12, "What each audience can see").
+
+**Options**
+1. Match on `Case.AccountId`. Every default review on the household would reach the portal.
+2. Match on `Case.ContactId`. Default reviews name the primary contact too, so the same problem.
+3. A lookup to the account that only billing disputes carry: `Customer_Household__c`, stamped by a before-save flow from `AccountId` when the record type is Billing Dispute, and cleared on any other case. **← decided**
+
+**Why:** A sharing set can only match a field, not a record type, so option 3 gives it a field that means exactly "this case is the household's dispute". The flow runs before the save, so it costs no extra DML, and only when a case is created or its record type or account changes.
+
+**Consequences:** `Case_BeforeSave_StampCustomerHousehold` keeps the field right, and a case that stops being a billing dispute leaves the portal. Billing disputes that existed before the flow are backfilled once, after the deploy. `DisputeStatusServiceTest` runs as a customer: the household's two disputes are visible, its default review and another household's dispute aren't, by list or by ID, and the flow stamps and clears the field.
+
+---
+
+### S-17 — A record's own portal page is a custom page with the ID in the address
+**Status:** Decided
+
+**Context:** The portal shows one statement or one dispute on its own page. An LWR site offers object pages, a detail, list and related-list page per object, or custom pages that a component fills.
+
+**Options**
+1. Object pages for Billing Statement and Case: six pages, with the record ID in the path.
+2. Two custom pages, `statement` and `dispute`, with the ID in the address's query (`?recordId=…`). **← decided**
+
+**Why:** The portal's components never show a record through the platform's record pages. Every read goes through a household-scoped controller (ST-12), so an object page's record binding adds nothing. Two pages instead of six, and no list or related-list pages to hide or secure.
+
+**Consequences:** `portalShared` builds the links (`recordPage`) and reads the ID back (`recordIdFrom`). Changing the ID in the address gets the no-access message, exactly as it would on an object page. If a standard record component is ever wanted on the portal, object pages can be added then.
+
+---
+
+### S-18 — Customers use custom profiles, not the standard external profiles
+**Status:** Decided
+
+**Context:** The second Phase 4 validation found that the org won't create users on the standard external profiles: "Allow using standard external profiles for self-registration, user creation, and login" is off, and Salesforce recommends custom profiles for external users instead.
+
+**Options**
+1. Turn the setting on and use Customer Community User and Customer Community Login User. Those profiles carry access Steward doesn't want: on 2026-10-18 the login profile had create and edit on cases, contracts, orders, assets, entitlements and work orders, among 25 objects.
+2. Two custom profiles: Steward Customer (Customer Community) for customers and Steward Customer Login (Customer Community Login) for test customers. All of Steward's access comes from `PS_Steward_Customer`. **← decided**
+
+**Why:** Least privilege, the same idea as NFR-01, applied to profiles. The setting stays off, as Salesforce recommends. Test customers use login licenses, so a test never needs one of the five member licenses the demo customers hold.
+
+**Consequences:** The sharing set and the site's members list the two custom profiles. A new customer user gets Steward Customer and `PS_Steward_Customer`. `PortalTestData` creates test customers on Steward Customer Login.
+
+---
+
+### S-19 — A dispute's agreement is stamped by a flow, not set by the caller
+**Status:** Decided
+
+**Context:** `DisputeIntakeService` copied the disputed statement's agreement onto the case (`Service_Contract__c`), reading it in user mode. Customer licenses can't use service contracts: the standard customer profiles have no access to the object. In the third Phase 4 validation, every dispute a customer opened failed before it was saved.
+
+**Options**
+1. Read the agreement in system mode inside the service: a fourth named exception to user mode (NFR-01).
+2. A before-save flow copies the disputed statement's agreement onto every Billing Dispute, so the caller never touches the field. **← decided**
+
+**Why:** The agreement isn't a choice the caller makes; it follows from the statement. Deriving it in a before-save flow costs no extra DML, adds no exception to user mode, and fills it on disputes reps open too.
+
+**Consequences:** `Case_BeforeSave_StampDisputeAgreement` runs when a Billing Dispute is created or its statement changes. The service no longer sets the field, and `PS_Steward_Customer` has no access to it. The flow is Steward's own; no Accord component changes (NFR-09).
+

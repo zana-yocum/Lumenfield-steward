@@ -1,0 +1,46 @@
+<template>
+  <section class="page">
+    <h1 class="page-title">{labels.whatWePromised}</h1>
+    <p class="lead">{labels.promisesLead}</p>
+    <template lwc:if={loading}>
+      <p role="status">{labels.promisesLoading}</p>
+    </template>
+    <template lwc:elseif={problem}>
+      <p class="notice" role="alert">{problem}</p>
+    </template>
+    <template lwc:elseif={hasCommitments}>
+      <ul class="plain-list">
+        <template for:each={commitments} for:item="commitment">
+          <li key={commitment.key}>
+            <article class="card">
+              <h2 class="card-title">{commitment.type}</h2>
+              <dl class="details">
+                <template for:each={commitment.details} for:item="detail">
+                  <div key={detail.label}>
+                    <dt>{detail.label}</dt>
+                    <dd>{detail.value}</dd>
+                  </div>
+                </template>
+              </dl>
+              <p class="terms">
+                <span class="terms-label">{labels.asRecorded}</span>
+                “{commitment.terms}”
+              </p>
+            </article>
+          </li>
+        </template>
+      </ul>
+      <p>{labels.promisesWrong}</p>
+      <p>
+        <a href={disputesUrl} onclick={handleDisputes}>{labels.openADispute}</a>
+      </p>
+    </template>
+    <template lwc:else>
+      <p>{labels.noPromises}</p>
+      <p>{labels.noPromisesHelp}</p>
+      <p>
+        <a href={disputesUrl} onclick={handleDisputes}>{labels.openADispute}</a>
+      </p>
+    </template>
+  </section>
+</template>

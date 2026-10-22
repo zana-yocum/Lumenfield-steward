@@ -1,8 +1,9 @@
-# ST-13 · S-05 · S-12 · NFR-03
-# Runs on every pull request to main. Checks formatting, runs component tests and
-# static analysis, then asks the org to validate the deployment with local Apex
-# tests and checks every Steward class is at 90% coverage or more. Nothing is
-# deployed here; the validation's job ID is kept for the merge.
+# ST-13 · S-05 · S-12 · S-15 · NFR-03
+# Runs on every pull request to main. Checks that no personal details are in the
+# metadata, checks formatting, runs component tests and static analysis, then asks
+# the org to validate the deployment with local Apex tests and checks every Steward
+# class is at 90% coverage or more. Nothing is deployed here; the validation's job
+# ID is kept for the merge.
 name: Validate
 
 on:
@@ -28,6 +29,11 @@ jobs:
       - name: Check out the pull request
         uses: actions/checkout@v6
 
+      # The repo is public. The org fills some settings with a real person's details, so
+      # metadata from the org is checked here as well as before the Retrieve workflow pushes.
+      - name: Check for personal details
+        run: scripts/check_personal_details.sh force-app
+
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
@@ -48,7 +54,7 @@ jobs:
             echo "No Lightning web components yet, so there's nothing to test."
           fi
 
-      - name: Test the coverage gate script
+      - name: Test the pipeline's scripts
         run: python3 -m unittest discover -s tests/pipeline -v
 
       - name: Install the Salesforce CLI and Code Analyzer

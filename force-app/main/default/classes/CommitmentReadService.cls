@@ -107,6 +107,8 @@ public with sharing class CommitmentReadService {
      * @return their commitments, grouped by account, in type order
      */
     public List<Commitment__c> commitmentsFor(Set<Id> householdIds) {
+      // Graph Engine reports this read as missing FLS and sharing checks. That's the S-08 design
+      // above, and CommitmentReadServiceTest proves the scoping it relies on.
       return [
         SELECT
           Account__c,

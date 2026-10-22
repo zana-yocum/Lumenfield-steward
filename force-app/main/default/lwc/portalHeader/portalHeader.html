@@ -1,0 +1,32 @@
+<template>
+  <header class="header">
+    <a
+      class="brand"
+      href={homeUrl}
+      data-page={homePage}
+      onclick={handleNavigate}
+      >{labels.brand}</a
+    >
+    <nav class="nav" aria-label={labels.navLabel}>
+      <ul class="nav-list">
+        <template for:each={links} for:item="link">
+          <li key={link.name}>
+            <a
+              class="nav-link"
+              href={link.url}
+              aria-current={link.current}
+              data-page={link.name}
+              onclick={handleNavigate}
+              >{link.label}</a
+            >
+          </li>
+        </template>
+        <li>
+          <a class="nav-link" href={logoutUrl} onclick={handleLogout}
+            >{labels.logOut}</a
+          >
+        </li>
+      </ul>
+    </nav>
+  </header>
+</template>
