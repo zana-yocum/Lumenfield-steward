@@ -54,7 +54,7 @@ The customer portal: an LWR site where a household sees its balance, statements,
 - `Case_BeforeSave_StampCustomerHousehold` also runs when a dispute's household doesn't match its account, so any save repairs it. `DisputeStatusServiceTest` proves it (S-16)
 - `scripts/apex/backfill-customer-household.apex` saves each billing dispute once, for the flow to stamp
 - **First validation** (`0Afaj00000odkFtCAI`): with the defaults off, customers couldn't read `Account.Primary_Contact__c`, so every dispute a customer opened failed; the tests' messages carried the logged reason. The new repair test also had to save in system mode
-- **Second validation** (`0Afaj00000odmmLCAQ`): 115 of 115 tests, 203 components. The 115 are every local test in the org: Steward's 105 and the 10 the site template brought
+- **Second validation** (`0Afaj00000odmmLCAQ`): 115 of 115 tests, 203 components. The 115 are every local test in the org: Steward's 105 and 10 in the classes Salesforce added when Digital Experiences was turned on
 - **Deployed** at 8:50 PM CT by quick deploy (`0Afaj00000odgKMCAY`). Nothing the portal shows changed, so the pipeline didn't republish it
 
 ### Checked in the org after #6, 2026-10-21
