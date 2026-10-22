@@ -29,7 +29,7 @@ The same way as Accord: requirements before configuration, decisions written dow
 | 1 | Requirements: 18 stories, 6 agent guardrails, 11 decisions | Done, 2026-10-16 |
 | 2 | Pipeline: validate on every pull request, quick deploy on merge, CI sign-in by certificate | Done, 2026-10-17 |
 | 3 | Apex services and the agent action log: 13 classes, 83 tests, a 90% per-class coverage gate | Done, 2026-10-18 |
-| 4 | Customer portal: six pages on an LWR site, household sharing, 115 Apex tests and 48 Jest tests with accessibility checks | Done, 2026-10-21 |
+| 4 | Customer portal: six pages on an LWR site, household sharing, 6 more classes, 105 Apex tests in all and 48 Jest tests with accessibility checks | Done, 2026-10-21 |
 | 5 | Rep assistant | Planned |
 | 6 | Service agent | Planned |
 | 7 | Payments | Planned |
