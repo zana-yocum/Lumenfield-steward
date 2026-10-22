@@ -2,9 +2,9 @@
 
 Newest first. One entry per phase.
 
-## v0.4 — in progress — Phase 4: Customer portal
+## v0.4 — 2026-10-21 — Phase 4: Customer portal
 
-The customer portal: an LWR site where a household sees its balance, statements, payments and commitments, and opens and follows its disputes. It was built in two pull requests. #4 turned on Digital Experiences and added the workflow that brings the site's template-built configuration into the repo. #5 built the pages, the Apex behind them and the sharing that keeps each household to its own records.
+The customer portal: an LWR site where a household sees its balance, statements, payments and commitments, and opens and follows its disputes. It took three pull requests. #4 turned on Digital Experiences and added the workflow that brings the site's template-built configuration into the repo. #5 built the pages, the Apex behind them and the sharing that keeps each household to its own records. #6 closed two gaps found in the org after #5 deployed: the customer profiles' default access, and the disputes that existed before the household flow. All three went through validation, merge and the pipeline's deploy, and the result was checked in the org.
 
 ### Added in pull request #5
 - **Six pages and a header** as Lightning web components on the site: My account, Statements, a statement's own page, What we promised you, Disputes and a dispute's own page (ST-01, ST-02, ST-06). A record's own page is a custom page with the ID in the address (S-17). Evidence is uploaded on the dispute's page
@@ -53,6 +53,13 @@ The customer portal: an LWR site where a household sees its balance, statements,
 - Both customer profiles switch off every object their license grants by default (S-18), and `PS_Steward_Customer` grants read on contacts, the one the portal needs
 - `Case_BeforeSave_StampCustomerHousehold` also runs when a dispute's household doesn't match its account, so any save repairs it. `DisputeStatusServiceTest` proves it (S-16)
 - `scripts/apex/backfill-customer-household.apex` saves each billing dispute once, for the flow to stamp
+- **First validation** (`0Afaj00000odkFtCAI`): with the defaults off, customers couldn't read `Account.Primary_Contact__c`, so every dispute a customer opened failed; the tests' messages carried the logged reason. The new repair test also had to save in system mode
+- **Second validation** (`0Afaj00000odmmLCAQ`): 115 of 115 tests, 203 components
+- **Deployed** at 8:50 PM CT by quick deploy (`0Afaj00000odgKMCAY`). Nothing the portal shows changed, so the pipeline didn't republish it
+
+### Checked in the org after #6, 2026-10-21
+- Both customer profiles have no object permissions at all
+- The backfill saved all 14 billing disputes. The admin can't read the field, by design, so the result was checked through access instead: of the 21 billing disputes and default reviews in the org, Sandra Barnett can read exactly one, her own open dispute, and Tanya Lattimore exactly one, her own closed dispute. Angela Coffey can read none. None of them can edit any, and none can see a default review (`UserRecordAccess`, S-16, ST-12)
 
 ### Added in pull request #4
 - `settings/Communities.settings-meta.xml` turns on Digital Experiences (S-04, S-11). Salesforce can't turn it off again. It's been in the plan since Phase 1, and the admin approved it before the merge
