@@ -319,7 +319,7 @@ The agent never:
 
 **Consequences:** The sharing set and the site's members list the two custom profiles. A new customer user gets Steward Customer and `PS_Steward_Customer`. `PortalTestData` creates test customers on Steward Customer Login.
 
-**Found after the first deploy.** A profile created from source starts with its license's defaults, not with nothing: on 2026-10-21 both custom profiles had the same 25 objects as the standard ones, create and edit on cases among them. Each of the 25 is now switched off explicitly in the profile's source, so the profiles grant nothing and `PS_Steward_Customer` is the only source of a customer's access.
+**Found after the first deploy.** A profile created from source starts with its license's defaults, not with nothing: on 2026-10-21 both custom profiles had the same 25 objects as the standard ones, create and edit on cases among them. Each of the 25 is now switched off explicitly in the profile's source, so the profiles grant nothing and `PS_Steward_Customer` is the only source of a customer's access. Switching them off showed one the portal relies on: read on contacts. A dispute names the household's primary contact, and a customer can't read a lookup to contacts, even with access to the field, unless they can read contacts. `PS_Steward_Customer` now grants it, read only.
 
 ---
 

@@ -40,6 +40,7 @@ The customer portal: an LWR site where a household sees its balance, statements,
 ### Found in the org while building
 - **The org won't create users on the standard external profiles** while "Allow using standard external profiles" is off. Custom profiles instead (S-18)
 - **A profile created from source starts with its license's defaults**: the custom profiles got the same 25 objects as the standard ones. Pull request #6 switches each off (S-18)
+- **A lookup is invisible to a user who can't read its object**, whatever their field access: with contacts switched off, customers lost `Account.Primary_Contact__c`, which the dispute needs. `PS_Steward_Customer` grants read on contacts
 - **Customer licenses can't use service contracts.** The dispute's agreement is now stamped by a flow (S-19)
 - **Accord sets a statement to In Dispute** when a dispute opens, so a test can't find a disputed statement by its old status
 - **A before-save flow can't clear a lookup with `$GlobalConstant.EmptyString`**; an assignment with no value clears it
@@ -49,7 +50,7 @@ The customer portal: an LWR site where a household sees its balance, statements,
 - **The first retrieve brought back personal details** (the site's email sender and admin), now caught by `scripts/check_personal_details.sh`
 
 ### Pull request #6
-- Both customer profiles switch off every object their license grants by default (S-18)
+- Both customer profiles switch off every object their license grants by default (S-18), and `PS_Steward_Customer` grants read on contacts, the one the portal needs
 - `Case_BeforeSave_StampCustomerHousehold` also runs when a dispute's household doesn't match its account, so any save repairs it. `DisputeStatusServiceTest` proves it (S-16)
 - `scripts/apex/backfill-customer-household.apex` saves each billing dispute once, for the flow to stamp
 

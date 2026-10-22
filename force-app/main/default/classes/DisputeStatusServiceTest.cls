@@ -227,10 +227,14 @@ private class DisputeStatusServiceTest {
     ]
     .Id;
     Test.startTest();
-    update new List<Case>{
-      new Case(Id = disputeId, Customer_Household__c = null),
-      new Case(Id = reviewId)
-    };
+    // System mode: no profile can set the field, and the test is about what the flow does.
+    Database.update(
+      new List<Case>{
+        new Case(Id = disputeId, Customer_Household__c = null),
+        new Case(Id = reviewId)
+      },
+      AccessLevel.SYSTEM_MODE
+    );
     Test.stopTest();
     Map<Id, Case> saved = new Map<Id, Case>(
       [
