@@ -1,5 +1,6 @@
 import {
   CONNECTION_PROBLEM,
+  format,
   formatDate,
   formatMoney,
   namedPage,
@@ -60,6 +61,19 @@ describe("c/portalShared", () => {
       expect(other).toContain("try again later");
       expect(problemMessage(undefined, "Not here")).toBe(other);
       expect(CONNECTION_PROBLEM).toContain("connection");
+    });
+  });
+
+  describe("format", () => {
+    it("fills a label's placeholders in order, and leaves nothing for a missing value", () => {
+      expect(format("Dispute {0} is open", "00001002")).toBe(
+        "Dispute 00001002 is open"
+      );
+      expect(format("{0} on {1}", "$120.00", "Oct 1, 2026")).toBe(
+        "$120.00 on Oct 1, 2026"
+      );
+      expect(format("Statement {0}")).toBe("Statement ");
+      expect(format(undefined, "x")).toBe("");
     });
   });
 

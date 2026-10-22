@@ -8,18 +8,32 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ## Phase 4 — Customer portal — started 2026-10-18
 
-Two pull requests. 4a turns on Digital Experiences and adds the retrieve workflow (S-15). 4b builds the site's pages, the controllers, the sharing set and `PS_Steward_Customer`, with their tests. Claude now pushes the branches and opens the pull requests (Phase 3, step 8b).
+Two pull requests. #4 turned on Digital Experiences and added the retrieve workflow (S-15). #5 builds the site's pages, the controllers, the sharing and `PS_Steward_Customer`, with their tests. Claude pushes the branches and opens the pull requests.
 
 **Your steps**
-- ☑ 1. Yes to turning on Digital Experiences, which Salesforce can't turn off again (12:00 PM CT)
-- ☐ 2. At the end, log in to the portal as each test customer and take screenshots. Steps to follow
+- ☑ 1. Yes to turning on Digital Experiences, which Salesforce can't turn off again (2026-10-18, 12:00 PM CT)
+- ☑ 2. Placeholder email sender for the site, `portal@lumenfield.example` (option b, 2026-10-18)
+- ☐ 3. Delete the branch `retrieve/1` on GitHub: it holds your private email and Salesforce username. Branches page → trash-can icon on its row. Claude can't delete branches (refused, 403)
+- ☐ 4. At the end, log in to the portal as each demo customer and take screenshots. Steps to follow
+- ☐ 5. Tag `v0.4` when the phase closes (two lines in PowerShell, as for v0.3)
 
 **Mine**
-- ☐ 4a through the pipeline: Digital Experiences on, `retrieve.yml`
-- ☐ Create the site from the Build Your Own (LWR) template and retrieve it into the repo
-- ☐ 4b: pages for My Account, Statements, What We Promised You and Disputes; Apex controllers over the Phase 3 services; the sharing set; `PS_Steward_Customer`; Jest, accessibility and Apex tests
-- ☐ Customer users for three test households: Sandra Barnett (behind on payments, with a commitment), Tanya Lattimore (current, with a commitment) and Angela Coffey (nothing on record)
-- ☐ Confirm S-08 and S-11 in the org, verify everything after the deploy, and finish `CHANGELOG.md` v0.4
+- ☑ 4a through the pipeline: Digital Experiences on, `retrieve.yml` (pull request #4, merged)
+- ☑ Site created from the Build Your Own (LWR) template and retrieved into the repo, with placeholders where the org had put personal details
+- ☑ Personal-details check in `retrieve.yml` and `validate.yml`, with tests
+- ☐ 4b, pull request #5: pages, controllers, sharing, profiles, labels and tests. Validations so far: see below
+- ☐ After the deploy: backfill `Customer_Household__c` on the 14 billing disputes that existed before the flow; customer users for Sandra Barnett (behind on payments, with a dispute), Tanya Lattimore (current, with a dispute) and Angela Coffey (nothing on record); check the site published
+- ☐ Confirm S-04, S-08 and S-11 in the org, and S-14's field-level refusal with a customer user; finish `CHANGELOG.md` v0.4
+
+**Pull request #5's validations**
+- ☑ First (`0Afaj00000oE785CAC`): two components refused. The household flow cleared its lookup with `$GlobalConstant.EmptyString`, and the sharing set's description was over 255 characters
+- ☑ Second (`0Afaj00000oE7PpCAK`): every component accepted; 14 of 99 tests failed. The org won't create users on the standard external profiles (S-18), and four tests looked up statements by a status Accord changes when a dispute opens
+- ☑ Third (`0Afaj00000oE8FRCA0`): 202 components accepted; 5 of 108 tests failed. Customer licenses can't use service contracts, so every dispute a customer opened failed (S-19), and a file an external user uploads needs the site's network
+- ☑ Fourth (`0Afaj00000odYOQCA2`, 2026-10-21): 203 components accepted; 112 of 113 tests passed, every new class at 100%. The one failure read the new case's owner by name and got nothing back; it now compares the queue's ID, as the Phase 3 test does
+
+**Known and accepted**
+- ⊘ Graph Engine's two findings are the S-08 commitments read, by design (`docs/pipeline.md`)
+- ⊘ The portal's evidence upload is proven in Apex (a customer can attach a file to their own dispute, not another household's). The upload control itself is checked by hand in the walkthrough
 
 ---
 
@@ -44,8 +58,8 @@ Pull request #2 passed its third validation, merged, and the pipeline quick-depl
 
 **Known and accepted**
 - ⊘ No retrieve manifest for Phase 3: everything was built in source, nothing in Setup
-- ⊘ Graph Engine data-flow rules: they start from entry points (invocable and Aura-enabled methods), and Steward has none yet. Run them once the Phase 6 actions exist
-- ⊘ 22 of 864 lines no test reaches yet. Seven are `PaymentArrangementService`'s safety net, which Accord's current rules can't trigger. Thirteen are in `DisputeIntakeService`: a caller who can create cases but not one of the dispute fields, a rejected save, and an over-long description. The field-level refusal is checked with the agent user in Phase 6 (below)
+- ☑ Graph Engine data-flow rules: they start from entry points, and the portal's controllers are the first. Run in Phase 4: two findings, both the S-08 read by design (`docs/pipeline.md`). Run again when the Phase 6 actions exist
+- ⊘ 22 of 864 lines no test reaches yet. Seven are `PaymentArrangementService`'s safety net, which Accord's current rules can't trigger. Thirteen are in `DisputeIntakeService`: a caller who can create cases but not one of the dispute fields, a rejected save, and an over-long description. The field-level refusal is now tested in Phase 4 with a customer user (S-14)
 
 ---
 

@@ -341,7 +341,7 @@ private class PortalControllersTest {
       SELECT
         Customer_Household__c,
         Description,
-        Owner.Name,
+        OwnerId,
         Disputed_Statement__r.Status__c
       FROM Case
       WHERE Id = :result.caseId
@@ -357,9 +357,14 @@ private class PortalControllersTest {
       'The card number never reaches the case'
     );
     Assert.areEqual(
-      'Dispute Specialists',
-      saved.Owner.Name,
-      'Accord\'s assignment rule routed it'
+      [
+        SELECT Id
+        FROM Group
+        WHERE Type = 'Queue' AND DeveloperName = 'Dispute_Specialists'
+      ]
+      .Id,
+      saved.OwnerId,
+      'Accord\'s assignment rule routed it to Dispute Specialists'
     );
     Assert.areEqual(
       'In Dispute',

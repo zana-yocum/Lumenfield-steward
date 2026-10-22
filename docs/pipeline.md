@@ -1,6 +1,6 @@
 # Pipeline — Steward
 
-How a change gets from a branch to the org, what protects each step, and how it was set up. Serves ST-13; decisions S-05, S-12, S-13 and S-15.
+How a change gets from a branch to the org, what protects each step, and how it was set up. Serves ST-13; decisions S-05, S-12, S-13, S-15 and S-17.
 
 ---
 
@@ -8,23 +8,26 @@ How a change gets from a branch to the org, what protects each step, and how it 
 
 ```
 feature branch ── pull request ──► Validate  (.github/workflows/validate.yml)
-                                     1. Formatting check (Prettier, code files only)
-                                     2. Component tests (Jest), once components exist
-                                     3. Tests of the coverage gate script itself
-                                     4. Static analysis (Code Analyzer); critical or high findings stop it
-                                     5. Sign in to the org as Steward CI (JWT)
-                                     6. Check-only deployment with local Apex tests
-                                     7. Coverage gate: every Steward class at 90% or more
-                                     8. Job ID kept 10 days, only if everything above passed
+                                     1. Personal-details check: no real email address or username in force-app
+                                     2. Formatting check (Prettier, code files only)
+                                     3. Component tests (Jest), with an accessibility check in each
+                                     4. Tests of the pipeline's own scripts
+                                     5. Static analysis (Code Analyzer); critical or high findings stop it
+                                     6. Sign in to the org as Steward CI (JWT)
+                                     7. Check-only deployment with local Apex tests
+                                     8. Coverage gate: every Steward class at 90% or more
+                                     9. Job ID kept 10 days, only if everything above passed
 
                merge to main ────► Deploy  (.github/workflows/deploy.yml, only when force-app/ changed)
                                      1. Find the pull request behind the merge and its passing validation
                                      2. Quick-deploy that validation, with no second test run
                                      3. If Salesforce won't accept the quick deploy, deploy again with the same tests
+                                     4. Publish the customer portal, when the pull request changed anything it shows
 
   run by hand ─────────────────────► Retrieve  (.github/workflows/retrieve.yml, S-15)
                                      1. Sign in as Steward CI and retrieve what a manifest lists
-                                     2. Push the result to retrieve/<run number>; a pull request takes it to main
+                                     2. Stop if the result holds a real email address or username
+                                     3. Push the result to retrieve/<run number>; a pull request takes it to main
 ```
 
 The `main` branch is protected by a ruleset: a pull request is required, the `validate` check has to pass, and the branch has to be up to date with `main` before merging. That last rule is what guarantees the commit that was validated is exactly what gets merged.
@@ -44,6 +47,8 @@ The `main` branch is protected by a ruleset: a pull request is required, the `va
 | A class ships with thin tests | The coverage gate fails the pull request when any Steward class is below 90% on its own. A failed gate means the job ID isn't kept, so the merge has nothing to deploy |
 | The coverage gate passes by mistake | It fails closed: a class the org reported no coverage for counts as 0%, and a result with no test data fails the check. The script has its own tests, run on every pull request |
 | A broken pipeline change slips in | Workflow files go through pull requests like everything else, and each version is checked with actionlint before it's committed |
+| A real person's details reach the public repo | The org fills some settings with the admin's own details, such as a new site's email sender and its admin. `scripts/check_personal_details.sh` fails on any email address or username not on a reserved example domain, before a retrieve pushes and on every pull request. It prints only the file and line, never the address, because the run logs of a public repo are public too |
+| The portal doesn't show what was deployed | An LWR site serves the copy last published. The deploy publishes the portal when the pull request changed its pages, components, navigation or settings, and fails if publishing doesn't finish within 10 minutes |
 
 ## The coverage gate
 
@@ -53,9 +58,30 @@ The org's own rule is 75% coverage across all Apex. Steward's is stricter: every
 
 Its tests are in `tests/pipeline/test_check_coverage.py`. To run them locally from the repo root: `python -m unittest discover -s tests/pipeline -v`.
 
+## The personal-details check
+
+The repo is public, and the first retrieve of the portal site, on 2026-10-18, brought back the admin's own email address as the site's email sender and her username as its admin. They reached a pushed branch before anyone saw them. `scripts/check_personal_details.sh` now stops that happening again. It finds every email address or username under the folder it's given and fails unless each is on a reserved example domain (`example.com`, or a name ending in `.example`). It lists only where each one is.
+
+It runs in two places: in `retrieve.yml`, before anything is pushed, and in `validate.yml`, so nothing personal can merge however it got onto a branch. Its tests are in `tests/pipeline/test_check_personal_details.py`. The settings it found now hold placeholders: the site's emails come from `portal@lumenfield.example`, and its admin is the Steward CI user.
+
+## Publishing the portal
+
+An LWR site serves the copy that was last published, so a deploy alone doesn't change what customers see. After a deploy, `deploy.yml` lists the pull request's files. If any is under the site bundle, the site's settings, its navigation or `lwc/`, it runs `sf community publish` for Lumenfield Customer Portal and waits for the background job to finish, checking `BackgroundOperation` every 15 seconds. The step fails if the job ends in an error or takes more than 10 minutes.
+
+## Component tests
+
+Jest runs every component's tests with `@salesforce/sfdx-lwc-jest`, and each test also runs an accessibility check with `@sa11y/jest` (`toBeAccessible`, NFR-05). Two pieces of setup in `jest/`:
+- `setupLabels.js` reads the repo's custom labels and gives each component its real text, so tests check the words a customer reads, and a component that names a label that doesn't exist fails.
+- `setupAccessibility.js` adds the accessibility check.
+
 ## Code Analyzer settings
 
-The pipeline runs Code Analyzer's Recommended rules. Changes to the defaults live in `code-analyzer.yml` at the repo root, each with a comment giving the reason. There's one so far. `ApexUnitTestClassShouldHaveRunAs` is moved out of the default run: access tests run as a user created for the test, and business-logic tests run as the pipeline user on purpose, because no Salesforce license is free for a test admin.
+The pipeline runs Code Analyzer's Recommended rules. Changes to the defaults live in `code-analyzer.yml` at the repo root, each with a comment giving the reason:
+- `ApexUnitTestClassShouldHaveRunAs` is moved out of the default run: access tests run as a user created for the test, and business-logic tests run as the pipeline user on purpose, because no Salesforce license is free for a test admin.
+- Jest tests are left out of the scan. They run in Node and are never deployed, and their documented patterns, such as waiting with `setTimeout`, break rules meant for component code.
+- The site bundle is left out. Experience Builder writes it, and the next retrieve would undo any change.
+
+Graph Engine, Code Analyzer's data-flow engine, isn't in the Recommended set; it's run by hand when entry points change (`sf code-analyzer run --rule-selector sfge`). On 2026-10-18 it reported two findings, both the S-08 commitments read: missing field-level and sharing checks, which is that decision's design, covered by `CommitmentReadServiceTest`.
 
 ## Retrieving what's built outside source
 

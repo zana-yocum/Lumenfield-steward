@@ -18,6 +18,34 @@ One page per Apex class, Lightning web component, prompt template and agent suba
 | [DisputeEvidenceCatalog](DisputeEvidenceCatalog.md) | The eight dispute reasons and the evidence each needs | ST-06 |
 | [AgentActionLogger](AgentActionLogger.md) | One log record per agent action, declined requests included | ST-11 · S-09 |
 
+**The customer portal (Phase 4): Apex**
+
+| Component | One line | Stories |
+|---|---|---|
+| [PortalAccountController](PortalAccountController.md) | My account, Statements and one statement, for the logged-in household | ST-01 · ST-12 |
+| [PortalCommitmentsController](PortalCommitmentsController.md) | What we promised you, through the S-08 read service | ST-02 · S-08 |
+| [PortalDisputesController](PortalDisputesController.md) | The household's disputes, the dispute form, and opening a dispute | ST-06 · S-14 |
+| [DisputeStatusService](DisputeStatusService.md) | A household's billing disputes and one dispute's evidence list | ST-06 · S-16 |
+| [PortalHousehold](PortalHousehold.md) | The logged-in customer's household, from their user, never from the page | ST-12 · S-07 |
+| [PortalFailure](PortalFailure.md) | A failure's details to the log, a reference to the customer | NFR-07 |
+| [PortalTestData](PortalTestData.md) | Customer users and the cases they must never see, for the tests | S-04 · S-18 |
+
+**The customer portal (Phase 4): Lightning web components**
+
+| Component | One line | Stories |
+|---|---|---|
+| [portalHeader](portalHeader.md) | The links on every page, with the current one marked | NFR-05 |
+| [portalMyAccount](portalMyAccount.md) | Balance, past due, oldest unpaid statement, next payment, arrangement | ST-01 |
+| [portalStatements](portalStatements.md) | Every statement, newest first | ST-01 |
+| [portalStatementCard](portalStatementCard.md) | One statement's amounts, status and payments | ST-01 |
+| [portalStatementDetail](portalStatementDetail.md) | A statement's own page, from the ID in the address | ST-01 · ST-12 |
+| [portalCommitments](portalCommitments.md) | What was promised at signing, terms as recorded | ST-02 |
+| [portalDisputes](portalDisputes.md) | The dispute form and the household's disputes | ST-06 |
+| [portalDisputeForm](portalDisputeForm.md) | Opens a dispute and shows what to send | ST-06 · NFR-07 |
+| [portalDisputeDetail](portalDisputeDetail.md) | A dispute's own page, with its evidence list and upload area | ST-06 · ST-12 |
+| [portalShared](portalShared.md) | Pages, labels, outcome codes and the words for problems | NFR-07 · ST-18 |
+| [portalStyles](portalStyles.md) | The shared stylesheet, every value from an SLDS styling hook | NFR-05 |
+
 **Shared building blocks**
 
 | Component | One line |

@@ -4,9 +4,28 @@ Newest first. One entry per phase.
 
 ## v0.4 — in progress — Phase 4: Customer portal
 
-The customer portal: an LWR site where a household sees its balance, statements, payments and commitments, and opens and follows its disputes. It's built in two pull requests. The first, below, turns on Digital Experiences and adds the workflow that brings the site's template-built configuration into the repo. The second builds the pages.
+The customer portal: an LWR site where a household sees its balance, statements, payments and commitments, and opens and follows its disputes. It was built in two pull requests. #4 turned on Digital Experiences and added the workflow that brings the site's template-built configuration into the repo. #5 built the pages, the Apex behind them and the sharing that keeps each household to its own records.
 
-### Added
+### Added in pull request #5
+- **Six pages and a header** as Lightning web components on the site: My account, Statements, a statement's own page, What we promised you, Disputes and a dispute's own page (ST-01, ST-02, ST-06). A record's own page is a custom page with the ID in the address (S-17). Evidence is uploaded on the dispute's page
+- **Controllers:** `PortalAccountController`, `PortalCommitmentsController` and `PortalDisputesController`, each taking the household from the login through `PortalHousehold`, never from the page (ST-12). `DisputeStatusService` reads a household's disputes for the portal now and the agent in Phase 6. `PortalFailure` turns any failure into a reference the customer can quote, with the details in the action log (NFR-07)
+- **Sharing:** the `Customer_Household` sharing set, matched on a new `Case.Customer_Household__c` that `Case_BeforeSave_StampCustomerHousehold` stamps only on billing disputes, so Accord's default reviews stay internal (S-16). `Case_BeforeSave_StampDisputeAgreement` copies the disputed statement's agreement onto the case (S-19)
+- **Access:** `PS_Steward_Customer`, and two custom profiles, Steward Customer and Steward Customer Login, instead of the standard external profiles (S-18)
+- **96 custom labels** (`Steward_Portal_*`) hold every word a customer reads (ST-18)
+- **Tests:** `PortalControllersTest` (12), `DisputeStatusServiceTest` (6) and `PortalHouseholdTest` (2) run as real customer users, and `AgentActionLoggerTest` gains one for references. 48 Jest tests in 10 suites, each state with an accessibility check (NFR-05). `PortalTestData` builds the customer users
+- **Pipeline:** `scripts/check_personal_details.sh` and its 7 tests, run before a retrieve pushes and on every pull request. The deploy publishes the portal when a pull request changes what it shows. Jest runs with real label text and `@sa11y/jest`
+- 18 explainers, one per new class and component (NFR-04). Decisions S-16 to S-19
+- `scripts/apex/`: the two one-time scripts run after the deploy, for the backfill and the demo customers
+
+### Changed in pull request #5
+- `DisputeIntakeService` no longer reads or sets the dispute's agreement; the flow does (S-19)
+- `AgentActionLogger.logForReference` returns a saved entry's number, and `StewardOutcome.Result` carries it as `reference` (NFR-07)
+- `CommitmentReadService`: a comment on the S-08 read that Graph Engine flags
+- `code-analyzer.yml` leaves Jest tests and the site bundle out of the scan; `.prettierignore` leaves the site bundle alone. Both are Experience Builder's or Node's, not deployed code
+- `docs/conventions.md`, `docs/pipeline.md` and `docs/requirements.md` for the portal
+- Version 0.4.0
+
+### Added in pull request #4
 - `settings/Communities.settings-meta.xml` turns on Digital Experiences (S-04, S-11). Salesforce can't turn it off again. It's been in the plan since Phase 1, and the admin approved it before the merge
 - `.github/workflows/retrieve.yml` and decision S-15: configuration built outside source is retrieved as Steward CI into a branch of its own, and reaches `main` through a pull request (ST-13)
 
