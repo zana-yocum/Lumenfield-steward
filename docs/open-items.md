@@ -6,16 +6,16 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ---
 
-## Phase 4 — Customer portal — started 2026-10-18
+## Phase 4 — Customer portal — built 2026-10-21; closes with the walkthrough and the tag
 
-Two pull requests. #4 turned on Digital Experiences and added the retrieve workflow (S-15). #5 builds the site's pages, the controllers, the sharing and `PS_Steward_Customer`, with their tests. Claude pushes the branches and opens the pull requests.
+Three pull requests. #4 turned on Digital Experiences and added the retrieve workflow (S-15). #5 built the site's pages, the controllers, the sharing and `PS_Steward_Customer`, with their tests. #6 switched off the customer profiles' default access and repaired the disputes from before the household flow. Claude pushes the branches, opens the pull requests and merges them once their final commit validates.
 
 **Your steps**
 - ☑ 1. Yes to turning on Digital Experiences, which Salesforce can't turn off again (2026-10-18, 12:00 PM CT)
 - ☑ 2. Placeholder email sender for the site, `portal@lumenfield.example` (option b, 2026-10-18)
 - ☐ 3. Delete the branch `retrieve/1` on GitHub: it holds your private email and Salesforce username. Branches page → trash-can icon on its row. Claude can't delete branches (refused, 403)
-- ☐ 4. At the end, log in to the portal as each demo customer and take screenshots. Steps to follow
-- ☐ 5. Tag `v0.4` when the phase closes (two lines in PowerShell, as for v0.3)
+- ☐ 4. Log in to the portal as each demo customer and take screenshots: Sandra Barnett, Tanya Lattimore, Angela Coffey, and the privacy check (steps sent 2026-10-21, 8:55 PM CT)
+- ☐ 5. Tag `v0.4` on `main` once the walkthrough is done, from `C:\Lumenfield-steward`: `git pull`, then `git tag v0.4`, then `git push https://Zana-yocum@github.com/zana-yocum/Lumenfield-steward.git v0.4`
 
 **Mine**
 - ☑ 4a through the pipeline: Digital Experiences on, `retrieve.yml` (pull request #4, merged)
@@ -24,10 +24,10 @@ Two pull requests. #4 turned on Digital Experiences and added the retrieve workf
 - ☑ 4b, pull request #5: pages, controllers, sharing, profiles, labels and tests. Fifth validation passed; merged 8:27 PM CT 2026-10-21, quick-deployed as Steward CI, and the portal published by the pipeline (details in `CHANGELOG.md` v0.4)
 - ☑ Site Live and published; the components, flows and profiles in the org, last changed by Steward CI
 - ☑ Customer users for Sandra Barnett (behind on payments, with a dispute), Tanya Lattimore (current, with a dispute) and Angela Coffey (nothing on record), each on Steward Customer with `PS_Steward_Customer` (`scripts/apex/create-demo-customers.apex`, 2026-10-21)
-- ☐ Pull request #6: the custom profiles still carried their license's 25 default objects; each is now switched off. The household flow repairs a dispute on any save, which is how the 14 disputes from before it get stamped
-- ☐ After #6 deploys: run `scripts/apex/backfill-customer-household.apex` and check the 14 disputes carry their household
+- ☑ Pull request #6: the custom profiles carried their license's 25 default objects; each is now switched off, and `PS_Steward_Customer` grants read on contacts, which the dispute needs. The household flow repairs a dispute on any save. Second validation passed (115 of 115); deployed 8:50 PM CT
+- ☑ Backfill run: all 14 billing disputes saved. Checked through access: each demo customer can read only their own dispute, and none can see a default review
 - ☑ S-04, S-08 and S-11 confirmed, and S-14's field-level refusal tested with a customer user
-- ☐ Finish `CHANGELOG.md` v0.4 with #6's deploy and the backfill
+- ☑ `CHANGELOG.md` v0.4 finished, with #6's deploy and the backfill (pull request #7)
 
 **Pull request #5's validations**
 - ☑ First (`0Afaj00000oE785CAC`): two components refused. The household flow cleared its lookup with `$GlobalConstant.EmptyString`, and the sharing set's description was over 255 characters
