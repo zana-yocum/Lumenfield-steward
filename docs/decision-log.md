@@ -287,7 +287,7 @@ The agent never:
 
 **Why:** A sharing set can only match a field, not a record type, so option 3 gives it a field that means exactly "this case is the household's dispute". The flow runs before the save, so it costs no extra DML, and only when a case is created or its record type or account changes.
 
-**Consequences:** `Case_BeforeSave_StampCustomerHousehold` keeps the field right, and a case that stops being a billing dispute leaves the portal. Billing disputes that existed before the flow are backfilled once, after the deploy. `DisputeStatusServiceTest` runs as a customer: the household's two disputes are visible, its default review and another household's dispute aren't, by list or by ID, and the flow stamps and clears the field.
+**Consequences:** `Case_BeforeSave_StampCustomerHousehold` keeps the field right, and a case that stops being a billing dispute leaves the portal. The flow also runs whenever a dispute's household doesn't match its account, so any save repairs one. That's how the 14 billing disputes from before the flow are backfilled: each is saved once. The field can't be set directly, even by an admin: no profile or permission set has access to it. `DisputeStatusServiceTest` runs as a customer: the household's two disputes are visible, its default review and another household's dispute aren't, by list or by ID, and the flow stamps and clears the field.
 
 ---
 
@@ -318,6 +318,8 @@ The agent never:
 **Why:** Least privilege, the same idea as NFR-01, applied to profiles. The setting stays off, as Salesforce recommends. Test customers use login licenses, so a test never needs one of the five member licenses the demo customers hold.
 
 **Consequences:** The sharing set and the site's members list the two custom profiles. A new customer user gets Steward Customer and `PS_Steward_Customer`. `PortalTestData` creates test customers on Steward Customer Login.
+
+**Found after the first deploy.** A profile created from source starts with its license's defaults, not with nothing: on 2026-10-21 both custom profiles had the same 25 objects as the standard ones, create and edit on cases among them. Each of the 25 is now switched off explicitly in the profile's source, so the profiles grant nothing and `PS_Steward_Customer` is the only source of a customer's access. Switching them off showed one the portal relies on: read on contacts. A dispute names the household's primary contact, and a customer can't read a lookup to contacts, even with access to the field, unless they can read contacts. `PS_Steward_Customer` now grants it, read only.
 
 ---
 

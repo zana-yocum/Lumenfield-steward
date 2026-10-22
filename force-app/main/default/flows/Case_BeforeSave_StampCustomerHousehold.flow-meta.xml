@@ -49,7 +49,7 @@
             <label>Billing dispute</label>
         </rules>
     </decisions>
-    <description>ST-06, ST-12, S-16. Copies the account onto Customer_Household__c for Billing Dispute cases, and clears it on every other case. Runs only when a case is created or its record type or account changes, the only times the answer can change. The Customer_Household sharing set reads that field, so customers see their own disputes in the portal, including ones a rep opened, and never a default review.</description>
+    <description>ST-06, ST-12, S-16. Copies the account onto Customer_Household__c for Billing Dispute cases, and clears it on every other case. Runs when a case is created or its record type or account changes, and when a dispute's household doesn't match its account, so any save repairs it. The Customer_Household sharing set reads that field, so customers see their own disputes in the portal, including ones a rep opened, and never a default review.</description>
     <environments>Default</environments>
     <interviewLabel>Case_BeforeSave_StampCustomerHousehold {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Case: Stamp Customer Household</label>
@@ -78,7 +78,7 @@
         <connector>
             <targetReference>is_billing_dispute</targetReference>
         </connector>
-        <filterFormula>ISNEW() || ISCHANGED({!$Record.RecordTypeId}) || ISCHANGED({!$Record.AccountId})</filterFormula>
+        <filterFormula>ISNEW() || ISCHANGED({!$Record.RecordTypeId}) || ISCHANGED({!$Record.AccountId}) || (NOT(ISBLANK({!$Record.Disputed_Statement__c})) &amp;&amp; {!$Record.Customer_Household__c} &lt;&gt; {!$Record.AccountId})</filterFormula>
         <object>Case</object>
         <recordTriggerType>CreateAndUpdate</recordTriggerType>
         <triggerType>RecordBeforeSave</triggerType>

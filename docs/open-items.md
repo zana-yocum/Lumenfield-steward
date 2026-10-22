@@ -21,15 +21,20 @@ Two pull requests. #4 turned on Digital Experiences and added the retrieve workf
 - ☑ 4a through the pipeline: Digital Experiences on, `retrieve.yml` (pull request #4, merged)
 - ☑ Site created from the Build Your Own (LWR) template and retrieved into the repo, with placeholders where the org had put personal details
 - ☑ Personal-details check in `retrieve.yml` and `validate.yml`, with tests
-- ☐ 4b, pull request #5: pages, controllers, sharing, profiles, labels and tests. Validations so far: see below
-- ☐ After the deploy: backfill `Customer_Household__c` on the 14 billing disputes that existed before the flow; customer users for Sandra Barnett (behind on payments, with a dispute), Tanya Lattimore (current, with a dispute) and Angela Coffey (nothing on record); check the site published
-- ☐ Confirm S-04, S-08 and S-11 in the org, and S-14's field-level refusal with a customer user; finish `CHANGELOG.md` v0.4
+- ☑ 4b, pull request #5: pages, controllers, sharing, profiles, labels and tests. Fifth validation passed; merged 8:27 PM CT 2026-10-21, quick-deployed as Steward CI, and the portal published by the pipeline (details in `CHANGELOG.md` v0.4)
+- ☑ Site Live and published; the components, flows and profiles in the org, last changed by Steward CI
+- ☑ Customer users for Sandra Barnett (behind on payments, with a dispute), Tanya Lattimore (current, with a dispute) and Angela Coffey (nothing on record), each on Steward Customer with `PS_Steward_Customer` (`scripts/apex/create-demo-customers.apex`, 2026-10-21)
+- ☐ Pull request #6: the custom profiles still carried their license's 25 default objects; each is now switched off. The household flow repairs a dispute on any save, which is how the 14 disputes from before it get stamped
+- ☐ After #6 deploys: run `scripts/apex/backfill-customer-household.apex` and check the 14 disputes carry their household
+- ☑ S-04, S-08 and S-11 confirmed, and S-14's field-level refusal tested with a customer user
+- ☐ Finish `CHANGELOG.md` v0.4 with #6's deploy and the backfill
 
 **Pull request #5's validations**
 - ☑ First (`0Afaj00000oE785CAC`): two components refused. The household flow cleared its lookup with `$GlobalConstant.EmptyString`, and the sharing set's description was over 255 characters
 - ☑ Second (`0Afaj00000oE7PpCAK`): every component accepted; 14 of 99 tests failed. The org won't create users on the standard external profiles (S-18), and four tests looked up statements by a status Accord changes when a dispute opens
 - ☑ Third (`0Afaj00000oE8FRCA0`): 202 components accepted; 5 of 108 tests failed. Customer licenses can't use service contracts, so every dispute a customer opened failed (S-19), and a file an external user uploads needs the site's network
 - ☑ Fourth (`0Afaj00000odYOQCA2`, 2026-10-21): 203 components accepted; 112 of 113 tests passed, every new class at 100%. The one failure read the new case's owner by name and got nothing back; it now compares the queue's ID, as the Phase 3 test does
+- ☑ Fifth (`0Afaj00000odfg1CAA`): 114 of 114 tests, 203 components, every class at 90% or more
 
 **Known and accepted**
 - ⊘ Graph Engine's two findings are the S-08 commitments read, by design (`docs/pipeline.md`)
