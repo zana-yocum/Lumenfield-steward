@@ -4,6 +4,7 @@ import {
   formatMoney,
   namedPage,
   problemMessage,
+  LOGOUT_PAGE,
   recordIdFrom,
   recordPage
 } from "c/portalShared";
@@ -84,6 +85,13 @@ describe("c/portalShared", () => {
         type: "comm__namedPage",
         attributes: { name: "Dispute__c" },
         state: { recordId: "500000000000001AAA" }
+      });
+    });
+
+    it("logs out through the site's own login page", () => {
+      expect(LOGOUT_PAGE).toEqual({
+        type: "comm__loginPage",
+        attributes: { actionName: "logout" }
       });
     });
 

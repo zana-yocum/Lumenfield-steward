@@ -43,6 +43,12 @@ export function namedPage(name) {
   return { type: "comm__namedPage", attributes: { name } };
 }
 
+/** Logs the customer out of the portal, the way Experience Cloud sites do it. */
+export const LOGOUT_PAGE = {
+  type: "comm__loginPage",
+  attributes: { actionName: "logout" }
+};
+
 /**
  * A link to a statement's or a dispute's own page, with the record's ID in the address
  * (?recordId=…). The page asks the server for that ID among the household's own records, so

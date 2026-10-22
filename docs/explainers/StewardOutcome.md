@@ -5,7 +5,7 @@
 **Why it exists:** ST-11, GR-04, GR-06. Services return codes, never sentences. The agent puts them into words (GR-04), and supervisors see the same outcome on every log record (ST-11). With one shared set of codes, the agent, the log and the dashboard can't disagree about what happened.
 
 **How it works:**
-1. Every service result extends `StewardOutcome.Result`, which carries `outcome` and `reasonCode`. `setOutcome` sets both at once, so a result never ends up with a new outcome and an old reason.
+1. Every service result extends `StewardOutcome.Result`, which carries `outcome` and `reasonCode`, plus `reference` on a failure: the action log's number for the customer to quote (NFR-07). `setOutcome` sets the outcome and reason at once, so a result never ends up with a new outcome and an old reason.
 2. `logLabel` turns an outcome code into the label stored in `Agent_Action_Log__c.Outcome__c`, such as "Declined by Policy". An unknown code returns null.
 3. `describeErrors` turns a failed save's errors into one line, such as `REQUIRED_FIELD_MISSING: Required fields are missing: [Name]`, for the log's details. It's never shown to a customer (NFR-07).
 4. `NOT_FOUND` is the answer both for a record that doesn't exist and for one that belongs to someone else, so a guessed ID confirms nothing (ST-12).

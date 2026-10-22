@@ -1,11 +1,11 @@
 @import "c/portalStyles";
 
 .terms {
-  margin-top: 0.75rem;
+  margin-top: var(--portal-space-3);
 }
 
 .terms-label {
   display: block;
-  font-size: 0.875rem;
-  color: #3e3e3c;
+  font-size: var(--portal-font-size-small);
+  color: var(--portal-color-text-label);
 }

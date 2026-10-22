@@ -5,23 +5,23 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--portal-space-2);
 }
 
 .payments-title {
-  margin-top: 1rem;
-  font-size: 1rem;
-  font-weight: 700;
+  margin-top: var(--portal-space-4);
+  font-size: var(--portal-font-size-body);
+  font-weight: var(--portal-font-weight-bold);
 }
 
 /* Status is text, never color alone; the border only frames it. */
 .status {
-  padding: 0.125rem 0.5rem;
-  border: 1px solid #706e6b;
-  border-radius: 1rem;
-  font-size: 0.875rem;
+  padding: var(--portal-space-1) var(--portal-space-2);
+  border: var(--portal-border-thin) solid var(--portal-color-border-strong);
+  border-radius: var(--portal-radius-pill);
+  font-size: var(--portal-font-size-small);
 }
 
 .dispute {
-  margin-top: 0.5rem;
+  margin-top: var(--portal-space-2);
 }

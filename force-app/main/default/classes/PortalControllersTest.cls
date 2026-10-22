@@ -327,7 +327,11 @@ private class PortalControllersTest {
       );
     }
     Test.stopTest();
-    Assert.areEqual(StewardOutcome.COMPLETED, result.outcome, 'Opened');
+    Assert.areEqual(
+      StewardOutcome.COMPLETED,
+      result.outcome,
+      'Opened' + loggedReason(result)
+    );
     Assert.isTrue(
       String.isNotBlank(result.caseNumber),
       'The customer can read their new case back, through the sharing set (S-16)'
@@ -383,7 +387,11 @@ private class PortalControllersTest {
       );
     }
     Test.stopTest();
-    Assert.areEqual(StewardOutcome.NOT_FOUND, result.reasonCode, 'Not found');
+    Assert.areEqual(
+      StewardOutcome.NOT_FOUND,
+      result.reasonCode,
+      'Not found' + loggedReason(result)
+    );
     Assert.areEqual(
       0,
       [
@@ -415,7 +423,7 @@ private class PortalControllersTest {
     Assert.areEqual(
       DisputeIntakeService.EXISTING_DISPUTE,
       result.reasonCode,
-      'Already in dispute'
+      'Already in dispute' + loggedReason(result)
     );
     Assert.areEqual(existing, result.caseId, 'Points to the open dispute');
   }
@@ -443,7 +451,7 @@ private class PortalControllersTest {
     Assert.areEqual(
       DisputeIntakeService.ACCESS_DENIED,
       result.reasonCode,
-      'For lack of access (S-14)'
+      'For lack of access (S-14)' + loggedReason(result)
     );
     Assert.isNull(result.failureDetail, 'No detail leaves the server (NFR-07)');
     Assert.isTrue(
@@ -610,13 +618,35 @@ private class PortalControllersTest {
     .Id;
   }
 
+  // A file uploaded in the portal belongs to the portal's network, as the upload area's are.
   private static ContentVersion evidenceFile(String fileName, Id disputeId) {
     return new ContentVersion(
       Title = fileName,
       PathOnClient = fileName,
       VersionData = Blob.valueOf('Fictional evidence for a test.'),
-      FirstPublishLocationId = disputeId
+      FirstPublishLocationId = disputeId,
+      NetworkId = [
+        SELECT Id
+        FROM Network
+        WHERE Name = 'Lumenfield Customer Portal'
+        LIMIT 1
+      ]
+      .Id
     );
+  }
+
+  // What the action log recorded for a failed result, so a failing assertion says why.
+  private static String loggedReason(StewardOutcome.Result result) {
+    if (result?.reference == null) {
+      return '';
+    }
+    List<Agent_Action_Log__c> logged = [
+      SELECT Details__c
+      FROM Agent_Action_Log__c
+      WHERE Name = :result.reference
+      WITH SYSTEM_MODE
+    ];
+    return logged.isEmpty() ? '' : ' (logged: ' + logged[0].Details__c + ')';
   }
 
   private static User customerOf(Account household, Id permissionSetId) {

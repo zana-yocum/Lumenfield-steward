@@ -13,7 +13,9 @@ rules:
 
 # Jest tests run in Node and are never deployed (.forceignore). Their documented patterns, such as
 # waiting for promises with setTimeout and emitting values from a wire adapter, break rules that
-# are meant for component code, so the tests are left out of the scan.
+# are meant for component code, so the tests are left out of the scan. The site bundle's own
+# stylesheet is Experience Builder's, rewritten on every retrieve (S-15), so it's left out too.
 ignores:
   files:
     - "**/__tests__/**"
+    - "**/digitalExperiences/**"

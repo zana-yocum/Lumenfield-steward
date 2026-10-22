@@ -1,10 +1,6 @@
 import { LightningElement, wire } from "lwc";
 import { CurrentPageReference, NavigationMixin } from "lightning/navigation";
-// The header is made only for the customer portal, where the site's base path builds the
-// Log out link.
-// eslint-disable-next-line @lwc/lwc-platform/no-community-import
-import basePath from "@salesforce/community/basePath";
-import { LABELS, PAGES, namedPage } from "c/portalShared";
+import { LABELS, LOGOUT_PAGE, PAGES, namedPage } from "c/portalShared";
 
 const LINKS = [
   { name: PAGES.account, label: LABELS.myAccount },
@@ -21,6 +17,7 @@ const LINKS = [
 export default class PortalHeader extends NavigationMixin(LightningElement) {
   labels = LABELS;
   urls = {};
+  logoutUrl;
   currentName;
 
   @wire(CurrentPageReference)
@@ -37,6 +34,9 @@ export default class PortalHeader extends NavigationMixin(LightningElement) {
       this[NavigationMixin.GenerateUrl](namedPage(link.name)).then((url) => {
         this.urls = { ...this.urls, [link.name]: url };
       });
+    });
+    this[NavigationMixin.GenerateUrl](LOGOUT_PAGE).then((url) => {
+      this.logoutUrl = url;
     });
   }
 
@@ -56,8 +56,9 @@ export default class PortalHeader extends NavigationMixin(LightningElement) {
     return PAGES.account;
   }
 
-  get logoutUrl() {
-    return `${basePath}/secur/logout.jsp`;
+  handleLogout(event) {
+    event.preventDefault();
+    this[NavigationMixin.Navigate](LOGOUT_PAGE);
   }
 
   handleNavigate(event) {

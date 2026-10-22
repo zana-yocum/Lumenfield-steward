@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <assignments>
+        <name>stamp_agreement</name>
+        <label>Stamp the statement's agreement</label>
+        <locationX>50</locationX>
+        <locationY>323</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Service_Contract__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Disputed_Statement__r.Service_Contract__c</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>is_dispute_on_statement</name>
+        <label>Is it a dispute about a statement?</label>
+        <locationX>182</locationX>
+        <locationY>215</locationY>
+        <defaultConnectorLabel>Any other case</defaultConnectorLabel>
+        <rules>
+            <name>dispute_on_statement</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.RecordType.DeveloperName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Billing_Dispute</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Disputed_Statement__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>stamp_agreement</targetReference>
+            </connector>
+            <label>Dispute on a statement</label>
+        </rules>
+    </decisions>
+    <description>ST-06, S-19. Copies the disputed statement's agreement onto Service_Contract__c when a Billing Dispute is created or its statement changes, so every dispute names its agreement however it was opened. Customer licenses can't read service contracts, so a portal customer can't set it themselves.</description>
+    <environments>Default</environments>
+    <interviewLabel>Case_BeforeSave_StampDisputeAgreement {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Case: Stamp Dispute Agreement</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>56</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>is_dispute_on_statement</targetReference>
+        </connector>
+        <filterFormula>ISNEW() || ISCHANGED({!$Record.Disputed_Statement__c})</filterFormula>
+        <object>Case</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
