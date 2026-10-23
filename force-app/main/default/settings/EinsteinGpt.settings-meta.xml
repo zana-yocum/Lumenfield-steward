@@ -7,7 +7,7 @@
     <disableAIProviderRegionFallback>false</disableAIProviderRegionFallback>
     <enableAIModelBeta>false</enableAIModelBeta>
     <enableDeployOnlyActivePromptTemplateVersion>false</enableDeployOnlyActivePromptTemplateVersion>
-    <enableEinsteinGPTDeployPromptTemplatesAsActive>false</enableEinsteinGPTDeployPromptTemplatesAsActive>
+    <enableEinsteinGPTDeployPromptTemplatesAsActive>true</enableEinsteinGPTDeployPromptTemplatesAsActive>
     <enableEinsteinGptAllowUnsafePTInputChanges>false</enableEinsteinGptAllowUnsafePTInputChanges>
     <enableEinsteinGptGlobalLangSupport>false</enableEinsteinGptGlobalLangSupport>
     <enableEinsteinGptPlatform>true</enableEinsteinGptPlatform>
