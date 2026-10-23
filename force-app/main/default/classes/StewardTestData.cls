@@ -113,6 +113,56 @@ public class StewardTestData {
   }
 
   /**
+   * Gives a household the known-answer history the snapshot and briefing tests check: four $120
+   * statements (one paid, two past due, one open and due in two weeks), $120 paid on the first
+   * and $50 on the third, and a $190 promise ten days out. $310 owed, $190 past due.
+   * @param household the household
+   * @return the four statements, oldest due first
+   */
+  public static List<Billing_Statement__c> addKnownAnswerHistory(
+    Household household
+  ) {
+    List<Billing_Statement__c> statements = new List<Billing_Statement__c>{
+      statement(household, monthStart(4), 120, STATEMENT_PAID),
+      statement(household, monthStart(3), 120, STATEMENT_PAST_DUE),
+      statement(household, monthStart(2), 120, STATEMENT_PAST_DUE),
+      statement(household, Date.today().addDays(14), 120, STATEMENT_OPEN)
+    };
+    insert statements;
+    insert new List<Payment__c>{
+      payment(statements[0], 120, monthStart(4).addDays(-2)),
+      payment(statements[2], 50, monthStart(2).addDays(-1))
+    };
+    // Within policy (the full $190 past due, inside the window), so Accord's flow keeps it Active.
+    insert promise(household, Date.today().addDays(10), 190, 'Active');
+    return statements;
+  }
+
+  /**
+   * The households a test's setup created, in name order (the order they were created), each
+   * with its primary contact's name and email.
+   * @return the households
+   */
+  public static List<Household> existingHouseholds() {
+    List<Household> households = new List<Household>();
+    for (Account account : [
+      SELECT
+        Id,
+        Name,
+        (SELECT Id, FirstName, LastName, Email FROM Contacts LIMIT 1)
+      FROM Account
+      WHERE Name LIKE 'Steward Test Household%'
+      ORDER BY Name
+    ]) {
+      Household household = new Household();
+      household.account = account;
+      household.primaryContact = account.Contacts[0];
+      households.add(household);
+    }
+    return households;
+  }
+
+  /**
    * The first payment due date on every test agreement.
    * @return the first of the month, 13 months ago; its first anniversary is the first of last month
    */
