@@ -48,7 +48,6 @@ public with sharing class AccountBriefingPrompt {
   @InvocableMethod(
     label='Steward account briefing data'
     description='The household facts behind the Steward_Account_Briefing prompt template, read with the running user\'s access.'
-    CapabilityType='FlexTemplate://Steward_Account_Briefing'
   )
   public static List<Response> getPrompt(List<Request> requests) {
     List<Id> accountIds = new List<Id>();

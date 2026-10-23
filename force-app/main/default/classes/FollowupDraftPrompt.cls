@@ -35,7 +35,6 @@ public with sharing class FollowupDraftPrompt {
   @InvocableMethod(
     label='Steward follow-up draft data'
     description='The call outcome and promise behind the Steward_Followup_Draft prompt template, read with the running user\'s access.'
-    CapabilityType='FlexTemplate://Steward_Followup_Draft'
   )
   public static List<Response> getPrompt(List<Request> requests) {
     List<Id> accountIds = new List<Id>();

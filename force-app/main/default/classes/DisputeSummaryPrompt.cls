@@ -51,7 +51,6 @@ public with sharing class DisputeSummaryPrompt {
   @InvocableMethod(
     label='Steward dispute summary data'
     description='The facts behind the Steward_Dispute_Summary prompt template, read with the running user\'s access.'
-    CapabilityType='FlexTemplate://Steward_Dispute_Summary'
   )
   public static List<Response> getPrompt(List<Request> requests) {
     List<Id> caseIds = new List<Id>();
