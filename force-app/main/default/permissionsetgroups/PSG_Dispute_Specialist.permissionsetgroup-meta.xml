@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Collections Core plus dispute case handling and credit proposal, with delete on Promise to Pay muted. US-07 through US-11.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Dispute Specialist</label>
+    <permissionSets>PS_Collections_Core</permissionSets>
+    <permissionSets>PS_Dispute_Management</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>
