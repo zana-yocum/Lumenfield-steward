@@ -6,16 +6,16 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ---
 
-## Phase 4 — Customer portal — built 2026-10-21; closes with the walkthrough and the tag
+## Phase 4 — Customer portal — closed 2026-10-22
 
 Three pull requests. #4 turned on Digital Experiences and added the retrieve workflow (S-15). #5 built the site's pages, the controllers, the sharing and `PS_Steward_Customer`, with their tests. #6 switched off the customer profiles' default access and repaired the disputes from before the household flow. Claude pushes the branches, opens the pull requests and merges them once their final commit validates.
 
 **Your steps**
 - ☑ 1. Yes to turning on Digital Experiences, which Salesforce can't turn off again (2026-10-18, 12:00 PM CT)
 - ☑ 2. Placeholder email sender for the site, `portal@lumenfield.example` (option b, 2026-10-18)
-- ☐ 3. Delete the branch `retrieve/1` on GitHub: it holds your private email and Salesforce username. Branches page → trash-can icon on its row. Claude can't delete branches (refused, 403)
-- ☐ 4. Log in to the portal as each demo customer and take screenshots: Sandra Barnett, Tanya Lattimore, Angela Coffey, and the privacy check (steps sent 2026-10-21, 8:55 PM CT)
-- ☐ 5. Tag `v0.4` on `main` once the walkthrough is done, from `C:\Lumenfield-steward`: `git pull`, then `git tag v0.4`, then `git push https://Zana-yocum@github.com/zana-yocum/Lumenfield-steward.git v0.4`
+- ☑ 3. Branch `retrieve/1` deleted on GitHub (2026-10-22): it held your private email and Salesforce username
+- ☑ 4. Walkthrough and screenshots as Sandra Barnett, Tanya Lattimore and Angela Coffey, with the privacy check (2026-10-22, by 7:48 PM CT). The contact page had no **Log in to Experience as User** (see below), so each login used the admin's login-as link for the site
+- ☑ 5. `v0.4` tagged on `9634423` and pushed (2026-10-22)
 
 **Mine**
 - ☑ 4a through the pipeline: Digital Experiences on, `retrieve.yml` (pull request #4, merged)
@@ -36,9 +36,17 @@ Three pull requests. #4 turned on Digital Experiences and added the retrieve wor
 - ☑ Fourth (`0Afaj00000odYOQCA2`, 2026-10-21): 203 components accepted; 112 of 113 tests passed, every new class at 100%. The one failure read the new case's owner by name and got nothing back; it now compares the queue's ID, as the Phase 3 test does
 - ☑ Fifth (`0Afaj00000odfg1CAA`): 114 of 114 tests, 203 components, every class at 90% or more
 
+**Checked in the org after the walkthrough (2026-10-22)**
+- ☑ Angela Coffey opened dispute 00001053 in the portal, 7:44 PM CT: created by her customer user, origin Web, reason Payment Not Posted. The agreement flow stamped Coffey Household Lease (S-19); Accord stamped the Billing Dispute SLA entitlement, routed the case to Dispute Specialists and set statement STMT-00854 to In Dispute (ST-06)
+- ☑ Angela can read 00001053 but not edit it, and still can't read Sandra Barnett's dispute (S-16, ST-12)
+
+**For a later phase**
+- ☐ Upload a file to a dispute as a customer, by hand. The walkthrough didn't use the upload control on the dispute page: no file has been uploaded through the portal (checked in the org, 2026-10-23). The server side is proven in Apex, so this checks only the control itself. Do it any time as Angela Coffey on 00001053, or in the Phase 10 walkthrough video
+- ☐ Phase 10, before the walkthrough video: decide whether to add **Log in to Experience as User** to the Contact page layout. The layout has its own customized list of Lightning actions, so the customer-user actions Salesforce adds don't appear on it. The layout is Accord's, so adding the action is an Accord change with its own changelog entry (NFR-09); the alternative is to keep using the admin's login-as link
+
 **Known and accepted**
 - ⊘ Graph Engine's two findings are the S-08 commitments read, by design (`docs/pipeline.md`)
-- ⊘ The portal's evidence upload is proven in Apex (a customer can attach a file to their own dispute, not another household's). The upload control itself is checked by hand in the walkthrough
+- ⊘ The portal's evidence upload is proven in Apex (a customer can attach a file to their own dispute, not another household's). The upload control itself still needs its hand check (above)
 
 ---
 
