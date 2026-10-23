@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Access for collections reps working past-due accounts. Collections Core, with delete on Promise to Pay muted. US-01, US-03, US-05, US-06.</description>
+    <description>Access for collections reps working past-due accounts. Collections Core, with delete on Promise to Pay muted. US-01, US-03, US-05, US-06. Steward adds its rep assistant and customer contact details (S-21, S-22).</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Collections Rep</label>
     <mutingPermissionSets>Mute_Rep_Promise_Delete</mutingPermissionSets>
     <permissionSets>PS_Collections_Core</permissionSets>
+    <permissionSets>PS_Steward_Collections_Contact</permissionSets>
+    <permissionSets>PS_Steward_Rep_Assistant</permissionSets>
     <status>Updated</status>
 </PermissionSetGroup>
