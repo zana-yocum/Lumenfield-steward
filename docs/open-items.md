@@ -41,11 +41,12 @@ Three pull requests. #4 turned on Digital Experiences and added the retrieve wor
 - ☑ Angela can read 00001053 but not edit it, and still can't read Sandra Barnett's dispute (S-16, ST-12)
 
 **For a later phase**
-- ☐ Phase 10, before the walkthrough video: decide whether to add **Log in to Experience as User** to the Contact page layout. The layout's Lightning action list was fixed when the org was set up, before Digital Experiences, so it has none of the customer-user actions. The layout is Accord's, so adding the action is an Accord change with its own changelog entry (NFR-09); the alternative is to keep using the admin's login-as link
+- ☐ Upload a file to a dispute as a customer, by hand. The walkthrough didn't use the upload control on the dispute page: no file has been uploaded through the portal (checked in the org, 2026-10-23). The server side is proven in Apex, so this checks only the control itself. Do it any time as Angela Coffey on 00001053, or in the Phase 10 walkthrough video
+- ☐ Phase 10, before the walkthrough video: decide whether to add **Log in to Experience as User** to the Contact page layout. The layout has its own customized list of Lightning actions, so the customer-user actions Salesforce adds don't appear on it. The layout is Accord's, so adding the action is an Accord change with its own changelog entry (NFR-09); the alternative is to keep using the admin's login-as link
 
 **Known and accepted**
 - ⊘ Graph Engine's two findings are the S-08 commitments read, by design (`docs/pipeline.md`)
-- ⊘ The portal's evidence upload is proven in Apex (a customer can attach a file to their own dispute, not another household's). The upload control itself is checked by hand in the walkthrough
+- ⊘ The portal's evidence upload is proven in Apex (a customer can attach a file to their own dispute, not another household's). The upload control itself still needs its hand check (above)
 
 ---
 
