@@ -1,0 +1,4 @@
+/* The model's line breaks are its paragraphs and headings, so they're kept as written. */
+.generated {
+  white-space: pre-line;
+}

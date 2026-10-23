@@ -1,0 +1,31 @@
+<template>
+  <template lwc:if={loading}>
+    <div class="slds-is-relative slds-p-vertical_xx-large">
+      <lightning-spinner
+        alternative-text={labels.writing}
+        size="small"
+      ></lightning-spinner>
+    </div>
+    <p class="slds-text-align_center slds-text-color_weak" aria-live="polite">
+      {labels.writing}
+    </p>
+  </template>
+  <template lwc:elseif={message}>
+    <div class="slds-scoped-notification slds-theme_warning" role="status">
+      <p class="message">{message}</p>
+      <p lwc:if={detail} class="detail slds-text-body_small slds-m-top_x-small">
+        {detail}
+      </p>
+    </div>
+  </template>
+  <template lwc:elseif={text}>
+    <div class="generated" role="region" aria-label={labels.generatedRegion}>
+      {text}
+    </div>
+    <p
+      class="disclaimer slds-text-body_small slds-text-color_weak slds-m-top_medium"
+    >
+      {labels.disclaimer}
+    </p>
+  </template>
+</template>

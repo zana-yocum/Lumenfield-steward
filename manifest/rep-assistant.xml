@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The Accord components the rep assistant adds to (ST-08, ST-09, ST-10, S-21, S-22):
+     the two console layouts that get its buttons, the three collections permission set groups
+     that get its permission sets, and the Einstein settings recorded in docs/agent-governance.md.
+     Retrieved by .github/workflows/retrieve.yml before Steward changes them in source. -->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Account-Residential Agreement Layout</members>
+        <members>Case-Billing Dispute Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>PSG_Collections_Rep</members>
+        <members>PSG_Collections_Supervisor</members>
+        <members>PSG_Dispute_Specialist</members>
+        <name>PermissionSetGroup</name>
+    </types>
+    <types>
+        <members>EinsteinGpt</members>
+        <name>Settings</name>
+    </types>
+    <version>68.0</version>
+</Package>

@@ -20,61 +20,17 @@ private class AccountSnapshotServiceTest {
     StewardTestData.Household known = households[0];
     StewardTestData.Household disputed = households[2];
 
-    List<Billing_Statement__c> statements = new List<Billing_Statement__c>{
-      StewardTestData.statement(
-        known,
-        StewardTestData.monthStart(4),
-        120,
-        StewardTestData.STATEMENT_PAID
-      ),
-      StewardTestData.statement(
-        known,
-        StewardTestData.monthStart(3),
-        120,
-        StewardTestData.STATEMENT_PAST_DUE
-      ),
-      StewardTestData.statement(
-        known,
-        StewardTestData.monthStart(2),
-        120,
-        StewardTestData.STATEMENT_PAST_DUE
-      ),
-      StewardTestData.statement(
-        known,
-        Date.today().addDays(14),
-        120,
-        StewardTestData.STATEMENT_OPEN
-      ),
-      StewardTestData.statement(
-        disputed,
-        StewardTestData.monthStart(2),
-        120,
-        StewardTestData.STATEMENT_PAST_DUE
-      )
-    };
-    insert statements;
-    insert new List<Payment__c>{
-      StewardTestData.payment(
-        statements[0],
-        120,
-        StewardTestData.monthStart(4).addDays(-2)
-      ),
-      StewardTestData.payment(
-        statements[2],
-        50,
-        StewardTestData.monthStart(2).addDays(-1)
-      )
-    };
-    // Within policy (the full $190 past due, inside the window), so Accord's flow keeps it Active.
-    insert StewardTestData.promise(
-      known,
-      Date.today().addDays(10),
-      190,
-      'Active'
+    StewardTestData.addKnownAnswerHistory(known);
+    Billing_Statement__c disputedStatement = StewardTestData.statement(
+      disputed,
+      StewardTestData.monthStart(2),
+      120,
+      StewardTestData.STATEMENT_PAST_DUE
     );
+    insert disputedStatement;
     StewardTestData.insertDispute(
       disputed,
-      statements[4],
+      disputedStatement,
       'Payment Not Posted'
     );
     // Inserted here rather than in the test method: an account insert followed by a user insert in

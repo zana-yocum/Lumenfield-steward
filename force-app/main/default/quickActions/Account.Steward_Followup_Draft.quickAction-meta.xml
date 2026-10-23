@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionSubtype>ScreenAction</actionSubtype>
+    <description>ST-10. Drafts today's follow-up email from the logged contact attempt and opens it in the email composer. Sends nothing.</description>
+    <label>Follow-up Draft</label>
+    <lightningWebComponent>repFollowupDraft</lightningWebComponent>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>LightningWebComponent</type>
+</QuickAction>

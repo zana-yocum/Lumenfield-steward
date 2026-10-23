@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <description>Shared by the rep assistant's buttons: their text, the outcome codes and the words for results that aren't text to show (ST-08, ST-09, ST-10, S-21).</description>
+    <isExposed>false</isExposed>
+    <masterLabel>Rep Assistant Shared Code</masterLabel>
+</LightningComponentBundle>

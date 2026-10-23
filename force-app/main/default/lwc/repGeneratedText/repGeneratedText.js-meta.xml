@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <description>Shows what the rep assistant wrote, as plain text with a reminder to check it, or why there's nothing (ST-08, ST-09, S-21).</description>
+    <isExposed>false</isExposed>
+    <masterLabel>Rep Assistant Generated Text</masterLabel>
+</LightningComponentBundle>
