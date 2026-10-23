@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Full collections access plus credit approval, reporting, and payment field visibility. Retains delete on Promise to Pay for corrections. US-12, US-13, US-14.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Collections Supervisor</label>
+    <permissionSets>PS_Collections_Core</permissionSets>
+    <permissionSets>PS_Collections_Reporting</permissionSets>
+    <permissionSets>PS_Credit_Approval</permissionSets>
+    <permissionSets>PS_Dispute_Management</permissionSets>
+    <permissionSets>PS_Payment_Detail</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>
