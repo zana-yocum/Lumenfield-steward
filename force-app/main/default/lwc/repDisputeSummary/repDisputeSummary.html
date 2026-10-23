@@ -1,0 +1,24 @@
+<template>
+  <lightning-quick-action-panel header={labels.summaryTitle}>
+    <c-rep-generated-text
+      loading={loading}
+      text={text}
+      message={message}
+      detail={detail}
+    ></c-rep-generated-text>
+    <div slot="footer">
+      <lightning-button
+        class="close"
+        label={labels.close}
+        onclick={close}
+      ></lightning-button>
+      <lightning-button
+        class="write-again slds-m-left_x-small"
+        variant="brand"
+        label={labels.writeAgain}
+        onclick={write}
+        disabled={loading}
+      ></lightning-button>
+    </div>
+  </lightning-quick-action-panel>
+</template>

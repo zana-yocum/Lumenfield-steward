@@ -768,4 +768,140 @@
         <shortDescription>Portal: Your disputes</shortDescription>
         <value>Your disputes</value>
     </labels>
+    <labels>
+        <fullName>Steward_Rep_Briefing_Title</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: the briefing's title</shortDescription>
+        <value>Briefing</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Close</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: close the panel</shortDescription>
+        <value>Close</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Disclaimer</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: reminder under generated text</shortDescription>
+        <value>Written by AI from this record's data. Check it against the record before you rely on it.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Failed</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: the model or the server failed</shortDescription>
+        <value>The assistant couldn't write this just now. Try again in a minute.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Followup_Title</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: the follow-up's title</shortDescription>
+        <value>Follow-up Draft</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Generated_Region</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: name of the generated text for screen readers</shortDescription>
+        <value>What the assistant wrote</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Greeting</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: email greeting; {0} is the contact's first name</shortDescription>
+        <value>Hi {0},</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Greeting_Plain</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: email greeting with no first name on record</shortDescription>
+        <value>Hello,</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_No_Attempt_Today</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: no contact attempt logged today</shortDescription>
+        <value>Log today's contact attempt first, so the draft reflects what happened on the call.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Not_Found</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: record not visible or not a billing dispute</shortDescription>
+        <value>This record isn't available to you.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Signoff</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: email sign-off before the rep's name</shortDescription>
+        <value>Thank you,</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Subject_Call</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: email subject after a call</shortDescription>
+        <value>Following up on today's call</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Subject_Missed</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: email subject when nobody was reached</shortDescription>
+        <value>We tried to reach you today</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Subject_Promise</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: email subject after a promise to pay</shortDescription>
+        <value>Your payment arrangement</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Summary_Title</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: the dispute summary's title</shortDescription>
+        <value>Dispute Summary</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Write_Again</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: generate the text again</shortDescription>
+        <value>Write again</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Rep_Writing</fullName>
+        <categories>Steward Rep Assistant</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rep assistant: shown while the model writes</shortDescription>
+        <value>Writing from this record…</value>
+    </labels>
 </CustomLabels>

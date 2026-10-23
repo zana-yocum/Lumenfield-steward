@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <description>The Follow-up Draft button on a household: today's follow-up email, opened in the standard composer for the rep to edit and send (ST-10, S-21).</description>
+    <isExposed>true</isExposed>
+    <masterLabel>Rep Assistant Follow-up Draft</masterLabel>
+    <targets>
+        <target>lightning__RecordAction</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordAction">
+            <actionType>ScreenAction</actionType>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

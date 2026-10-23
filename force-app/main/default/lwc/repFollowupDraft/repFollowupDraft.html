@@ -1,0 +1,16 @@
+<template>
+  <lightning-quick-action-panel header={labels.followupTitle}>
+    <c-rep-generated-text
+      loading={loading}
+      message={message}
+      detail={detail}
+    ></c-rep-generated-text>
+    <div slot="footer">
+      <lightning-button
+        class="close"
+        label={labels.close}
+        onclick={close}
+      ></lightning-button>
+    </div>
+  </lightning-quick-action-panel>
+</template>
