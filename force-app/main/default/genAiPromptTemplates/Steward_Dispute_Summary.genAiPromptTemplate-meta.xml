@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
-    <activeVersionIdentifier>Steward_Dispute_Summary_1</activeVersionIdentifier>
     <description>ST-09, S-20. A first-pass summary of one billing dispute for a dispute specialist, grounded only in the dispute's records through DisputeSummaryPrompt, read with the specialist's own access. Never recommends an outcome.</description>
     <masterLabel>Steward Dispute Summary</masterLabel>
     <templateVersions>
@@ -50,7 +49,6 @@ Rules:
             </parameters>
             <referenceName>Apex:DisputeSummaryPrompt</referenceName>
         </templateDataProviders>
-        <versionIdentifier>Steward_Dispute_Summary_1</versionIdentifier>
     </templateVersions>
     <type>einstein_gpt__flex</type>
     <visibility>Global</visibility>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
-    <activeVersionIdentifier>Steward_Account_Briefing_1</activeVersionIdentifier>
     <description>ST-08, S-20. A pre-call briefing on one household for a collections rep, grounded only in the household's records through AccountBriefingPrompt, read with the rep's own access. Started from the Briefing button in the Collections Console.</description>
     <masterLabel>Steward Account Briefing</masterLabel>
     <templateVersions>
@@ -54,7 +53,6 @@ Rules:
             </parameters>
             <referenceName>Apex:AccountBriefingPrompt</referenceName>
         </templateDataProviders>
-        <versionIdentifier>Steward_Account_Briefing_1</versionIdentifier>
     </templateVersions>
     <type>einstein_gpt__flex</type>
     <visibility>Global</visibility>
