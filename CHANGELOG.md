@@ -2,6 +2,47 @@
 
 Newest first. One entry per phase.
 
+## v0.5 — 2026-10-23 — Phase 5: Rep assistant
+
+The rep assistant: three buttons in the Collections Console. **Briefing** writes a pre-call briefing on a household, **Dispute Summary** a first-pass summary of a billing dispute, and **Follow-up Draft** an email after today's call, opened in the composer for the rep to edit and send. Each runs a Prompt Builder template grounded in Apex that reads the records with the clicking person's own access. One pull request, #9.
+
+### Added in pull request #9
+- **Three prompt templates:** `Steward_Account_Briefing`, `Steward_Dispute_Summary` and `Steward_Followup_Draft` (ST-08, ST-09, ST-10). Each has INSTRUCTIONS and DATA parts and tells the model to treat text between `<quoted>` tags as something a person wrote, never as instructions
+- **The data behind them (S-20):** `AccountBriefingPrompt`, `DisputeSummaryPrompt` and `FollowupDraftPrompt`, with `PromptFormat`, `PromptSection`, `RecordLines`, `SlaMilestones`, `HouseholdBriefing` and `EvidenceChecklist`. Every query is in user mode, and a related list the person can't read says so. Names, contact details and record IDs never reach a model; typed text is quoted after card numbers, email addresses and phone numbers are removed
+- **The buttons (S-21):** three screen quick actions (`repBriefing`, `repDisputeSummary`, `repFollowupDraft`, with `repGeneratedText` and `repAssistantShared`), `RepAssistantController`, which checks each request before any model runs, and `PromptRunner`, the only place Steward's Apex calls a model. Added to Accord's Residential Agreement account layout and Billing Dispute case layout, with the standard Email action the composer needs
+- **Access (S-22):** `PS_Steward_Rep_Assistant`, `PS_Steward_Collections_Contact` and `PS_Steward_Dispute_Specialist`, in Accord's three collections groups
+- **17 custom labels** (`Steward_Rep_*`) hold every word the buttons show
+- **Tests:** `AccountBriefingPromptTest` (8), `DisputeSummaryPromptTest` (5), `FollowupDraftPromptTest` (5), `RepAssistantControllerTest` (7), `PromptRunnerTest` (3), `PromptFormatTest` (7), `RecordLinesTest` (4), `SlaMilestonesTest` (3), and two more in `SensitiveTextTest`. 20 Jest tests in 4 suites, with accessibility checks
+- **`docs/agent-governance.md`** (ST-17): every object and field each template reads, what never reaches a model, and the Einstein and Trust Layer settings as read on 2026-10-23
+- 19 explainers (NFR-04). Decisions S-20 to S-22
+- `manifest/rep-assistant.xml`: the Accord components Steward now deploys, retrieved as they were first (S-15)
+
+### Changed in pull request #9
+- `SensitiveText.redactForPrompt` removes email addresses and phone numbers as well as card numbers, for text on its way to a model
+- `StewardTestData` gains the known-answer history the snapshot and briefing tests share, and `AccountSnapshotServiceTest` uses it
+- Einstein setting `enableEinsteinGPTDeployPromptTemplatesAsActive` turned on, to activate deployed templates. New templates still arrived inactive (below)
+- `jest.config.js` maps `lightning/actions` to a stub, for the quick actions' tests
+- `docs/conventions.md` and `docs/requirements.md` for the rep assistant
+- Version 0.5.0
+
+### Pull request #9's validations
+- **First** (`0Afaj00000ortiQCAQ`): 13 component errors, one cause. Salesforce has retired the flex capability type, so `CapabilityType='FlexTemplate://…'` stopped the three data classes compiling, and everything that depends on them failed. Removed: Prompt Builder matches the request's variable names to the template's inputs (S-20)
+- **Second** (`0Afaj00000osgezCAA`): the Apex compiled; three errors, the templates' version identifiers. The org generates those, so a new template is deployed without one and retrieved afterwards
+- **Third** (`0Afaj00000os6mpCAA`): 259 components, 159 of 159 tests, every class at 90% or more. The new classes run from 94.2% (`DisputeSummaryPrompt`) to 100%; seven of the eleven are at 100%
+
+### Deployed, 2026-10-23
+- Merged at 10:58 AM CT and quick-deployed as Steward CI (`0Afaj00000osZjyCAE`), with no second test run. The pull request changed components in `lwc/`, so the pipeline also republished the portal; none of the rep assistant's components are on it
+- In the org: the three permission sets are in the three collections groups, which recalculated (status Updated), and the three templates exist, published
+- **The templates arrived inactive**, though the same deploy turned on the setting that activates deployed templates, and an inactive template can't generate ("No active template version"). Pull request #10 retrieves them, now with the identifiers the org generated, and names each one's active version in source (`docs/conventions.md`)
+
+### Found in the org while building
+- **The flex capability type is retired** (above). Prompt Builder matches an Apex merge field to a flex template by the request's variable names
+- **The org generates a template version's identifier**, and gave all three templates the same one, so it isn't a hash of the content
+- **No Accord persona could read a case's subject, description, account or contact, and reps couldn't read a contact's email or phone numbers.** Steward's permission sets now grant what Zana chose (S-22)
+- **This org has no Trust Layer data masking**: the setup page reads it as not provisioned, and Prompt Security's feature gate as closed. Steward keeps contact details out of prompts itself (S-20, `docs/agent-governance.md`)
+- **The Turn on Einstein switch can be read** through the Einstein settings metadata (`enableEinsteinGptPlatform`: on), which Phase 1 couldn't do through the API
+- **Accord's `Collection_Hold_Until__c` description is a copy of `Do_Not_Contact__c`'s.** An Accord defect, for Accord's changelog (open items)
+
 ## v0.4 — 2026-10-21 — Phase 4: Customer portal
 
 The customer portal: an LWR site where a household sees its balance, statements, payments and commitments, and opens and follows its disputes. It took three pull requests. #4 turned on Digital Experiences and added the workflow that brings the site's template-built configuration into the repo. #5 built the pages, the Apex behind them and the sharing that keeps each household to its own records. #6 closed two gaps found in the org after #5 deployed: the customer profiles' default access, and the disputes that existed before the household flow. All three went through validation, merge and the pipeline's deploy, and the result was checked in the org.

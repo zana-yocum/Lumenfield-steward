@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The rep assistant's three prompt templates, retrieved after their first deploy (ST-08, ST-09,
+     ST-10). The org generates each version's identifier when it creates the version, so a new
+     template is deployed without one and retrieved here to bring the identifiers into source.
+     Retrieved by .github/workflows/retrieve.yml. -->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Steward_Account_Briefing</members>
+        <members>Steward_Dispute_Summary</members>
+        <members>Steward_Followup_Draft</members>
+        <name>GenAiPromptTemplate</name>
+    </types>
+    <version>68.0</version>
+</Package>
