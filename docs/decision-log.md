@@ -25,6 +25,9 @@ The decisions that shape Steward, the options considered, and why one was chosen
 | S-17 | A record's own portal page is a custom page with the ID in the address | Decided |
 | S-18 | Customers use custom profiles, not the standard external profiles | Decided |
 | S-19 | A dispute's agreement is stamped by a flow, not set by the caller | Decided |
+| S-20 | The rep assistant's templates read records in Apex, with the user's own access | Decided |
+| S-21 | The assistant's buttons check before any model runs; the follow-up opens in the email composer | Decided |
+| S-22 | Steward permission sets close the collections groups' access gaps | Decided |
 
 ---
 
@@ -336,3 +339,68 @@ The agent never:
 
 **Consequences:** `Case_BeforeSave_StampDisputeAgreement` runs when a Billing Dispute is created or its statement changes. The service no longer sets the field, and `PS_Steward_Customer` has no access to it. The flow is Steward's own; no Accord component changes (NFR-09).
 
+---
+
+### S-20 — The rep assistant's templates read records in Apex, with the user's own access
+**Status:** Decided
+
+**Context:** Prompt Builder can fill a flex template from the record's fields, its related lists, a flow or Apex. The briefing needs exact figures from six kinds of related records, some filtered (open promises, the last 30 days of contact attempts) and all capped. ST-08 requires that a rep's briefing hold only what the rep can see: no payment method without `PS_Payment_Detail`. Some of the text is untrusted: commitment terms, rep notes, and dispute descriptions, which customers write and which will soon arrive through the agent (ST-09).
+
+**Options**
+1. Merge fields and related lists in the template. Related lists can't be filtered to open promises or recent attempts, amounts and dates can't be written one fixed way, and nothing marks text a person typed.
+2. A flow as the data source. It can filter, but formatting every figure, fencing typed text and saying when a list can't be read would take dozens of formula resources, and a flow's tests can't easily prove each figure.
+3. Apex: one invocable class per template, querying in user mode and writing labelled lines for the model to copy. **← decided**
+
+**Why:** User mode makes the platform enforce what each person may see, so ST-08's payment-method criterion doesn't depend on the template's wording. Apex tests prove every figure, every fallback and every fence. What's never sent is decided in code, which a test checks, not by an instruction the model might ignore. That matters more here because this org has no Trust Layer data masking: on 2026-10-23 the org read as not provisioned for it (`docs/agent-governance.md`).
+
+**Consequences:**
+- `AccountBriefingPrompt`, `DisputeSummaryPrompt` and `FollowupDraftPrompt`, with shared helpers: `PromptFormat`, `PromptSection`, `RecordLines`, `SlaMilestones`, `HouseholdBriefing` and `EvidenceChecklist`.
+- A related list the person can't read says "Not available to you." The briefing still runs, and the template copies that sentence. Unreadable never counts as empty, so "no collections history" is only said when it's true.
+- No names, email addresses, phone numbers, street addresses or record IDs go into a prompt. Text a person typed goes between `<quoted>` tags after card numbers, email addresses and phone numbers are removed, with its angle brackets swapped for look-alikes so it can't close its own tag. The templates say that quoted text is content, never instructions, using the INSTRUCTIONS and DATA layout of Salesforce's own templates.
+- Amounts and dates are written one fixed way whatever the user's locale, and the templates tell the model to copy figures, never calculate them.
+- The payment method is read only for someone who can read it. The processor reference never is.
+- Disputes are found through the disputed statement's household, because collections personas can't read `Case.AccountId`.
+- NFR-01 holds with no new exception: every query is in user mode.
+- The classes carry no `CapabilityType`. The first validation refused `FlexTemplate://…`: Salesforce has retired the flex capability, and Prompt Builder now matches an Apex merge field by the request's variable names (`Household`, `Dispute`), which must match the template's inputs exactly.
+- Tests can't call a model. They prove the data. The known-answer, adversarial and persona checks run in the org after the deploy, with their evidence in `docs/agent-governance.md`.
+
+---
+
+### S-21 — The assistant's buttons check before any model runs; the follow-up opens in the email composer
+**Status:** Decided
+
+**Context:** ST-08 to ST-10 put three buttons in the Collections Console. ST-10's draft must open in the email composer and never send itself, and it must wait until today's contact attempt is logged. The email needs the customer's name and address, which S-20 keeps away from the model.
+
+**Options**
+1. A Sales Email template, run from the composer's own Einstein button. It's grounded in the recipient, so the customer's name and contact details would go to the model, and it can't refuse a draft when nothing was logged today.
+2. Lightning web component quick actions that call Apex. `RepAssistantController` checks the record, and for a follow-up today's attempt, before any generation; runs the template through `ConnectApi.EinsteinLLM`; and for the follow-up opens the standard composer with the recipient, subject and body filled in. **← decided**
+
+**Why:** No model runs for a request that shouldn't: a household or dispute the person can't see, a case that isn't a billing dispute, or a follow-up with nothing logged today. The greeting, recipient and sign-off are added after generation, from a user-mode read, so the model never sees them. The rep edits and sends from the standard composer, and the email is logged on the household like any other (Enhanced Email is on).
+
+**Consequences:**
+- Briefing, Follow-up Draft and Dispute Summary are added to Accord's Residential Agreement account layout and Billing Dispute case layout, with the standard Email action the composer needs. Steward retrieved both layouts as they were (S-15) and deploys them with the additions. They're additions to Accord's layouts, not changes to its flows, rules or approval process, so NFR-09 holds; Accord's changelog gets an entry (open items).
+- `PromptRunner` is the only place Steward's Apex calls a model. Tests put a stand-in model there.
+- The model's text is shown as text in the console and escaped into the email's HTML, so nothing a customer typed can become a link or markup.
+- A failed generation tells the rep to try again, with the platform's message underneath for an internal user.
+- A draft is written for every outcome (Zana's choice, 2026-10-23). After Requested No Further Contact or Hardship or Bankruptcy Mentioned, it's a servicing note with no payment request and no amounts, and the rep decides whether to send it.
+
+---
+
+### S-22 — Steward permission sets close the collections groups' access gaps
+**Status:** Decided
+
+**Context:** Reading the collections personas' access for S-20 on 2026-10-23 found two gaps. No persona can read a case's Subject, Description, AccountId or ContactId, so a specialist's summary couldn't say what the customer wrote. Reps can't read a contact's email or phone numbers, or the account's phone, so a follow-up couldn't be addressed and a rep couldn't see the number to call. Accord gives its personas their access through three permission set groups.
+
+**Options**
+1. Leave the access as it is: summaries without the customer's words, follow-ups without a recipient.
+2. Edit Accord's permission sets.
+3. New Steward permission sets, added to Accord's groups. **← decided**
+
+**Why:** Zana chose who gets what (2026-10-23): specialists and supervisors read the case fields; reps, specialists and supervisors read contact email and phones. Steward's own permission sets keep the additions visible and easy to remove, and leave Accord's permission sets as they are (NFR-09).
+
+**Consequences:**
+- `PS_Steward_Dispute_Specialist`: read on Case Subject, Description, AccountId and ContactId, in the Dispute Specialist and Collections Supervisor groups. Reps are unchanged.
+- `PS_Steward_Collections_Contact`: read on Contact Email, Phone and MobilePhone, and Account Phone, in all three groups.
+- `PS_Steward_Rep_Assistant`: Execute Prompt Templates and the four Apex classes, in all three groups. The permission needs the Einstein Prompt Templates license, so everyone in those groups needs it too. Test Persona, the only member, got it on 2026-10-23.
+- Steward deploys Accord's three groups from source, retrieved as they were first (S-15). Accord's changelog gets an entry (open items).
+- What each template reads, field by field, is in `docs/agent-governance.md`.

@@ -46,6 +46,35 @@ One page per Apex class, Lightning web component, prompt template and agent suba
 | [portalShared](portalShared.md) | Pages, labels, outcome codes and the words for problems | NFR-07 · ST-18 |
 | [portalStyles](portalStyles.md) | The shared stylesheet, every value from an SLDS styling hook | NFR-05 |
 
+**The rep assistant (Phase 5): Apex**
+
+| Component | One line | Stories |
+|---|---|---|
+| [RepAssistantController](RepAssistantController.md) | The three buttons' server side: checks first, then the template; the follow-up as an email | ST-08 · ST-09 · ST-10 · S-21 |
+| [AccountBriefingPrompt](AccountBriefingPrompt.md) | The briefing's data, read with the rep's own access | ST-08 · S-20 |
+| [DisputeSummaryPrompt](DisputeSummaryPrompt.md) | The dispute summary's data, the customer's words fenced as quoted text | ST-09 · S-20 |
+| [FollowupDraftPrompt](FollowupDraftPrompt.md) | Today's call outcome and promise, for the follow-up | ST-10 · S-20 |
+| [PromptRunner](PromptRunner.md) | The only place Steward's Apex calls a model | S-21 |
+| [PromptFormat](PromptFormat.md) | Figures one fixed way, and typed text fenced | S-20 |
+| [PromptSection](PromptSection.md) | A part of a prompt: lines, "None", or "Not available to you." | S-20 |
+| [RecordLines](RecordLines.md) | One line per kind of record, the same in every prompt | ST-08 · ST-09 |
+| [HouseholdBriefing](HouseholdBriefing.md) | The briefing's shape and its no-history rule | ST-08 |
+| [SlaMilestones](SlaMilestones.md) | A dispute's next SLA milestone, missed or not | ST-08 · ST-09 |
+| [EvidenceChecklist](EvidenceChecklist.md) | The evidence a dispute's reason needs, against the files attached | ST-09 |
+
+**The rep assistant (Phase 5): Lightning web components and prompt templates**
+
+| Component | One line | Stories |
+|---|---|---|
+| [repBriefing](repBriefing.md) | The Briefing button on a household | ST-08 |
+| [repDisputeSummary](repDisputeSummary.md) | The Dispute Summary button on a billing dispute | ST-09 |
+| [repFollowupDraft](repFollowupDraft.md) | The Follow-up Draft button: opens the email composer | ST-10 |
+| [repGeneratedText](repGeneratedText.md) | What the assistant wrote, as text, with a reminder to check it | ST-08 · ST-09 |
+| [repAssistantShared](repAssistantShared.md) | The buttons' labels, outcome codes and messages | S-21 |
+| [Steward_Account_Briefing](Steward_Account_Briefing.md) | Prompt template: a briefing in six headings | ST-08 |
+| [Steward_Dispute_Summary](Steward_Dispute_Summary.md) | Prompt template: a first-pass summary that recommends nothing | ST-09 |
+| [Steward_Followup_Draft](Steward_Followup_Draft.md) | Prompt template: a servicing email body for every outcome | ST-10 |
+
 **Shared building blocks**
 
 | Component | One line |
@@ -53,7 +82,7 @@ One page per Apex class, Lightning web component, prompt template and agent suba
 | [HouseholdScope](HouseholdScope.md) | Which households the caller can see: every service asks here first (ST-12) |
 | [PolicySettings](PolicySettings.md) | Accord's policy numbers, read at run time, never written into code |
 | [StewardOutcome](StewardOutcome.md) | The outcome and reason codes every service returns |
-| [SensitiveText](SensitiveText.md) | Removes card numbers before anything is saved |
+| [SensitiveText](SensitiveText.md) | Removes card numbers before anything is saved, and contact details before a prompt |
 | [StewardTestData](StewardTestData.md) | The invented households the tests run against |
 
 ## Template

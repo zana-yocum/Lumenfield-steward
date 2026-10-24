@@ -6,6 +6,64 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ---
 
+## Phase 5 — Rep assistant — in progress
+
+Pull request #9 built it: the three prompt templates and the Apex behind them, the three buttons, and the permission sets. #10 activates the templates and adds the docs; a last pull request adds the org checks' evidence. Claude pushes each one, merges it once its final commit validates, and checks the deploy.
+
+**Your steps**
+- ☑ 1. Three decisions (2026-10-23): specialists and supervisors read a case's subject, description, account and contact; reps, specialists and supervisors read contact email and phone numbers; a follow-up is drafted for every outcome (S-21, S-22)
+- ☐ 2. Hand check as Test Persona, after the deploy (steps below)
+- ☐ 3. Accord's changelog: one entry for what Steward added to Accord's components (NFR-09). Accord's repository is private and not connected here, so the text is below, ready to paste
+- ☐ 4. `v0.5` tag once Phase 5 closes, from `C:\Lumenfield-steward` in PowerShell: `git tag v0.5 <commit>`, then `git push https://Zana-yocum@github.com/zana-yocum/Lumenfield-steward.git v0.5`. Claude gives you the commit
+
+**Mine**
+- ☑ Accord's components retrieved as they were, before any change (`retrieve/2`, `manifest/rep-assistant.xml`): the two layouts, the three collections groups and the Einstein settings (S-15)
+- ☑ Einstein Prompt Templates license assigned to Test Persona (2026-10-23). Test Persona is the only member of the three groups, and the groups now include a permission set that needs the license (S-22)
+- ☑ Built and checked before the pull request: 3 templates, 11 Apex classes and 8 test classes, 5 components with 20 Jest tests, 3 quick actions, 3 permission sets, 17 labels. Code Analyzer: 0 violations. Prettier and the personal-details check clean
+- ☑ Docs: decisions S-20 to S-22, `docs/agent-governance.md`, 19 explainers, conventions and traceability
+- ☑ Pull request #9 merged (10:58 AM CT) and quick-deployed as Steward CI (`0Afaj00000osZjyCAE`). In the org: the permission sets in the three groups, which recalculated, and the three templates, published
+- ☑ The templates arrived inactive, so they can't generate yet. Retrieved (`retrieve/3`) with the identifiers the org generated
+- ☐ Pull request #10: each template's active version named in source, and the docs. Merged and deployed, then the templates checked active
+- ☐ Org checks, with the evidence in `docs/agent-governance.md`:
+  - Known answers: briefings for Sandra Barnett, Tanya Lattimore and Angela Coffey, every figure against the records
+  - No history: a briefing for a household with nothing on record
+  - Adversarial: a commitment's terms and a dispute's description that try to instruct the AI, each summarized as content and not followed
+  - Payment method: none in a briefing for someone without `PS_Payment_Detail`
+  - Follow-up drafts: a promise's amount and date from its record, and no promotional content
+  - ☑ Persona access (2026-10-23): Test Persona can read every field the templates read except the payment method, the processor reference, and a case's description, subject, account and contact, as S-22 intends
+
+**Hand check (step 2), about 10 minutes, after Claude says the templates are active**
+1. In Salesforce as yourself: the gear icon → **Setup** → type `Users` in Quick Find → **Users** → click **Login** next to **Test Persona**.
+2. App Launcher (the nine dots) → **Collections Console** → search for **Sandra Barnett Household** and open it.
+3. Click **Briefing** at the top right of the record (if you don't see it, it's under the ▼ arrow). The panel says "Writing from this record…", then shows the briefing. Check: the balance, past-due balance and days past due match the fields on the record; no payment method appears anywhere (a rep can't read it); Disputes names 00001035 and says its milestone was missed; the reminder to check it sits at the bottom. Click **Close**.
+4. Click **Follow-up Draft**. It should say: "Log today's contact attempt first, so the draft reflects what happened on the call." Click **Close**.
+5. Click **Log Contact Attempt**, choose **Left Voicemail**, type a short note such as `Hand check`, and finish.
+6. Click **Follow-up Draft** again. The email composer opens with the subject "We tried to reach you today", a body starting "Hi Sandra," and the sign-off "Thank you," with Test Persona and Lumenfield Home Energy. The To line should hold Sandra's address (an example.com address). **Don't send it:** close the composer and choose **Discard**.
+7. In the household's cases, open **00001035** and click **Dispute Summary**. As a rep, "What the customer said" should say the description isn't available to you; the evidence for Outage or Repair Credit and the missed milestone should be there. Click **Close**.
+8. Top right: **Log out as Test Persona**. Then tell Claude "hand check done", with anything that looked wrong.
+
+**Accord's changelog entry (step 3), ready to paste**
+```
+### Changed by Steward (2026-10-23)
+- Residential Agreement account layout: Steward's Briefing and Follow-up Draft actions and the
+  standard Email action added to the Lightning actions, which now read Briefing, Log Contact
+  Attempt, Follow-up Draft, Email, Edit.
+- Billing Dispute case layout: Steward's Dispute Summary action added first to the Lightning actions.
+- Collections Rep, Dispute Specialist and Collections Supervisor permission set groups: Steward's
+  PS_Steward_Rep_Assistant and PS_Steward_Collections_Contact added to all three, and
+  PS_Steward_Dispute_Specialist to the specialist and supervisor groups (Steward S-22). Accord's
+  own permission sets are unchanged.
+- Found: no persona could read a case's Subject, Description, AccountId or ContactId, and reps
+  couldn't read a contact's Email, Phone or MobilePhone or the account's Phone. Steward closes
+  this for the collections personas (S-22).
+- Found: Collection_Hold_Until__c's description is a copy of Do_Not_Contact__c's (defect, open).
+```
+
+**Pull request #9's validations**
+- ☑ First (`0Afaj00000ortiQCAQ`): 13 component errors, one cause. Salesforce has retired the flex capability type (`FlexTemplate://…`), so the three data classes didn't compile and everything depending on them failed. Removed (S-20)
+- ☑ Second (`0Afaj00000osgezCAA`): the Apex compiled; three errors, the templates' made-up version identifiers. The org generates them, so they're left out of a new template's source
+- ☑ Third (`0Afaj00000os6mpCAA`): 259 components, 159 of 159 tests, every class at 90% or more
+
 ## Phase 4 — Customer portal — closed 2026-10-22
 
 Three pull requests. #4 turned on Digital Experiences and added the retrieve workflow (S-15). #5 built the site's pages, the controllers, the sharing and `PS_Steward_Customer`, with their tests. #6 switched off the customer profiles' default access and repaired the disputes from before the household flow. Claude pushes the branches, opens the pull requests and merges them once their final commit validates.
