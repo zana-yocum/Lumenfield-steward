@@ -19,6 +19,11 @@ public with sharing class DisputeSummaryPrompt {
   public static final String PROMISED_CREDIT_REASON = 'Promised Credit Not Applied';
   /** Added to a commitment that could be the credit a Promised Credit Not Applied dispute means. */
   public static final String MAY_MATCH = ' [May match this dispute: not marked Applied.]';
+  /**
+   * Added to every other commitment. Saying so outright keeps the model from calling one a match
+   * because its type sounds related: the first org check caught exactly that (S-20).
+   */
+  public static final String NOT_FLAGGED = ' [Not flagged as a possible match.]';
 
   @TestVisible
   private static final Integer MAX_COMMENTS = 5;
@@ -273,7 +278,7 @@ public with sharing class DisputeSummaryPrompt {
         promisedCredit &&
         UNAPPLIED_COMMITMENT_STATUSES.contains(commitment.Status__c);
       section.add(
-        RecordLines.commitment(commitment, mayMatch ? MAY_MATCH : null)
+        RecordLines.commitment(commitment, mayMatch ? MAY_MATCH : NOT_FLAGGED)
       );
     }
     return section;

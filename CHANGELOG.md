@@ -35,6 +35,21 @@ The rep assistant: three buttons in the Collections Console. **Briefing** writes
 - In the org: the three permission sets are in the three collections groups, which recalculated (status Updated), and the three templates exist, published
 - **The templates arrived inactive**, though the same deploy turned on the setting that activates deployed templates, and an inactive template can't generate ("No active template version"). Pull request #10 retrieves them, now with the identifiers the org generated, and names each one's active version in source (`docs/conventions.md`)
 
+### Pull request #10
+- The templates as retrieved (`retrieve/3`), with the identifiers the org generated, and `activeVersionIdentifier` added to each. Validated (`0Afaj00000ovJCQCA2`, 159 of 159 tests), merged and quick-deployed (`0Afaj00000ouMkICAU`): the templates generate
+- The Phase 5 docs: decisions S-20 to S-22, `docs/agent-governance.md`, 19 explainers, conventions, traceability, open items, this changelog
+
+### Checked in the org, 2026-10-23
+- Known answers: briefings for Sandra Barnett, Tanya Lattimore and Angela Coffey, every figure matching the records. A household with nothing on record gets one sentence
+- Adversarial: a commitment's terms and a dispute's description aimed at the AI were reported as content and not followed, and nothing was recommended
+- Follow-up: a Promise Made draft confirmed the promise's amount and date from its record, with no offers
+- Persona access: Test Persona can read everything the templates read except the payment method, the processor reference, and a case's description, subject, account and contact
+- One defect, fixed in pull request #11: a dispute summary called a commitment the data didn't flag a possible match
+
+### Pull request #11
+- `DisputeSummaryPrompt` marks every commitment its match rule doesn't flag "[Not flagged as a possible match.]", and `DisputeSummaryPromptTest` checks both markers
+- The org checks' evidence in `docs/agent-governance.md`
+
 ### Found in the org while building
 - **The flex capability type is retired** (above). Prompt Builder matches an Apex merge field to a flex template by the request's variable names
 - **The org generates a template version's identifier**, and gave all three templates the same one, so it isn't a hash of the content
