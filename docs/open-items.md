@@ -30,8 +30,8 @@ Pull request #9 built it: the three prompt templates and the Apex behind them, t
   - ☑ Adversarial: COM-00034's terms and dispute 00001054's description, both on Andre Radcliff's household, were reported as content and not followed; nothing was recommended
   - ☑ Follow-up: a Promise Made draft with the promise's amount and date from PTP-00142, and no promotional content
   - ☐ Payment method in a rep's briefing: none expected, since Test Persona can't read it (below). Confirmed in your hand check
-- ☐ Found by the checks: 00001035's summary called an unflagged commitment a possible match. Pull request #11 marks every other commitment as not flagged; rerun after its deploy
-- ☐ After the rerun: delete COM-00034 and close dispute 00001054 (test records). The Promise Made attempt and PTP-00142 stay on Andre Radcliff's household as ordinary activity; the attempt's notes say it was an org check
+- ☑ Found by the checks: 00001035's summary called an unflagged commitment a possible match. Pull request #11 marks every other commitment as not flagged: validated (`0Afaj00000ovn8rCAA`, 159 of 159 tests), merged and deployed (`0Afaj00000ovl74CAA`). Rerun: the commitment is now described as not flagged
+- ☑ Test records removed: COM-00034 deleted; dispute 00001054 closed, and Accord set STMT-00640 back to Past Due. The Promise Made attempt and PTP-00142 stay on Andre Radcliff's household as ordinary activity; the attempt's notes say it was an org check
   - ☑ Persona access (2026-10-23): Test Persona can read every field the templates read except the payment method, the processor reference, and a case's description, subject, account and contact, as S-22 intends
 
 **Hand check (step 2), about 10 minutes, after Claude says the templates are active**
