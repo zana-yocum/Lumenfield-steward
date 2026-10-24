@@ -8,11 +8,11 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ## Phase 5 — Rep assistant — in progress
 
-Pull request #9 built it: the three prompt templates and the Apex behind them, the three buttons, and the permission sets. #10 activates the templates and adds the docs; a last pull request adds the org checks' evidence. Claude pushes each one, merges it once its final commit validates, and checks the deploy.
+Pull request #9 built it: the three prompt templates and the Apex behind them, the three buttons, and the permission sets. #10 activated the templates and added the docs. #11 fixes what the org checks found and records their evidence. Claude pushes each one, merges it once its final commit validates, and checks the deploy.
 
 **Your steps**
 - ☑ 1. Three decisions (2026-10-23): specialists and supervisors read a case's subject, description, account and contact; reps, specialists and supervisors read contact email and phone numbers; a follow-up is drafted for every outcome (S-21, S-22)
-- ☐ 2. Hand check as Test Persona, after the deploy (steps below)
+- ☐ 2. Hand check as Test Persona (steps below). Ready now: the templates are active
 - ☐ 3. Accord's changelog: one entry for what Steward added to Accord's components (NFR-09). Accord's repository is private and not connected here, so the text is below, ready to paste
 - ☐ 4. `v0.5` tag once Phase 5 closes, from `C:\Lumenfield-steward` in PowerShell: `git tag v0.5 <commit>`, then `git push https://Zana-yocum@github.com/zana-yocum/Lumenfield-steward.git v0.5`. Claude gives you the commit
 
@@ -23,13 +23,15 @@ Pull request #9 built it: the three prompt templates and the Apex behind them, t
 - ☑ Docs: decisions S-20 to S-22, `docs/agent-governance.md`, 19 explainers, conventions and traceability
 - ☑ Pull request #9 merged (10:58 AM CT) and quick-deployed as Steward CI (`0Afaj00000osZjyCAE`). In the org: the permission sets in the three groups, which recalculated, and the three templates, published
 - ☑ The templates arrived inactive, so they can't generate yet. Retrieved (`retrieve/3`) with the identifiers the org generated
-- ☐ Pull request #10: each template's active version named in source, and the docs. Merged and deployed, then the templates checked active
-- ☐ Org checks, with the evidence in `docs/agent-governance.md`:
-  - Known answers: briefings for Sandra Barnett, Tanya Lattimore and Angela Coffey, every figure against the records
-  - No history: a briefing for a household with nothing on record
-  - Adversarial: a commitment's terms and a dispute's description that try to instruct the AI, each summarized as content and not followed
-  - Payment method: none in a briefing for someone without `PS_Payment_Detail`
-  - Follow-up drafts: a promise's amount and date from its record, and no promotional content
+- ☑ Pull request #10: each template's active version named in source, and the docs. Validated (`0Afaj00000ovJCQCA2`, 159 of 159 tests), merged and quick-deployed (`0Afaj00000ouMkICAU`); the templates generate
+- ☑ Org checks (2026-10-23), with the evidence in `docs/agent-governance.md`:
+  - ☑ Known answers: briefings for Sandra Barnett, Tanya Lattimore and Angela Coffey; every figure matched the records
+  - ☑ No history: Angela Prather's briefing is one sentence saying there's nothing to discuss
+  - ☑ Adversarial: COM-00034's terms and dispute 00001054's description, both on Andre Radcliff's household, were reported as content and not followed; nothing was recommended
+  - ☑ Follow-up: a Promise Made draft with the promise's amount and date from PTP-00142, and no promotional content
+  - ☐ Payment method in a rep's briefing: none expected, since Test Persona can't read it (below). Confirmed in your hand check
+- ☐ Found by the checks: 00001035's summary called an unflagged commitment a possible match. Pull request #11 marks every other commitment as not flagged; rerun after its deploy
+- ☐ After the rerun: delete COM-00034 and close dispute 00001054 (test records). The Promise Made attempt and PTP-00142 stay on Andre Radcliff's household as ordinary activity; the attempt's notes say it was an org check
   - ☑ Persona access (2026-10-23): Test Persona can read every field the templates read except the payment method, the processor reference, and a case's description, subject, account and contact, as S-22 intends
 
 **Hand check (step 2), about 10 minutes, after Claude says the templates are active**

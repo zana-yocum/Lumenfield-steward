@@ -152,9 +152,11 @@ private class DisputeSummaryPromptTest {
     );
     Assert.isTrue(
       text.contains(
-        'Payment Coverage, value $360.00, 3 months covered, status Expired. Terms:'
+        'Payment Coverage, value $360.00, 3 months covered, status Expired.' +
+          DisputeSummaryPrompt.NOT_FLAGGED +
+          ' Terms:'
       ),
-      'An expired commitment isn\'t flagged: ' + text
+      'An expired commitment is marked as not a possible match: ' + text
     );
     Assert.isFalse(
       text.contains('Referral Bonus'),
@@ -240,6 +242,13 @@ private class DisputeSummaryPromptTest {
     Assert.isFalse(
       text.contains(DisputeSummaryPrompt.MAY_MATCH),
       'Only a Promised Credit Not Applied dispute flags commitments: ' + text
+    );
+    Assert.isTrue(
+      text.contains(
+        'Referral Bonus, value $150.00, status Recorded.' +
+        DisputeSummaryPrompt.NOT_FLAGGED
+      ),
+      'Every other commitment says it isn\'t flagged: ' + text
     );
   }
 
