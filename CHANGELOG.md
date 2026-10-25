@@ -49,6 +49,7 @@ The rep assistant: three buttons in the Collections Console. **Briefing** writes
 ### Pull request #11
 - `DisputeSummaryPrompt` marks every commitment its match rule doesn't flag "[Not flagged as a possible match.]", and `DisputeSummaryPromptTest` checks both markers
 - The org checks' evidence in `docs/agent-governance.md`
+- Validated (`0Afaj00000ovn8rCAA`, 159 of 159 tests), merged and quick-deployed (`0Afaj00000ovl74CAA`). Rerun: 00001035's summary now calls the commitment not flagged, and the adversarial dispute's summary is unchanged. The two adversarial test records were then removed
 
 ### Found in the org while building
 - **The flex capability type is retired** (above). Prompt Builder matches an Apex merge field to a flex template by the request's variable names
