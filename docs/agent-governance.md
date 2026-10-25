@@ -118,6 +118,8 @@ Test Persona, the collections rep, read through `UserFieldAccess` after the depl
 
 So a rep's briefing has every section, and the platform, not the template, keeps the payment method out of it.
 
+**Rechecked 2026-10-25, after Accord's DEF-09.** Accord had been granting field access through the Minimum Access profile, which the design says holds nothing. DEF-09 moved that access into Accord's permission sets and removed it from the profile. Test Persona's group, Collections Rep, now holds read access on every Accord field the templates read: counted in the group's own permissions against the plan, and spot-checked through `UserFieldAccess` on the account, statement, promise, commitment and case fields. The table above still holds. What changed for a rep is edit rights: Account Status, Broken Promises (90d), Collection Hold Until, statement dates and status, a promise's amount received and every commitment field are now read-only. Steward's templates only read, so nothing in a briefing, summary or draft changed.
+
 ### Generations (2026-10-23, evening)
 
 Run as the admin through the REST generations resource, which runs the same template, Apex and Trust Layer path as the buttons. The admin can read payment methods, so these briefings show them, as a supervisor's may. Times are in the reader's own time zone, which for the admin is Pacific.
