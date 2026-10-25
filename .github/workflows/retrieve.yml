@@ -77,6 +77,18 @@ jobs:
       # The org fills some settings with a real person's details, such as a new site's email
       # sender and admin. The repo is public, so the run stops before pushing anything personal.
       # Found on the first retrieve, 2026-10-18.
+      # Tools branch only, for restoring Accord's repository: the components left out of the first
+      # restore name org users. Swap each org username for a placeholder on an example domain
+      # before the check runs, so nothing personal is pushed. Never merged to main.
+      - name: Replace org usernames with placeholders
+        run: |
+          grep -rlIE '@(agentforce\.com|orgfarm\.salesforce\.com|lumenfield\.energy)' force-app | while IFS= read -r f; do
+            sed -i -E -e 's/[A-Za-z0-9._%+-]+@agentforce\.com/accord.admin@example.com/g' \
+              -e 's/[A-Za-z0-9._%+-]+@orgfarm\.salesforce\.com/orgfarm.provisioning@example.com/g' \
+              -e 's/test\.persona@lumenfield\.energy/test.persona@lumenfield.example/g' "$f"
+            echo "Placeholder written in $f"
+          done
+
       - name: Check for personal details
         run: scripts/check_personal_details.sh force-app
 

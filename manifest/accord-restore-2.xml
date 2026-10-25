@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The rest of Accord's components for restoring its repository: the ones that name an org
+     user, retrieved with this branch's placeholder step (see .github/workflows/retrieve.yml on
+     tools/accord-restore). Not a Steward manifest. -->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Adjustment__c.Credit_Approval</members>
+        <name>ApprovalProcess</name>
+    </types>
+    <types>
+        <members>Case</members>
+        <members>Lead</members>
+        <name>AssignmentRules</name>
+    </types>
+    <types>
+        <members>Collections_Dashboards</members>
+        <members>Collections_Dashboards/KBzhEuJNWsMpcbnMzmuwzHqwlGrEtH1</members>
+        <members>DataQualityDashboard</members>
+        <members>DataQualityDashboard/KBzhEuJNWsMpcbnMzmuwzHqwlGrEtH</members>
+        <name>Dashboard</name>
+    </types>
+    <types>
+        <members>Collections</members>
+        <members>DataQuality</members>
+        <name>Report</name>
+    </types>
+    <version>68.0</version>
+</Package>
