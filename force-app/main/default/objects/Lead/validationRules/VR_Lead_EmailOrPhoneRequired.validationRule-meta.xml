@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_Lead_EmailOrPhoneRequired</fullName>
+    <active>true</active>
+    <description>A lead needs an email or phone number, or there is no way to follow up. Web-to-lead submissions without either are rejected. US-16.</description>
+    <errorConditionFormula>AND(ISBLANK(Email), ISBLANK(Phone))</errorConditionFormula>
+    <errorMessage>Enter an email address or phone number so we can follow up.</errorMessage>
+</ValidationRule>

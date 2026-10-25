@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Billing_Dispute</fullName>
+    <active>true</active>
+    <businessProcess>Billing_Dispute_Process</businessProcess>
+    <description>A customer disputes a bill. Worked by dispute specialists under the three-milestone entitlement process. Replaces a custom dispute object (D-03). US-07 to US-11.</description>
+    <label>Billing Dispute</label>
+    <picklistValues>
+        <picklist>Dispute_Reason__c</picklist>
+        <values>
+            <fullName>Annual Escalator Increase</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Billing Started Before Activation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Duplicate or Unauthorized Draft</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Home Sale or Transfer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Outage or Repair Credit</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Payment Not Posted</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Production Below Estimate</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Promised Credit Not Applied</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Origin</picklist>
+        <values>
+            <fullName>Email</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Phone</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Web</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Priority</picklist>
+        <values>
+            <fullName>High</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Low</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Medium</fullName>
+            <default>true</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Reason</picklist>
+        <values>
+            <fullName>Breakdown</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Equipment Complexity</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Equipment Design</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Feedback</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Installation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Performance</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Root_Cause__c</picklist>
+        <values>
+            <fullName>Activation Date Mismatch</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Billing Start Date Error</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Concession Not Recorded at Signing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Customer Misunderstanding - No Company Error</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Duplicate Draft</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Payment Posting Error</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Production Shortfall - Equipment</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Production Shortfall - Weather or Shading</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Type</picklist>
+        <values>
+            <fullName>Electrical</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Electronic</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mechanical</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Structural</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

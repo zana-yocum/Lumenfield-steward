@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_Promise_AmountPositive</fullName>
+    <active>true</active>
+    <description>Rejects zero or negative promises, which would put an account on collection hold with nothing committed. US-03.</description>
+    <errorConditionFormula>Promise_Amount__c &lt;= 0</errorConditionFormula>
+    <errorDisplayField>Promise_Amount__c</errorDisplayField>
+    <errorMessage>Enter a promise amount greater than zero.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Balance__c</fullName>
+    <description>Amount still owed: amount due minus payments minus posted credits, floored at zero (a credit larger than the statement doesn&apos;t carry forward; see README limits). Credits added after DEF-01 in system testing.</description>
+    <formula>MAX(0, Amount_Due__c - Amount_Paid__c - Credits_Applied__c)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Balance</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

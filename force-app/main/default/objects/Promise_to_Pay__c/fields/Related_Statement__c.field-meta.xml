@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Related_Statement__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Which bill the promise covers.</description>
+    <label>Related Statement</label>
+    <referenceTo>Billing_Statement__c</referenceTo>
+    <relationshipLabel>Promises to Pay</relationshipLabel>
+    <relationshipName>Promises_to_Pay</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

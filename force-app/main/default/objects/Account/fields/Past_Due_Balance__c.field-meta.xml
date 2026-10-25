@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Past_Due_Balance__c</fullName>
+    <description>Amount actually late. Filters on stamped statement status, which is why that field isn&apos;t a formula. D-06.</description>
+    <label>Past Due Balance</label>
+    <summarizedField>Billing_Statement__c.Balance__c</summarizedField>
+    <summaryFilterItems>
+        <field>Billing_Statement__c.Status__c</field>
+        <operation>equals</operation>
+        <value>Past Due</value>
+    </summaryFilterItems>
+    <summaryForeignKey>Billing_Statement__c.Account__c</summaryForeignKey>
+    <summaryOperation>sum</summaryOperation>
+    <type>Summary</type>
+</CustomField>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingCriteriaRules>
+        <fullName>Billing_Disputes_to_Collections</fullName>
+        <accessLevel>Read</accessLevel>
+        <description>Gives collections reps read-only visibility into billing disputes, so they don&apos;t pursue a balance the customer is disputing. US-01, D-08.</description>
+        <label>Billing Disputes to Collections</label>
+        <sharedTo>
+            <role>CollectionsRep</role>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Billing Dispute</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+</SharingRules>

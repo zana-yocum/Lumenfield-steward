@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Service_Area__c</fullName>
+    <description>Territory used by lead assignment rules. US-16.</description>
+    <label>Service Area</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Louisville Metro</fullName>
+                <default>false</default>
+                <label>Louisville Metro</label>
+            </value>
+            <value>
+                <fullName>Southern Indiana</fullName>
+                <default>false</default>
+                <label>Southern Indiana</label>
+            </value>
+            <value>
+                <fullName>Central Kentucky</fullName>
+                <default>false</default>
+                <label>Central Kentucky</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

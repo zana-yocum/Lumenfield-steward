@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_Account_PrimaryContactRequired</fullName>
+    <active>true</active>
+    <description>Residential accounts that aren&apos;t closed need a primary contact. Skips the first save: the account must exist before its contact, and the primary contact flow fills it in. Activated in Phase 7 after the backfill. US-01, US-19.</description>
+    <errorConditionFormula>AND(
+  NOT(ISNEW()),
+  RecordType.DeveloperName = &quot;Residential_Agreement&quot;,
+  NOT(ISPICKVAL(Account_Status__c, &quot;Closed&quot;)),
+  ISBLANK(Primary_Contact__c)
+)</errorConditionFormula>
+    <errorDisplayField>Primary_Contact__c</errorDisplayField>
+    <errorMessage>Choose a primary contact. Residential accounts need one person collections and billing can reach.</errorMessage>
+</ValidationRule>

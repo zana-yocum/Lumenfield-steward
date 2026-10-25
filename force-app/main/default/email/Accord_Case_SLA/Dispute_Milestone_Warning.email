@@ -1,0 +1,9 @@
+A billing dispute is approaching its next SLA deadline.
+
+Case: {!Case.CaseNumber} - {!Case.Subject}
+Account: {!Case.Account}
+Status: {!Case.Status}
+
+Open the case: {!Case.Link}
+
+Moving the case to its next status completes the milestone.

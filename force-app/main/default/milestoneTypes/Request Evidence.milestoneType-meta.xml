@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MilestoneType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Evidence checklist sent to the customer (and the sales rep, if a commitment is involved). Target: 3 business days. Completes when the case moves to Awaiting Evidence. US-07, US-09.</description>
+    <recurrenceType>none</recurrenceType>
+</MilestoneType>

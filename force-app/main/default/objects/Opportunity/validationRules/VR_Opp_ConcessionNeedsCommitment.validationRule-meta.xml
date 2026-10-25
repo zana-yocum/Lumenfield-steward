@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_Opp_ConcessionNeedsCommitment</fullName>
+    <active>true</active>
+    <description>A deal with a concession can&apos;t close as won until the concession is recorded as a Commitment. Fires only on the move to Closed Won, so history isn&apos;t blocked. US-02.</description>
+    <errorConditionFormula>AND(ISCHANGED(StageName), ISPICKVAL(StageName, &quot;Closed Won&quot;), ISPICKVAL(Concession_Offered__c, &quot;Yes&quot;), Commitment_Count__c = 0)</errorConditionFormula>
+    <errorMessage>Add a Commitment record describing the concession before closing this deal as won.</errorMessage>
+</ValidationRule>

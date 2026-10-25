@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Oldest_Past_Due_Date__c</fullName>
+    <description>Due date of the oldest unpaid statement. Anchors account-level days past due.</description>
+    <label>Oldest Past Due Date</label>
+    <summarizedField>Billing_Statement__c.Due_Date__c</summarizedField>
+    <summaryFilterItems>
+        <field>Billing_Statement__c.Status__c</field>
+        <operation>equals</operation>
+        <value>Past Due</value>
+    </summaryFilterItems>
+    <summaryForeignKey>Billing_Statement__c.Account__c</summaryForeignKey>
+    <summaryOperation>min</summaryOperation>
+    <type>Summary</type>
+</CustomField>

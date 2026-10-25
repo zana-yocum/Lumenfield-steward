@@ -1,0 +1,8 @@
+A billing dispute has missed an SLA milestone.
+
+Case: {!Case.CaseNumber} - {!Case.Subject}
+Account: {!Case.Account}
+Status: {!Case.Status}
+Owner: {!Case.OwnerFullName}
+
+Open the case: {!Case.Link}

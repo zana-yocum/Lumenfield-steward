@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_Case_DisputeNeedsStatement</fullName>
+    <active>true</active>
+    <description>A billing dispute has to name the statement being disputed, so the statement can be flagged and excluded from collections priority while the case is open. US-07.</description>
+    <errorConditionFormula>AND(RecordType.DeveloperName = &quot;Billing_Dispute&quot;, ISBLANK(Disputed_Statement__c))</errorConditionFormula>
+    <errorDisplayField>Disputed_Statement__c</errorDisplayField>
+    <errorMessage>Choose the disputed statement. A billing dispute has to name what&apos;s being disputed.</errorMessage>
+</ValidationRule>

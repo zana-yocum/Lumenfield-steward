@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Sent to the case owner when 75% of a dispute milestone&apos;s time has passed. US-14.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Dispute Milestone Warning</name>
+    <style>none</style>
+    <subject>SLA warning: case {!Case.CaseNumber} is due soon</subject>
+    <type>text</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MilestoneType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Dispute decided and closed with a root cause. Target: 10 business days. Completes when the case moves to Resolved. US-09, US-10.</description>
+    <recurrenceType>none</recurrenceType>
+</MilestoneType>

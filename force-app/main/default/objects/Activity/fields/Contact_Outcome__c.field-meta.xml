@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Contact_Outcome__c</fullName>
+    <description>Result of a collections contact attempt, from the Contact Outcome global value set. Set by the Log Contact Attempt action. US-06.</description>
+    <label>Contact Outcome</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>Contact_Outcome</valueSetName>
+    </valueSet>
+</CustomField>

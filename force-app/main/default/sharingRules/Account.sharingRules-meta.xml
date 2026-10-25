@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingCriteriaRules>
+        <fullName>Delinquent_Accounts_to_Collections</fullName>
+        <accessLevel>Edit</accessLevel>
+        <accountSettings>
+            <caseAccessLevel>None</caseAccessLevel>
+            <contactAccessLevel>Edit</contactAccessLevel>
+            <opportunityAccessLevel>None</opportunityAccessLevel>
+        </accountSettings>
+        <description>Grants collections access to accounts once they go delinquent, without moving ownership away from sales. Access ends automatically when status returns to Current. D-08.</description>
+        <label>Delinquent Accounts to Collections</label>
+        <sharedTo>
+            <group>Collections_Team</group>
+        </sharedTo>
+        <criteriaItems>
+            <field>Account_Status__c</field>
+            <operation>equals</operation>
+            <value>Default Review,Delinquent,Hardship Review</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+</SharingRules>

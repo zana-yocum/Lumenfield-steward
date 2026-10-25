@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingCriteriaRules>
+        <fullName>Closed_Won_to_Collections</fullName>
+        <accessLevel>Read</accessLevel>
+        <description>Commitments are master-detail children of Opportunity, so collections cannot see what was promised at signing without read access to the closed deal. Read-only, closed deals only. D-02, D-06, US-07.</description>
+        <label>Closed Won to Collections</label>
+        <sharedTo>
+            <group>Collections_Team</group>
+        </sharedTo>
+        <criteriaItems>
+            <field>StageName</field>
+            <operation>equals</operation>
+            <value>Closed Won</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+</SharingRules>

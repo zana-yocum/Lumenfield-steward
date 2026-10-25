@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BusinessProcess xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Billing_Dispute_Process</fullName>
+    <description>Billing dispute status path. Acknowledged, Awaiting Evidence, and Resolved match the 1/3/10 business-day milestones. Pending Credit Approval covers credits above the specialist limit. Closed means withdrawn or duplicate. US-07, US-09 to US-11.</description>
+    <isActive>true</isActive>
+    <values>
+        <fullName>Acknowledged</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Awaiting Evidence</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Closed</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>New</fullName>
+        <default>true</default>
+    </values>
+    <values>
+        <fullName>Pending Credit Approval</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Resolved</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Under Review</fullName>
+        <default>false</default>
+    </values>
+</BusinessProcess>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_Case_RootCauseRequired</fullName>
+    <active>true</active>
+    <description>A billing dispute can&apos;t be marked Resolved without a root cause, so dispute patterns can be fixed at the source. Closed (withdrawn or duplicate) doesn&apos;t need one. US-10.</description>
+    <errorConditionFormula>AND(
+  RecordType.DeveloperName = &quot;Billing_Dispute&quot;,
+  ISPICKVAL(Status, &quot;Resolved&quot;),
+  ISBLANK(TEXT(Root_Cause__c))
+)</errorConditionFormula>
+    <errorDisplayField>Root_Cause__c</errorDisplayField>
+    <errorMessage>Choose a root cause before resolving this dispute.</errorMessage>
+</ValidationRule>

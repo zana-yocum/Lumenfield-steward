@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Out_of_Policy__c</fullName>
+    <description>Flags a promise that falls short of the past-due balance or extends beyond the policy window. Routes the record to supervisor approval instead of applying a collection hold. US-03.</description>
+    <formula>OR(
+  Promise_Amount__c &lt; Account__r.Past_Due_Balance__c,
+  Promise_Date__c - TODAY() &gt; $CustomMetadata.Policy_Setting__mdt.Promise_Window_Days.Number_Value__c
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Out of Policy</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

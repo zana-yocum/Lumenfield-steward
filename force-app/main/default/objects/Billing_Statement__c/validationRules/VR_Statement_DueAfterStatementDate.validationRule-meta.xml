@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_Statement_DueAfterStatementDate</fullName>
+    <active>true</active>
+    <description>Blocks a due date earlier than the statement date. Prevents the date error found in the data quality baseline. Phase 5.</description>
+    <errorConditionFormula>Due_Date__c &lt; Statement_Date__c</errorConditionFormula>
+    <errorDisplayField>Due_Date__c</errorDisplayField>
+    <errorMessage>Enter a due date on or after the statement date.</errorMessage>
+</ValidationRule>

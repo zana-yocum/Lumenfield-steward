@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_Adjustment_RejectionReason</fullName>
+    <active>true</active>
+    <description>Requires a reason when an adjustment is rejected. Exists because native approval comments can&apos;t be made mandatory. US-11.</description>
+    <errorConditionFormula>AND(ISPICKVAL(Status__c, &quot;Rejected&quot;), ISBLANK(Rejection_Reason__c))</errorConditionFormula>
+    <errorDisplayField>Rejection_Reason__c</errorDisplayField>
+    <errorMessage>Enter a rejection reason before rejecting this adjustment.</errorMessage>
+</ValidationRule>

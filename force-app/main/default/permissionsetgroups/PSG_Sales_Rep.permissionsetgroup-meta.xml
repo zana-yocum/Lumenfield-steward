@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Selling and concession capture. No access to payment data or collections activity. US-02, US-16, US-18.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Sales Rep</label>
+    <permissionSets>PS_Sales_Core</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

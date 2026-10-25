@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Credits_Applied__c</fullName>
+    <defaultValue>0</defaultValue>
+    <description>Total of posted adjustments against this statement. Maintained by Adjustment_AfterSave_ApplyCredits; subtracted in Balance. Found missing in system testing (DEF-01). US-10, US-11.</description>
+    <inlineHelpText>Sum of posted credits. Set automatically; don&apos;t edit.</inlineHelpText>
+    <label>Credits Applied</label>
+    <precision>16</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

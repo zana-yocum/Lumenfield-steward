@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Payment Coverage</fullName>
+        <default>false</default>
+        <label>Payment Coverage</label>
+    </customValue>
+    <customValue>
+        <fullName>Promotional Credit</fullName>
+        <default>false</default>
+        <label>Promotional Credit</label>
+    </customValue>
+    <customValue>
+        <fullName>Delayed Billing Start</fullName>
+        <default>false</default>
+        <label>Delayed Billing Start</label>
+    </customValue>
+    <customValue>
+        <fullName>Referral Bonus</fullName>
+        <default>false</default>
+        <label>Referral Bonus</label>
+    </customValue>
+    <customValue>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+    </customValue>
+    <description>What a rep promised at signing. Used by Commitment</description>
+    <masterLabel>Commitment Type</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

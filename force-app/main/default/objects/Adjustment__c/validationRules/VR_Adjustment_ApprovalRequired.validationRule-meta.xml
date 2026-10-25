@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_Adjustment_ApprovalRequired</fullName>
+    <active>true</active>
+    <description>Credits over Rep_Credit_Limit can only be approved or posted through the Credit Approval process. Approval field updates skip validation rules, which is what makes the approval process the only route. US-11.</description>
+    <errorConditionFormula>AND(ISCHANGED(Status__c), Amount__c &gt; $CustomMetadata.Policy_Setting__mdt.Rep_Credit_Limit.Number_Value__c, OR(ISPICKVAL(Status__c, &quot;Approved&quot;), AND(ISPICKVAL(Status__c, &quot;Posted&quot;), NOT(ISPICKVAL(PRIORVALUE(Status__c), &quot;Approved&quot;)))))</errorConditionFormula>
+    <errorDisplayField>Status__c</errorDisplayField>
+    <errorMessage>Credits over the rep limit need supervisor approval. Use Submit for Approval instead of changing the status.</errorMessage>
+</ValidationRule>

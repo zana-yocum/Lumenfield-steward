@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Business thresholds referenced by automation. Changing a policy is a data change here, not a flow edit.</description>
+    <label>Policy Setting</label>
+    <pluralLabel>Policy Settings</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

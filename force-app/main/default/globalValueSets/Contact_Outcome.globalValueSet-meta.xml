@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Right Party Contact</fullName>
+        <default>false</default>
+        <label>Right Party Contact</label>
+    </customValue>
+    <customValue>
+        <fullName>Third Party on Agreement</fullName>
+        <default>false</default>
+        <label>Third Party on Agreement</label>
+    </customValue>
+    <customValue>
+        <fullName>Wrong Number</fullName>
+        <default>false</default>
+        <label>Wrong Number</label>
+    </customValue>
+    <customValue>
+        <fullName>No Answer</fullName>
+        <default>false</default>
+        <label>No Answer</label>
+    </customValue>
+    <customValue>
+        <fullName>Left Voicemail</fullName>
+        <default>false</default>
+        <label>Left Voicemail</label>
+    </customValue>
+    <customValue>
+        <fullName>Promise Made</fullName>
+        <default>false</default>
+        <label>Promise Made</label>
+    </customValue>
+    <customValue>
+        <fullName>Refused to Pay</fullName>
+        <default>false</default>
+        <label>Refused to Pay</label>
+    </customValue>
+    <customValue>
+        <fullName>Disputed Balance</fullName>
+        <default>false</default>
+        <label>Disputed Balance</label>
+    </customValue>
+    <customValue>
+        <fullName>Requested No Further Contact</fullName>
+        <default>false</default>
+        <label>Requested No Further Contact</label>
+    </customValue>
+    <customValue>
+        <fullName>Hardship or Bankruptcy Mentioned</fullName>
+        <default>false</default>
+        <label>Hardship or Bankruptcy Mentioned</label>
+    </customValue>
+    <description>Result of a collections contact attempt. Used on Task. Drives no-contact and hardship flags.</description>
+    <masterLabel>Contact Outcome</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DPD_Bucket__c</fullName>
+    <description>Aging band: Current, 1-30, 31-60, 61-90, 90+. Used for aging reports and the default review threshold. US-15.</description>
+    <externalId>false</externalId>
+    <formula>IF(Days_Past_Due__c = 0, &quot;Current&quot;,
+IF(Days_Past_Due__c &lt;= 30, &quot;1-30&quot;,
+IF(Days_Past_Due__c &lt;= 60, &quot;31-60&quot;,
+IF(Days_Past_Due__c &lt;= 90, &quot;61-90&quot;, &quot;90+&quot;))))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>DPD Bucket</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

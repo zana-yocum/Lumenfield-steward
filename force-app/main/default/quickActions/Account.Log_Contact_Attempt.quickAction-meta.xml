@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Log the outcome of a collections call or message. US-06.</description>
+    <flowDefinition>Account_Screen_LogContactAttempt</flowDefinition>
+    <label>Log Contact Attempt</label>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>Flow</type>
+</QuickAction>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Do_Not_Contact__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Customer asked for no further contact. Suppresses every channel including servicing messages. Set by a rep logging a contact outcome, never by automation. US-06, US-21.</description>
+    <label>Do Not Contact</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>

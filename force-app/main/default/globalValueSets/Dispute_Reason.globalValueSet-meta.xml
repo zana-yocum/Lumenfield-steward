@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Billing Started Before Activation</fullName>
+        <default>false</default>
+        <label>Billing Started Before Activation</label>
+    </customValue>
+    <customValue>
+        <fullName>Production Below Estimate</fullName>
+        <default>false</default>
+        <label>Production Below Estimate</label>
+    </customValue>
+    <customValue>
+        <fullName>Promised Credit Not Applied</fullName>
+        <default>false</default>
+        <label>Promised Credit Not Applied</label>
+    </customValue>
+    <customValue>
+        <fullName>Duplicate or Unauthorized Draft</fullName>
+        <default>false</default>
+        <label>Duplicate or Unauthorized Draft</label>
+    </customValue>
+    <customValue>
+        <fullName>Payment Not Posted</fullName>
+        <default>false</default>
+        <label>Payment Not Posted</label>
+    </customValue>
+    <customValue>
+        <fullName>Annual Escalator Increase</fullName>
+        <default>false</default>
+        <label>Annual Escalator Increase</label>
+    </customValue>
+    <customValue>
+        <fullName>Home Sale or Transfer</fullName>
+        <default>false</default>
+        <label>Home Sale or Transfer</label>
+    </customValue>
+    <customValue>
+        <fullName>Outage or Repair Credit</fullName>
+        <default>false</default>
+        <label>Outage or Repair Credit</label>
+    </customValue>
+    <description>Why a customer is disputing. Drives the evidence checklist.</description>
+    <masterLabel>Dispute Reason</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

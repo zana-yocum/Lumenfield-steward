@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status__c</fullName>
+    <description>Lifecycle of a sales commitment: Recorded at signing, Applied when the service contract honors it, Expired, or Disputed when a customer says it was not honored. US-02.</description>
+    <label>Status</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Recorded</fullName>
+                <default>false</default>
+                <label>Recorded</label>
+            </value>
+            <value>
+                <fullName>Applied</fullName>
+                <default>false</default>
+                <label>Applied</label>
+            </value>
+            <value>
+                <fullName>Expired</fullName>
+                <default>false</default>
+                <label>Expired</label>
+            </value>
+            <value>
+                <fullName>Disputed</fullName>
+                <default>false</default>
+                <label>Disputed</label>
+            </value>
+            <value>
+                <fullName>Check</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Check</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Concession Not Recorded at Signing</fullName>
+        <default>false</default>
+        <label>Concession Not Recorded at Signing</label>
+    </customValue>
+    <customValue>
+        <fullName>Billing Start Date Error</fullName>
+        <default>false</default>
+        <label>Billing Start Date Error</label>
+    </customValue>
+    <customValue>
+        <fullName>Activation Date Mismatch</fullName>
+        <default>false</default>
+        <label>Activation Date Mismatch</label>
+    </customValue>
+    <customValue>
+        <fullName>Production Shortfall - Equipment</fullName>
+        <default>false</default>
+        <label>Production Shortfall - Equipment</label>
+    </customValue>
+    <customValue>
+        <fullName>Production Shortfall - Weather or Shading</fullName>
+        <default>false</default>
+        <label>Production Shortfall - Weather or Shading</label>
+    </customValue>
+    <customValue>
+        <fullName>Payment Posting Error</fullName>
+        <default>false</default>
+        <label>Payment Posting Error</label>
+    </customValue>
+    <customValue>
+        <fullName>Duplicate Draft</fullName>
+        <default>false</default>
+        <label>Duplicate Draft</label>
+    </customValue>
+    <customValue>
+        <fullName>Customer Misunderstanding - No Company Error</fullName>
+        <default>false</default>
+        <label>Customer Misunderstanding - No Company Error</label>
+    </customValue>
+    <description>Why the dispute happened, required at close</description>
+    <masterLabel>Root Cause</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

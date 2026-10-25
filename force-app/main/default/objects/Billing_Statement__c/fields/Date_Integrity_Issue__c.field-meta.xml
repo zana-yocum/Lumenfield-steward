@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Date_Integrity_Issue__c</fullName>
+    <description>Flags statements whose due date falls before the statement date. Feeds the data quality dashboard; the matching validation rule prevents new ones.</description>
+    <formula>Due_Date__c &lt; Statement_Date__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Date Integrity Issue</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>
