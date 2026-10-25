@@ -378,7 +378,7 @@ The agent never:
 **Why:** No model runs for a request that shouldn't: a household or dispute the person can't see, a case that isn't a billing dispute, or a follow-up with nothing logged today. The greeting, recipient and sign-off are added after generation, from a user-mode read, so the model never sees them. The rep edits and sends from the standard composer, and the email is logged on the household like any other (Enhanced Email is on).
 
 **Consequences:**
-- Briefing, Follow-up Draft and Dispute Summary are added to Accord's Residential Agreement account layout and Billing Dispute case layout, with the standard Email action the composer needs. Steward retrieved both layouts as they were (S-15) and deploys them with the additions. They're additions to Accord's layouts, not changes to its flows, rules or approval process, so NFR-09 holds; Accord's changelog gets an entry (open items).
+- Briefing, Follow-up Draft and Dispute Summary are added to Accord's Residential Agreement account layout and Billing Dispute case layout, with the standard Email action the composer needs. Steward retrieved both layouts as they were (S-15) and deploys them with the additions. They're additions to Accord's layouts, not changes to its flows, rules or approval process, so NFR-09 holds; Accord's changelog gets an entry (open items). From here on, Steward's source is the copy of record for both layouts: a change made in Setup has to be retrieved into Steward first, or Steward's next deploy undoes it.
 - `PromptRunner` is the only place Steward's Apex calls a model. Tests put a stand-in model there.
 - The model's text is shown as text in the console and escaped into the email's HTML, so nothing a customer typed can become a link or markup.
 - A failed generation tells the rep to try again, with the platform's message underneath for an internal user.
@@ -402,5 +402,5 @@ The agent never:
 - `PS_Steward_Dispute_Specialist`: read on Case Subject, Description, AccountId and ContactId, in the Dispute Specialist and Collections Supervisor groups. Reps are unchanged.
 - `PS_Steward_Collections_Contact`: read on Contact Email, Phone and MobilePhone, and Account Phone, in all three groups.
 - `PS_Steward_Rep_Assistant`: Execute Prompt Templates and the four Apex classes, in all three groups. The permission needs the Einstein Prompt Templates license, so everyone in those groups needs it too. Test Persona, the only member, got it on 2026-10-23.
-- Steward deploys Accord's three groups from source, retrieved as they were first (S-15). Accord's changelog gets an entry (open items).
+- Steward deploys Accord's three groups from source, retrieved as they were first (S-15), so Steward's source is now their copy of record, as for the layouts (S-21). Accord's changelog gets an entry (open items).
 - What each template reads, field by field, is in `docs/agent-governance.md`.

@@ -12,8 +12,8 @@ Pull request #9 built it: the three prompt templates and the Apex behind them, t
 
 **Your steps**
 - ☑ 1. Three decisions (2026-10-23): specialists and supervisors read a case's subject, description, account and contact; reps, specialists and supervisors read contact email and phone numbers; a follow-up is drafted for every outcome (S-21, S-22)
-- ☐ 2. Hand check as Test Persona (steps below). Ready now: the templates are active
-- ☐ 3. Accord's changelog: one entry for what Steward added to Accord's components (NFR-09). Accord's repository is private and not connected here, so the text is below, ready to paste
+- ☐ 2. Hand check as Test Persona (steps below). Not done yet: on 2026-10-24 the org showed no login as Test Persona since Oct 8, and no contact attempt logged by Test Persona. It's the only check of the buttons themselves in the console; everything else ran through the API
+- ☐ 3. Accord's changelog: one entry for what Steward added to Accord's components (NFR-09). Claude has access to Accord's repository since 2026-10-24, but its `main` stops at the Oct 3 Phase 5 commit (v0.4): v0.5 to v1.0.1 were committed on your computer and never pushed. Push them first (GitHub Desktop → `Lumenfield-accord` → **Push origin**); then Claude adds the entry below to the top of `CHANGELOG.md`
 - ☐ 4. `v0.5` tag once Phase 5 closes, from `C:\Lumenfield-steward` in PowerShell: `git tag v0.5 <commit>`, then `git push https://Zana-yocum@github.com/zana-yocum/Lumenfield-steward.git v0.5`. Claude gives you the commit
 
 **Mine**
@@ -101,12 +101,12 @@ Three pull requests. #4 turned on Digital Experiences and added the retrieve wor
 - ☑ Angela can read 00001053 but not edit it, and still can't read Sandra Barnett's dispute (S-16, ST-12)
 
 **For a later phase**
-- ☐ Upload a file to a dispute as a customer, by hand. The walkthrough didn't use the upload control on the dispute page: no file has been uploaded through the portal (checked in the org, 2026-10-23). The server side is proven in Apex, so this checks only the control itself. Do it any time as Angela Coffey on 00001053, or in the Phase 10 walkthrough video
+- ☑ Upload a file to a dispute as a customer, by hand: done 2026-10-23, 8:32 AM CT. Angela Coffey's customer user attached a PNG to 00001053 through the portal (checked in the org, 2026-10-24)
 - ☐ Phase 10, before the walkthrough video: decide whether to add **Log in to Experience as User** to the Contact page layout. The layout has its own customized list of Lightning actions, so the customer-user actions Salesforce adds don't appear on it. The layout is Accord's, so adding the action is an Accord change with its own changelog entry (NFR-09); the alternative is to keep using the admin's login-as link
 
 **Known and accepted**
 - ⊘ Graph Engine's two findings are the S-08 commitments read, by design (`docs/pipeline.md`)
-- ⊘ The portal's evidence upload is proven in Apex (a customer can attach a file to their own dispute, not another household's). The upload control itself still needs its hand check (above)
+- ⊘ The portal's evidence upload is proven in Apex (a customer can attach a file to their own dispute, not another household's), and the control itself by hand (above)
 
 ---
 
@@ -222,6 +222,7 @@ The first change went through the whole pipeline: pull request #1 validated as S
 
 ## Risks to watch
 
+- **Steward's source is now the copy of record for two Accord layouts and three Accord groups** (S-21, S-22). A change made to them in Setup is undone by Steward's next deploy unless it's retrieved into Steward first (S-15). That includes Accord's unfinished DEF-07, the Commitments related list on the Residential Agreement layout, which now has to be added in Steward's source.
 - **Einstein usage is capped in Developer Edition**, and agent test runs use it. Keep test suites focused and run the full set at release.
 - **Data 360 usage is capped** too, which is why ST-14 is a Should.
 - **Five customer licenses.** The plan uses three test households, which leaves room for a fourth if a test needs one.
