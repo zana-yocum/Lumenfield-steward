@@ -3,17 +3,12 @@
      Accord's main branch lost 623 metadata files in its Phase 6 commit (d55887f, 2026-10-07).
      Not a Steward manifest: started on this branch only because Steward's retrieve workflow is
      the only signed-in path to the org from here. Left out on purpose: the approval process, the
-     two dashboards and the report and dashboard folders, which name a real user (the workflow's
-     personal-details check would stop the run); those come from Accord's history instead. -->
+     two dashboards, the report and dashboard folders and the assignment rules, which name a user
+     (the workflow's personal-details check stops the run); those come from Accord's history. -->
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
         <members>Collections_Console</members>
         <name>CustomApplication</name>
-    </types>
-    <types>
-        <members>Case</members>
-        <members>Lead</members>
-        <name>AssignmentRules</name>
     </types>
     <types>
         <members>Case.Billing_Dispute_Process</members>
