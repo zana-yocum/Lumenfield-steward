@@ -62,6 +62,7 @@ docs/
   pipeline.md             How a change reaches the org, and how the pipeline was set up
   conventions.md          Naming and coding standards
   explainers/             One page per Apex class, component and prompt template, written for an interview walkthrough
+  screenshots/            The portal as each demo customer sees it (phase-4/)
   open-items.md           Everything deferred, flagged or not done yet
 code-analyzer.yml         Changes to Code Analyzer's default rules, each with its reason
 CHANGELOG.md

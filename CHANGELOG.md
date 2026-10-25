@@ -51,13 +51,26 @@ The rep assistant: three buttons in the Collections Console. **Briefing** writes
 - The org checks' evidence in `docs/agent-governance.md`
 - Validated (`0Afaj00000ovn8rCAA`, 159 of 159 tests), merged and quick-deployed (`0Afaj00000ovl74CAA`). Rerun: 00001035's summary now calls the commitment not flagged, and the adversarial dispute's summary is unchanged. The two adversarial test records were then removed
 
+### The hand check, 2026-10-24
+- Zana logged in as Test Persona at 8:10 PM CT, in the audit trail. Steps 1–4 went as written: Briefing, then Follow-up Draft asking for today's contact attempt first.
+- **Step 5 found an Accord defect, DEF-08: Log Contact Attempt wasn't on the page.**
+  - The action launches Accord's screen flow, and a user needs the Run Flows permission or access to that flow. Minimum Access and Accord's permission sets gave neither, so Lightning hid the action from every collections persona. Steward's Follow-up Draft needs a logged attempt, so it couldn't work for a real rep either.
+  - Every earlier check ran as the admin, who can run any flow. Only a person in the console as the persona could have found this.
+  - Fixed the same night in Accord's components, least privilege: the flow restricts access to enabled permission sets, and `PS_Collections_Core` grants that one flow. Recorded in Accord's CHANGELOG v1.0.2.
+- Steps 5–8 still to finish.
+
+### Pull request #13
+- The three collections groups' descriptions said delete on Promise to Pay was muted (rep, specialist) or kept (supervisor). Accord's OBS-01 removed it from every persona; the descriptions now say so, and the rep group's names the Log Contact Attempt flow.
+- **Commitments related list on the Residential Agreement layout** (Type, Value, Status). This finishes Accord's DEF-07: commitments were stamped with their account on Oct 14, but the list was never added. Recorded in Accord's changelog (NFR-09).
+- `docs/screenshots/phase-4/`: the Phase 4 portal screenshots, indexed. They had been committed to Accord's repository by mistake.
+
 ### Found in the org while building
 - **The flex capability type is retired** (above). Prompt Builder matches an Apex merge field to a flex template by the request's variable names
 - **The org generates a template version's identifier**, and gave all three templates the same one, so it isn't a hash of the content
 - **No Accord persona could read a case's subject, description, account or contact, and reps couldn't read a contact's email or phone numbers.** Steward's permission sets now grant what Zana chose (S-22)
 - **This org has no Trust Layer data masking**: the setup page reads it as not provisioned, and Prompt Security's feature gate as closed. Steward keeps contact details out of prompts itself (S-20, `docs/agent-governance.md`)
 - **The Turn on Einstein switch can be read** through the Einstein settings metadata (`enableEinsteinGptPlatform`: on), which Phase 1 couldn't do through the API
-- **Accord's `Collection_Hold_Until__c` description is a copy of `Do_Not_Contact__c`'s.** An Accord defect, for Accord's changelog (open items)
+- **Accord's `Collection_Hold_Until__c` description was a copy of `Do_Not_Contact__c`'s.** Rewritten in Accord v1.0.2 (2026-10-24)
 
 ## v0.4 — 2026-10-21 — Phase 4: Customer portal
 

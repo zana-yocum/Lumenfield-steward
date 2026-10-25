@@ -8,13 +8,19 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ## Phase 5 — Rep assistant — in progress
 
-Pull request #9 built it: the three prompt templates and the Apex behind them, the three buttons, and the permission sets. #10 activated the templates and added the docs. #11 fixes what the org checks found and records their evidence. Claude pushes each one, merges it once its final commit validates, and checks the deploy.
+Pull request #9 built it: the three prompt templates and the Apex behind them, the three buttons, and the permission sets. #10 activated the templates and added the docs. #11 fixed what the org checks found and recorded their evidence. #13 records what the hand check found and finishes Accord's DEF-07 on the account layout. Claude pushes each one, merges it once its final commit validates, and checks the deploy.
 
 **Your steps**
 - ☑ 1. Three decisions (2026-10-23): specialists and supervisors read a case's subject, description, account and contact; reps, specialists and supervisors read contact email and phone numbers; a follow-up is drafted for every outcome (S-21, S-22)
-- ☐ 2. Hand check as Test Persona (steps below). Not done yet: on 2026-10-24 the org showed no login as Test Persona since Oct 8, and no contact attempt logged by Test Persona. It's the only check of the buttons themselves in the console; everything else ran through the API
-- ☐ 3. Accord's changelog: one entry for what Steward added to Accord's components (NFR-09). Claude has access to Accord's repository since 2026-10-24, but its `main` stops at the Oct 3 Phase 5 commit (v0.4): v0.5 to v1.0.1 were committed on your computer and never pushed. Push them first (GitHub Desktop → `Lumenfield-accord` → **Push origin**); then Claude adds the entry below to the top of `CHANGELOG.md`
+- ☐ 2. Hand check as Test Persona (steps below). **Steps 1–4 done 2026-10-24** (login as Test Persona at 8:10 PM CT, in the audit trail). Step 5 stopped: Log Contact Attempt wasn't there. That was Accord's DEF-08, fixed the same night (below). **Steps 5–8 to finish**
+- ☑ 3. Accord's changelog: the entry below is in Accord's `CHANGELOG.md` v1.0.2 (2026-10-24), on Accord's branch `release/v1.0.2`. It reaches Accord's `main` after your decision on Accord's history (Accord's open items, step 1)
 - ☐ 4. `v0.5` tag once Phase 5 closes, from `C:\Lumenfield-steward` in PowerShell: `git tag v0.5 <commit>`, then `git push https://Zana-yocum@github.com/zana-yocum/Lumenfield-steward.git v0.5`. Claude gives you the commit
+- ☐ 5. **Your private email is in this repository's history:** 19 commits on `main` carry it, the 12 pull-request merges and 7 commits pushed from your computer, because GitHub and your local git stamp commits with your account's primary address. Two steps stop new ones:
+  - GitHub → your photo → **Settings** → **Emails** → tick **Keep my email addresses private** and **Block command line pushes that expose my email**.
+  - In PowerShell, once: `git config --global user.email "<the noreply address shown on that page>"`.
+
+  Until then, Claude merges pull requests by rebase, so no commit is made under your name. Removing the existing ones means rewriting `main` and recreating the v0.1–v0.4 tags: your decision
+- ☐ 6. Optional cleanup on GitHub (**Branches**): `tools/accord-restore`, `retrieve/5` and `retrieve/6` were only used to restore Accord's repository and can be deleted. Claude can't delete branches
 
 **Mine**
 - ☑ Accord's components retrieved as they were, before any change (`retrieve/2`, `manifest/rep-assistant.xml`): the two layouts, the three collections groups and the Einstein settings (S-15)
@@ -33,13 +39,16 @@ Pull request #9 built it: the three prompt templates and the Apex behind them, t
 - ☑ Found by the checks: 00001035's summary called an unflagged commitment a possible match. Pull request #11 marks every other commitment as not flagged: validated (`0Afaj00000ovn8rCAA`, 159 of 159 tests), merged and deployed (`0Afaj00000ovl74CAA`). Rerun: the commitment is now described as not flagged
 - ☑ Test records removed: COM-00034 deleted; dispute 00001054 closed, and Accord set STMT-00640 back to Past Due. The Promise Made attempt and PTP-00142 stay on Andre Radcliff's household as ordinary activity; the attempt's notes say it was an org check
   - ☑ Persona access (2026-10-23): Test Persona can read every field the templates read except the payment method, the processor reference, and a case's description, subject, account and contact, as S-22 intends
+- ☑ **Hand check finding, 2026-10-24: Accord's DEF-08.** Test Persona saw Briefing and Follow-up Draft but not Log Contact Attempt. The action launches Accord's screen flow `Account_Screen_LogContactAttempt`, and a user needs the Run Flows permission or access to that flow. Minimum Access and Accord's permission sets gave neither. Fixed in the org the same night, least privilege, in Accord's components: flow version 3 restricts access to enabled permission sets, and `PS_Collections_Core` grants that one flow. Checked through the API: the three collections groups recalculated with the access; Sales Rep has none. Recorded in Accord's CHANGELOG v1.0.2 and results doc. Steward's Follow-up Draft needs a logged attempt, so it had been unusable for real reps
+- ☑ Pull request #13: the three collections groups' descriptions corrected. They still described a muted Promise to Pay delete that Accord's OBS-01 removed. Also in #13: the Commitments related list on the Residential Agreement layout, which finishes Accord's DEF-07, and the Phase 4 portal screenshots in `docs/screenshots/phase-4/`, moved from Accord's repository
+- ☑ Accord's repository restored, using this repository's retrieve workflow. Accord's `main` had lost its custom objects, fields, permission sets, groups and analytics in its Phase 6 commit. The workflow ran from the branch `tools/accord-restore` (runs 5 and 6); the second run's version of the workflow swapped org usernames for `example.com` placeholders before the personal-details check. Never merged here. Retrieving them also showed no drift in the components this repository owns: the two layouts differ from the org only by empty columns, and the three groups match exactly
 
 **Hand check (step 2), about 10 minutes, after Claude says the templates are active**
 1. In Salesforce as yourself: the gear icon → **Setup** → type `Users` in Quick Find → **Users** → click **Login** next to **Test Persona**.
 2. App Launcher (the nine dots) → **Collections Console** → search for **Sandra Barnett Household** and open it.
 3. Click **Briefing** at the top right of the record (if you don't see it, it's under the ▼ arrow). The panel says "Writing from this record…", then shows the briefing. Check: the balance, past-due balance and days past due match the fields on the record; no payment method appears anywhere (a rep can't read it); Disputes names 00001035 and says its milestone was missed; the reminder to check it sits at the bottom. Click **Close**.
 4. Click **Follow-up Draft**. It should say: "Log today's contact attempt first, so the draft reflects what happened on the call." Click **Close**.
-5. Click **Log Contact Attempt**, choose **Left Voicemail**, type a short note such as `Hand check`, and finish.
+5. Click **Log Contact Attempt** (refresh the page first; it was missing until DEF-08 was fixed on 2026-10-24), choose **Left Voicemail**, type a short note such as `Hand check`, and finish.
 6. Click **Follow-up Draft** again. The email composer opens with the subject "We tried to reach you today", a body starting "Hi Sandra," and the sign-off "Thank you," with Test Persona and Lumenfield Home Energy. The To line should hold Sandra's address (an example.com address). **Don't send it:** close the composer and choose **Discard**.
 7. In the household's cases, open **00001035** and click **Dispute Summary**. As a rep, "What the customer said" should say the description isn't available to you; the evidence for Outage or Repair Credit and the missed milestone should be there. Click **Close**.
 8. Top right: **Log out as Test Persona**. Then tell Claude "hand check done", with anything that looked wrong.
@@ -58,7 +67,8 @@ Pull request #9 built it: the three prompt templates and the Apex behind them, t
 - Found: no persona could read a case's Subject, Description, AccountId or ContactId, and reps
   couldn't read a contact's Email, Phone or MobilePhone or the account's Phone. Steward closes
   this for the collections personas (S-22).
-- Found: Collection_Hold_Until__c's description is a copy of Do_Not_Contact__c's (defect, open).
+- Found: Collection_Hold_Until__c's description is a copy of Do_Not_Contact__c's (fixed in
+  Accord v1.0.2).
 ```
 
 **Pull request #9's validations**
@@ -229,4 +239,4 @@ The first change went through the whole pipeline: pull request #1 validated as S
 - **No spare Salesforce licenses** now that Steward CI has the fourth. A second persona user would mean switching Test Persona between roles, as Accord did. Apex tests use a Salesforce Platform user instead.
 - **Apex test time.** Every pull request now runs 83 tests in the org, and five of them build 200 households through Accord's flows. Phase 3's three runs took 227, 114 and 149 seconds of test time. In the third, the slowest test, opening 200 disputes, took 32 seconds. If a run nears the CPU limit, the bulk tests are where to look.
 - **Nobody can read the action log's fields yet**, the admin included, until `PS_Steward_Supervisor` in Phase 6. Records are written and counted, but anyone opening one would see only its number and outcome. Expected for now.
-- **Accord's DEF-07 is unfinished** (the Commitments related list isn't on the account layout). That's tracked in Accord's open items. Steward depends only on the `Account__c` field, which is done.
+- ☑ **Accord's DEF-07 finished by pull request #13:** the Commitments related list is on the Residential Agreement layout, which this repository maintains. Steward depends only on the `Account__c` field.
