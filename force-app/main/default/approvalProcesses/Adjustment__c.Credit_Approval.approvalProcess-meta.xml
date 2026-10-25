@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApprovalProcess xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <allowRecall>true</allowRecall>
+    <allowedSubmitters>
+        <submitter>CollectionsRep</submitter>
+        <type>role</type>
+    </allowedSubmitters>
+    <allowedSubmitters>
+        <submitter>DisputeSpecialist</submitter>
+        <type>role</type>
+    </allowedSubmitters>
+    <approvalPageFields>
+        <field>Name</field>
+        <field>Account__c</field>
+        <field>Type__c</field>
+        <field>Amount__c</field>
+        <field>Case__c</field>
+        <field>Billing_Statement__c</field>
+        <field>CreatedBy</field>
+    </approvalPageFields>
+    <approvalStep>
+        <allowDelegate>false</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <name>accord.admin@example.com</name>
+                <type>user</type>
+            </approver>
+            <whenMultipleApprovers>FirstResponse</whenMultipleApprovers>
+        </assignedApprover>
+        <label>Collections Supervisor Review</label>
+        <name>Collections_Supervisor_Review</name>
+    </approvalStep>
+    <description>Credits over $100 go to the Collections Supervisor. Only Dispute Specialists and Collections Reps can submit, so supervisors can&apos;t self-approve. Threshold duplicates Rep_Credit_Limit (criteria can&apos;t read custom metadata). US-11, US-13.</description>
+    <enableMobileDeviceAccess>false</enableMobileDeviceAccess>
+    <entryCriteria>
+        <formula>Amount__c &gt; 100</formula>
+    </entryCriteria>
+    <finalApprovalActions>
+        <action>
+            <name>Adjustment_Set_Approved</name>
+            <type>FieldUpdate</type>
+        </action>
+    </finalApprovalActions>
+    <finalApprovalRecordLock>false</finalApprovalRecordLock>
+    <finalRejectionActions>
+        <action>
+            <name>Adjustment_Set_Rejected</name>
+            <type>FieldUpdate</type>
+        </action>
+    </finalRejectionActions>
+    <finalRejectionRecordLock>false</finalRejectionRecordLock>
+    <initialSubmissionActions>
+        <action>
+            <name>Adjustment_Set_Pending</name>
+            <type>FieldUpdate</type>
+        </action>
+    </initialSubmissionActions>
+    <label>Credit Approval</label>
+    <processOrder>1</processOrder>
+    <recallActions>
+        <action>
+            <name>Adjustment_Set_Draft</name>
+            <type>FieldUpdate</type>
+        </action>
+    </recallActions>
+    <recordEditability>AdminOnly</recordEditability>
+    <showApprovalHistory>true</showApprovalHistory>
+</ApprovalProcess>
