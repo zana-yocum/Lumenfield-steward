@@ -2,7 +2,7 @@
 
 Newest first. One entry per phase.
 
-## v0.5 — 2026-10-23 — Phase 5: Rep assistant
+## v0.5 — 2026-10-26 — Phase 5: Rep assistant
 
 The rep assistant: three buttons in the Collections Console. **Briefing** writes a pre-call briefing on a household, **Dispute Summary** a first-pass summary of a billing dispute, and **Follow-up Draft** an email after today's call, opened in the composer for the rep to edit and send. Each runs a Prompt Builder template grounded in Apex that reads the records with the clicking person's own access. One pull request, #9.
 
@@ -51,13 +51,13 @@ The rep assistant: three buttons in the Collections Console. **Briefing** writes
 - The org checks' evidence in `docs/agent-governance.md`
 - Validated (`0Afaj00000ovn8rCAA`, 159 of 159 tests), merged and quick-deployed (`0Afaj00000ovl74CAA`). Rerun: 00001035's summary now calls the commitment not flagged, and the adversarial dispute's summary is unchanged. The two adversarial test records were then removed
 
-### The hand check, 2026-10-24
+### The hand check, 2026-10-24 and 26
 - Zana logged in as Test Persona at 8:10 PM CT, in the audit trail. Steps 1–4 went as written: Briefing, then Follow-up Draft asking for today's contact attempt first.
 - **Step 5 found an Accord defect, DEF-08: Log Contact Attempt wasn't on the page.**
   - The action launches Accord's screen flow, and a user needs the Run Flows permission or access to that flow. Minimum Access and Accord's permission sets gave neither, so Lightning hid the action from every collections persona. Steward's Follow-up Draft needs a logged attempt, so it couldn't work for a real rep either.
   - Every earlier check ran as the admin, who can run any flow. Only a person in the console as the persona could have found this.
   - Fixed the same night in Accord's components, least privilege: the flow restricts access to enabled permission sets, and `PS_Collections_Core` grants that one flow. Recorded in Accord's CHANGELOG v1.0.2.
-- Steps 5–8 still to finish.
+- **Steps 5–8 done 2026-10-26.** Zana logged in as Test Persona at 1:51 PM CT and out at 1:54 PM CT, in the audit trail. Log Contact Attempt was on the page: the Left Voicemail attempt with the note "Hand check" is on Sandra Barnett Household, logged at 1:53 PM CT. Zana reported the follow-up draft and the dispute summary as written, and no email went out: the org has no email message from Test Persona.
 
 ### Pull request #13 (merged and deployed 2026-10-25, `0Afaj00000p7b8jCAA`)
 - The three collections groups' descriptions said delete on Promise to Pay was muted (rep, specialist) or kept (supervisor). Accord's OBS-01 removed it from every persona; the descriptions now say so, and the rep group's names the Log Contact Attempt flow.
@@ -70,9 +70,17 @@ The rep assistant: three buttons in the Collections Console. **Briefing** writes
 - **Collection Hold Until editable on the Residential Agreement layout.** Accord's DEF-09 gives supervisors edit on it through `PS_Collections_Overrides`, but the layout showed it read-only, so the override couldn't be used from the record page. Field-level security still decides: read-only for reps and specialists, hidden from sales.
 - Checked in the org after the deploy: the layout field is Edit. Field permissions: the Collections Supervisor group can edit it, the rep and specialist groups can only read it, the Sales Rep group has none. Test Persona, in the rep group, still reads it as read-only (`UserFieldAccess`). Recorded in Accord's changelog, Accord pull request #2.
 
+### Accord's DEF-10 (found 2026-10-25, fixed 2026-10-26)
+- Accord's closed-deal sharing rule let every collections rep read every customer account. Accord's fix shares deals with reps only on accounts in collections. The rep assistant reads as the user, so a rep can now open, and brief, the 34 accounts in collections, with their deals and commitments, and 6 current accounts with a billing dispute, read-only. Nothing in this repository changed, and the 159 Apex tests passed after each step of Accord's change.
+- **Known limit, from that fix:** on those six current accounts a rep can read the household but not its deal, so user mode returns no commitments, and a briefing or dispute summary there says "None." for commitments that exist. Recorded in `docs/agent-governance.md`. Reps don't work current accounts; dispute specialists, who work the disputes, read every closed deal.
+
 ### Pull request #15
 - The README's link to Accord uses the repository's exact name.
 - Open items: #14's deploy and checks, where the hand check stands, and which branches on GitHub can be deleted.
+
+### Pull request #16: Phase 5 closed
+- README, open items and this entry: the hand check finished, and Phase 5 done.
+- `docs/agent-governance.md`: which records a rep reaches since Accord's DEF-10, and the known limit above. The two prompt classes' explainers say the same.
 
 ### Found in the org while building
 - **The flex capability type is retired** (above). Prompt Builder matches an Apex merge field to a flex template by the request's variable names
