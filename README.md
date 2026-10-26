@@ -1,6 +1,6 @@
 # Steward — Agentforce for a Residential Solar Servicer
 
-Steward is the second Lumenfield Home Energy project, built on the same Salesforce org as [Accord](https://github.com/Zana-yocum/lumenfield-accord). Accord made every promise, dispute and credit a governed record. Steward lets customers use those records themselves, through a portal and an AI service agent, and gives reps an AI assistant for everything else.
+Steward is the second Lumenfield Home Energy project, built on the same Salesforce org as [Accord](https://github.com/zana-yocum/Lumenfield-accord). Accord made every promise, dispute and credit a governed record. Steward lets customers use those records themselves, through a portal and an AI service agent, and gives reps an AI assistant for everything else.
 
 **The rule it's built around:** the agent can never do what a person in the same seat can't. It acts only for the logged-in customer's household, every record it creates goes through Accord's policy, and every action it takes, or declines, is logged for a supervisor.
 

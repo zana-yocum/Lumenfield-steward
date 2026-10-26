@@ -66,8 +66,13 @@ The rep assistant: three buttons in the Collections Console. **Briefing** writes
 - **Accord's DEF-09, found while checking DEF-08's fix.** The Minimum Access profile granted access to 74 of Accord's fields, 58 of them editable, so reps and sales reps could edit Account Status, which drives Accord's collections sharing rule. Sales reps could also read balances. Fixed in Accord's components on 2026-10-25: each persona's fields now come from its permission sets, and the profile grants none. Steward's part is one line: Accord's new `PS_Collections_Overrides` (supervisor edit on Account Status, Collection Hold Until and High Value) joins `PSG_Collections_Supervisor`, because this repository is that group's copy of record (S-21). Test Persona still reads every field the templates read (`docs/agent-governance.md`).
 - Checked in the org after the deploy: the related list is on the layout, the supervisor group holds `PS_Collections_Overrides`, and the groups' descriptions match source.
 
-### Pull request #14
+### Pull request #14 (merged and deployed 2026-10-25, `0Afaj00000p7cPlCAI`)
 - **Collection Hold Until editable on the Residential Agreement layout.** Accord's DEF-09 gives supervisors edit on it through `PS_Collections_Overrides`, but the layout showed it read-only, so the override couldn't be used from the record page. Field-level security still decides: read-only for reps and specialists, hidden from sales.
+- Checked in the org after the deploy: the layout field is Edit. Field permissions: the Collections Supervisor group can edit it, the rep and specialist groups can only read it, the Sales Rep group has none. Test Persona, in the rep group, still reads it as read-only (`UserFieldAccess`). Recorded in Accord's changelog, Accord pull request #2.
+
+### Pull request #15
+- The README's link to Accord uses the repository's exact name.
+- Open items: #14's deploy and checks, where the hand check stands, and which branches on GitHub can be deleted.
 
 ### Found in the org while building
 - **The flex capability type is retired** (above). Prompt Builder matches an Apex merge field to a flex template by the request's variable names
