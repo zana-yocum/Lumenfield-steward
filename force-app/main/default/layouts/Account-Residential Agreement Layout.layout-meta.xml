@@ -45,7 +45,7 @@
                 <field>High_Value__c</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Readonly</behavior>
+                <behavior>Edit</behavior>
                 <field>Collection_Hold_Until__c</field>
             </layoutItems>
         </layoutColumns>
