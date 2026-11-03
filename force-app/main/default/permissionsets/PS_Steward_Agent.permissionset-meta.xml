@@ -36,7 +36,7 @@
         <apexClass>RecordHandoffAction</apexClass>
         <enabled>true</enabled>
     </classAccesses>
-    <description>S-01, S-06, GR-03, ST-12. The service agent user's access, and nothing more: the nine agent actions; read on what the services read in user mode (balances, statements, payment dates and amounts, posted credits, the agreement's escalator, promises, disputes); create on promises to pay and billing disputes. No edit or delete anywhere, no payment method or processor reference, and nothing on commitments, opportunities or the action log, which the services reach for it (S-08, S-09). Assigned to the agent user when it exists.</description>
+    <description>S-01, ST-12. The service agent user&apos;s whole access: the nine actions, read on what the services read in user mode, and create on promises to pay and billing disputes. Nothing on payment methods, commitments or the action log.</description>
     <fieldPermissions>
         <editable>false</editable>
         <field>Account.Account_Status__c</field>
@@ -185,6 +185,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>ServiceContract.First_Due_Date__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>ServiceContract.StartDate</field>
         <readable>true</readable>
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>

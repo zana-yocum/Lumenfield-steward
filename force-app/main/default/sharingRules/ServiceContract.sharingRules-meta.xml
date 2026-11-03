@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingOwnerRules>
+        <fullName>Agreements_to_Steward_Agent</fullName>
+        <accessLevel>Read</accessLevel>
+        <description>S-01, ST-03. Read on service agreements for the service agent, so it can explain an escalator from a statement's agreement. It reaches an agreement only through a statement of the household it serves.</description>
+        <label>Agreements to Steward Agent</label>
+        <sharedTo>
+            <group>Steward_Agent</group>
+        </sharedTo>
+        <sharedFrom>
+            <allInternalUsers></allInternalUsers>
+        </sharedFrom>
+    </sharingOwnerRules>
+</SharingRules>
