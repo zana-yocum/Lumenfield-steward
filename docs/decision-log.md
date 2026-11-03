@@ -55,7 +55,7 @@ The decisions that shape Steward, the options considered, and why one was chosen
 - The household rule gives Edit, not Read. A promise to pay is a master-detail child of its account, and with the relationship's default setting, adding a child needs edit access to the parent. The permission set still leaves every account field read only, and no action updates an account.
 - `Account.sharingRules` also carries Accord's `Delinquent_Accounts_to_Collections` rule, unchanged, so deploying the file can't drop it. Steward's source is now that rule's copy of record, as for the layouts and groups (S-21, S-22).
 - `AgentAccessTest` runs every action as an Einstein Agent User with only this access. All nine answer in full. A second customer's chat can't reach the first household, though the agent user can see it. And the agent user can't see an Organization account.
-- A check-only deployment doesn't apply the sharing rules it brings, so the test grants the group the rules' access by hand. The rules themselves are checked in the org after the release.
+- A check-only deployment doesn't apply the sharing rules it brings, so the test grants the group the rules' access by hand. The rules themselves were checked in the org after the release on 2026-11-03. The household rule shares all 88 Residential Agreement accounts with the group and none of the 12 Organization accounts. The agreement rule shares all 100 agreements. Accord's rule still shares the 34 accounts in collections.
 - The agent user is created with the agent, which is Zana's step. It then gets the permission set and joins the group.
 
 ---

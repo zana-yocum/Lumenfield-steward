@@ -62,7 +62,10 @@ Nothing else, so it has no Delete, no Edit on any object, no View All or Modify 
   - From a second customer's chat, the first household's statement is not found, even though the agent user can see that household.
   - The agent user can't see an Organization account.
   - The agent user can't set a case's account, which is why the dispute insert stays an exception (S-14).
-- A check-only deployment doesn't apply new sharing rules, so the test gives the group the same access by hand. The rules themselves are checked in the org after each release: share rows from each rule exist for the Steward Agent group on every household and every agreement, and on no Organization account.
+- A check-only deployment doesn't apply new sharing rules, so the test gives the group the same access by hand. The rules themselves are checked in the org after each release. On 2026-11-03, the first check:
+  - The household rule shared all 88 Residential Agreement accounts with the group (Edit, cases Read), and none of the 12 Organization accounts.
+  - The agreement rule shared all 100 agreements, read only. That includes the 12 on Organization accounts, which the agent never reaches.
+  - Accord's own rule still shared its 34 accounts in collections.
 
 ## Collections personas (Phases 5 and 6)
 
