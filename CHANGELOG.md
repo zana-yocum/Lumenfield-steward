@@ -27,7 +27,7 @@ Everything the service agent will run, and the access it runs with, built and te
 - **Fourth** (`0Afaj00000qImD7CAK`): `AccountShare.ContactAccessLevel` isn't writeable in this org, so the test doesn't set it
 - **Fifth** (`0Afaj00000qInSXCA0`): the test read each household's agreement from a helper that doesn't fill it in. It now queries the agreements
 - **Sixth** (`0Afaj00000qIpm5CAC`) and **seventh** (`0Afaj00000qIDfCCAW`): as the agent user, everything passed except opening a dispute. The test was made to name the failing action's own log line, and it found the last gap: a lookup to an object the user can't read is hidden, so the agent couldn't read the household's primary contact or name it on the case. `PS_Steward_Agent` gets read on the Contact object, with no contact field
-- **Eighth** (FINAL_RUN)
+- **Eighth** (`0Afaj00000qHxAdCAK`): 291 components, 214 of 214 tests, every class at 90% or more. The new classes run from 97.7% (`AgentSession`) to 100%, and Code Analyzer reports 0 at every severity
 
 ## v0.5 — 2026-10-26 — Phase 5: Rep assistant
 
