@@ -9,6 +9,15 @@ public with sharing class AgentActions {
   /** The reason code on an exception nobody planned for. */
   public static final String UNEXPECTED_ERROR = 'UNEXPECTED_ERROR';
 
+  /** One piece of evidence for a dispute, as the agent passes it on. */
+  public class EvidenceLine {
+    @AuraEnabled
+    public String item;
+    /** Required items come first. */
+    @AuraEnabled
+    public Boolean required;
+  }
+
   /**
    * The household behind each request's session.
    * @param sessionIds the session ID each request gave, in request order; nulls allowed
@@ -38,6 +47,54 @@ public with sharing class AgentActions {
         ? AgentSession.NOT_VERIFIED
         : identity.reasonCode
     );
+  }
+
+  /**
+   * Evidence items as the agent passes them on, in the catalog's order, required first.
+   * @param items DisputeEvidenceCatalog's items; null is treated as none
+   * @return one line per item
+   */
+  public static List<EvidenceLine> evidenceLines(
+    List<DisputeEvidenceCatalog.EvidenceItem> items
+  ) {
+    List<EvidenceLine> lines = new List<EvidenceLine>();
+    if (items == null) {
+      return lines;
+    }
+    for (DisputeEvidenceCatalog.EvidenceItem item : items) {
+      EvidenceLine line = new EvidenceLine();
+      line.item = item.item;
+      line.required = item.required;
+      lines.add(line);
+    }
+    return lines;
+  }
+
+  /**
+   * A record ID the model passed, or null when it isn't a well-formed ID. The services look for an
+   * ID only among the household's own records, so a well-formed ID from elsewhere finds nothing
+   * too (ST-12).
+   * @param value what the model passed
+   * @return the ID, or null
+   */
+  public static Id toId(String value) {
+    if (String.isBlank(value)) {
+      return null;
+    }
+    try {
+      return Id.valueOf(value.trim());
+    } catch (StringException notAnId) {
+      return null;
+    }
+  }
+
+  /**
+   * Answers a request that named a record by something that isn't an ID: NOT_FOUND, the same as
+   * a record the household doesn't have, so nothing is read and nothing is guessed.
+   * @param result the request's result
+   */
+  public static void declineNotFound(StewardOutcome.Result result) {
+    result.setOutcome(StewardOutcome.DECLINED_POLICY, StewardOutcome.NOT_FOUND);
   }
 
   /**

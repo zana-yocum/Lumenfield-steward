@@ -160,7 +160,11 @@ private class AgentSessionTest {
         'An account or contact ID typed into a chat names no household: ' +
         value
       );
-      Assert.areEqual(AgentSession.NOT_VERIFIED, identity.reasonCode, value);
+      Assert.areEqual(
+        AgentSession.NOT_VERIFIED,
+        identity.reasonCode,
+        'Reason for ' + value
+      );
     }
     Assert.areEqual(0, sessions.loads, 'None of them is even looked up');
   }
