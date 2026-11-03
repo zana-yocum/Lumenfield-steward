@@ -259,8 +259,8 @@ public class StewardTestData {
         ? 'Not supported by the records'
         : null
     );
-    // Accord's plan numbers adjustments ADJ-00001 onward. While the name is still plain text,
-    // it's required, so the test names it; once it's an auto-number, the platform does.
+    // Accord's plan numbers adjustments ADJ-00001 onward. While the name is still plain text, the
+    // test gives each one a readable name; once it's an auto-number, the platform numbers it.
     if (!Schema.SObjectType.Adjustment__c.fields.Name.isAutoNumber()) {
       credit.Name = type + ' ' + nextSuffix();
     }
