@@ -62,6 +62,17 @@ public with sharing class AgentActionLogger {
   }
 
   /**
+   * The numbers of log records already saved, the references customers can quote (NFR-07).
+   * @param logIds the records' IDs
+   * @return each record's number, keyed by ID; an ID that isn't a log record is left out
+   */
+  public static Map<Id, String> referencesFor(Set<Id> logIds) {
+    return logIds == null || logIds.isEmpty()
+      ? new Map<Id, String>()
+      : new Elevated().referencesFor(logIds);
+  }
+
+  /**
    * Records actions in one save. Entries that fail to save are reported, not thrown.
    * @param entries what happened; nulls are skipped
    * @return one save result per saved entry, in order
@@ -139,6 +150,24 @@ public with sharing class AgentActionLogger {
         LIMIT 1
       ];
       return rows.isEmpty() ? null : rows[0].Name;
+    }
+
+    /**
+     * The numbers of log records this class wrote.
+     * @param logIds the records' IDs
+     * @return each one's number, keyed by ID
+     */
+    public Map<Id, String> referencesFor(Set<Id> logIds) {
+      Map<Id, String> references = new Map<Id, String>();
+      for (Agent_Action_Log__c row : [
+        SELECT Id, Name
+        FROM Agent_Action_Log__c
+        WHERE Id IN :logIds
+        WITH SYSTEM_MODE
+      ]) {
+        references.put(row.Id, row.Name);
+      }
+      return references;
     }
 
     /**

@@ -5,8 +5,8 @@
  */
 @IsTest
 private class AgentSessionTest {
-  private static final String WEB_CHAT = 'EmbeddedMessaging';
-  private static final String ACTIVE = 'Active';
+  private static final String WEB_CHAT = AgentTestSessions.WEB_CHAT;
+  private static final String ACTIVE = AgentTestSessions.ACTIVE;
 
   @TestSetup
   static void createData() {
@@ -18,12 +18,12 @@ private class AgentSessionTest {
   static void aLoggedInCustomersChatActsForTheirOwnHousehold() {
     List<StewardTestData.Household> households = StewardTestData.existingHouseholds();
     List<User> customers = PortalTestData.createCustomers(households);
-    Id first = fakeSessionId(1);
-    Id second = fakeSessionId(2);
-    Sessions sessions = new Sessions()
+    Id first = AgentTestSessions.fakeId(1);
+    Id second = AgentTestSessions.fakeId(2);
+    AgentTestSessions sessions = new AgentTestSessions()
       .add(first, ACTIVE, WEB_CHAT, customers[0].Id)
       .add(second, ACTIVE, WEB_CHAT, customers[1].Id);
-    AgentSession.source = sessions;
+    sessions.install();
 
     Test.startTest();
     Map<String, AgentSession.Identity> identities = AgentSession.resolve(
@@ -53,8 +53,8 @@ private class AgentSessionTest {
 
   @IsTest
   static void anAnonymousChatHasNoHousehold() {
-    Id session = fakeSessionId(1);
-    AgentSession.source = new Sessions().add(session, ACTIVE, WEB_CHAT, null);
+    Id session = AgentTestSessions.fakeId(1);
+    new AgentTestSessions().add(session, ACTIVE, WEB_CHAT, null).install();
 
     AgentSession.Identity identity = AgentSession.resolve(session);
 
@@ -65,9 +65,10 @@ private class AgentSessionTest {
 
   @IsTest
   static void anEmployeeLoggedInIsNotACustomer() {
-    Id session = fakeSessionId(1);
-    AgentSession.source = new Sessions()
-      .add(session, ACTIVE, WEB_CHAT, UserInfo.getUserId());
+    Id session = AgentTestSessions.fakeId(1);
+    new AgentTestSessions()
+      .add(session, ACTIVE, WEB_CHAT, UserInfo.getUserId())
+      .install();
 
     AgentSession.Identity identity = AgentSession.resolve(session);
 
@@ -85,9 +86,10 @@ private class AgentSessionTest {
     System.runAs(new User(Id = UserInfo.getUserId())) {
       update new User(Id = customer.Id, IsActive = false);
     }
-    Id session = fakeSessionId(1);
-    AgentSession.source = new Sessions()
-      .add(session, ACTIVE, WEB_CHAT, customer.Id);
+    Id session = AgentTestSessions.fakeId(1);
+    new AgentTestSessions()
+      .add(session, ACTIVE, WEB_CHAT, customer.Id)
+      .install();
 
     AgentSession.Identity identity = AgentSession.resolve(session);
 
@@ -102,9 +104,10 @@ private class AgentSessionTest {
   static void anEndedChatActsForNobody() {
     List<StewardTestData.Household> households = StewardTestData.existingHouseholds();
     User customer = PortalTestData.createCustomers(households)[0];
-    Id session = fakeSessionId(1);
-    AgentSession.source = new Sessions()
-      .add(session, 'Ended', WEB_CHAT, customer.Id);
+    Id session = AgentTestSessions.fakeId(1);
+    new AgentTestSessions()
+      .add(session, 'Ended', WEB_CHAT, customer.Id)
+      .install();
 
     AgentSession.Identity identity = AgentSession.resolve(session);
 
@@ -116,9 +119,8 @@ private class AgentSessionTest {
   static void onlyThePortalsWebChatIsServed() {
     List<StewardTestData.Household> households = StewardTestData.existingHouseholds();
     User customer = PortalTestData.createCustomers(households)[0];
-    Id session = fakeSessionId(1);
-    AgentSession.source = new Sessions()
-      .add(session, ACTIVE, 'Text', customer.Id);
+    Id session = AgentTestSessions.fakeId(1);
+    new AgentTestSessions().add(session, ACTIVE, 'Text', customer.Id).install();
 
     AgentSession.Identity identity = AgentSession.resolve(session);
 
@@ -132,8 +134,8 @@ private class AgentSessionTest {
   @IsTest
   static void anythingButAMessagingSessionIdIsRefusedUnread() {
     StewardTestData.Household household = StewardTestData.existingHouseholds()[0];
-    Sessions sessions = new Sessions();
-    AgentSession.source = sessions;
+    AgentTestSessions sessions = new AgentTestSessions();
+    sessions.install();
     Set<String> given = new Set<String>{
       null,
       '',
@@ -165,7 +167,7 @@ private class AgentSessionTest {
 
   @IsTest
   static void aSessionThatDoesntExistHasNoHousehold() {
-    Id session = fakeSessionId(1);
+    Id session = AgentTestSessions.fakeId(1);
 
     // The real source: the org has no such session.
     AgentSession.Identity identity = AgentSession.resolve(session);
@@ -189,7 +191,7 @@ private class AgentSessionTest {
 
   @IsTest
   static void factsComeFromTheSessionAndItsMessagingUser() {
-    Id session = fakeSessionId(1);
+    Id session = AgentTestSessions.fakeId(1);
     Id user = UserInfo.getUserId();
     MessagingSession record = (MessagingSession) JSON.deserialize(
       '{"attributes":{"type":"MessagingSession"},"Id":"' +
@@ -221,43 +223,5 @@ private class AgentSessionTest {
       AgentSession.factsFrom(record).authenticatedUserId,
       'No messaging user, no authenticated user'
     );
-  }
-
-  // A well-formed messaging session ID that no record has.
-  private static Id fakeSessionId(Integer n) {
-    String prefix = MessagingSession.SObjectType.getDescribe().getKeyPrefix();
-    return Id.valueOf(prefix + String.valueOf(n).leftPad(12, '0'));
-  }
-
-  // Session facts set by the test, standing in for the org's messaging records.
-  private class Sessions implements AgentSession.SessionSource {
-    private Map<Id, AgentSession.SessionFacts> facts = new Map<Id, AgentSession.SessionFacts>();
-    public Integer loads = 0;
-
-    public Sessions add(
-      Id sessionId,
-      String status,
-      String channelType,
-      Id authenticatedUserId
-    ) {
-      AgentSession.SessionFacts session = new AgentSession.SessionFacts();
-      session.sessionId = sessionId;
-      session.status = status;
-      session.channelType = channelType;
-      session.authenticatedUserId = authenticatedUserId;
-      facts.put(sessionId, session);
-      return this;
-    }
-
-    public Map<Id, AgentSession.SessionFacts> load(Set<Id> sessionIds) {
-      loads++;
-      Map<Id, AgentSession.SessionFacts> found = new Map<Id, AgentSession.SessionFacts>();
-      for (Id sessionId : sessionIds) {
-        if (facts.containsKey(sessionId)) {
-          found.put(sessionId, facts.get(sessionId));
-        }
-      }
-      return found;
-    }
   }
 }
