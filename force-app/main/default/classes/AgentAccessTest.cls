@@ -100,23 +100,23 @@ private class AgentAccessTest {
       Test.stopTest();
     }
 
-    assertCompleted('Get Account Summary', summary.outcome);
+    assertCompleted('GetAccountSummaryAction', summary.outcome);
     Assert.areEqual(
       pastDueOf(households[0]),
       summary.pastDueBalance,
       'The household\'s own past-due balance'
     );
     Assert.areEqual(3, summary.statements.size(), 'Every statement');
-    assertCompleted('Get Commitments', commitments.outcome);
+    assertCompleted('GetCommitmentsAction', commitments.outcome);
     Assert.areEqual(1, commitments.commitments.size(), 'The commitment');
-    assertCompleted('Explain Statement', explained.outcome);
+    assertCompleted('ExplainStatementAction', explained.outcome);
     Assert.isTrue(
       hasReason(explained, StatementExplanationService.ESCALATOR),
       'The escalator, read from the agreement: ' + JSON.serialize(explained)
     );
-    assertCompleted('Get Dispute Reasons', reasons.outcome);
+    assertCompleted('GetDisputeReasonsAction', reasons.outcome);
     Assert.isFalse(reasons.reasons.isEmpty(), 'The reasons');
-    assertCompleted('Get Dispute Status', disputes.outcome);
+    assertCompleted('GetDisputeStatusAction', disputes.outcome);
   }
 
   @IsTest
@@ -155,13 +155,13 @@ private class AgentAccessTest {
       Test.stopTest();
     }
 
-    assertCompleted('Check Payment Arrangement', checked.outcome);
+    assertCompleted('CheckPaymentArrangementAction', checked.outcome);
     Assert.areEqual(
       PaymentArrangementService.ELIGIBLE,
       checked.reasonCode,
       'Eligible'
     );
-    assertCompleted('Create Payment Arrangement', created.outcome);
+    assertCompleted('CreatePaymentArrangementAction', created.outcome);
     Assert.areEqual(
       'Active',
       [
@@ -173,7 +173,7 @@ private class AgentAccessTest {
       .Status__c,
       'The promise is saved through Accord\'s flow, Active'
     );
-    assertCompleted('Open Dispute', opened.outcome);
+    assertCompleted('OpenDisputeAction', opened.outcome);
     Assert.isNotNull(opened.caseNumber, 'The case number, read back');
     Assert.areEqual(StewardOutcome.HANDOFF, handedOff.outcome, 'Handed off');
     Assert.isNotNull(handedOff.reference, 'The log number for the person');
@@ -236,18 +236,29 @@ private class AgentAccessTest {
   @IsTest
   static void theAgentUserCantSetACasesAccountSoDisputesStayAnException() {
     List<StewardTestData.Household> households = StewardTestData.existingHouseholds();
+    Case dispute = new Case(
+      RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName()
+        .get(StewardTestData.DISPUTE_RECORD_TYPE)
+        .getRecordTypeId(),
+      AccountId = households[0].account.Id,
+      ContactId = households[0].primaryContact.Id,
+      Disputed_Statement__c = latestStatementOf(households[0]),
+      Dispute_Reason__c = PAYMENT_NOT_POSTED,
+      Origin = 'Web',
+      Subject = 'Billing dispute: ' + PAYMENT_NOT_POSTED,
+      Description = 'My payment on the 3rd isn\'t showing.'
+    );
     User agent = createAgentUser();
 
     SObjectAccessDecision decision;
+    String blocked;
     System.runAs(agent) {
       decision = Security.stripInaccessible(
         AccessType.CREATABLE,
-        new List<Case>{
-          new Case(
-            AccountId = households[0].account.Id,
-            Subject = 'Billing dispute'
-          )
-        }
+        new List<Case>{ dispute.clone() }
+      );
+      blocked = DisputeIntakeService.blockedFields(
+        new List<Case>{ dispute.clone() }
       );
     }
 
@@ -257,9 +268,9 @@ private class AgentAccessTest {
       'The agent user can\'t set a case\'s account, so the dispute insert stays in system mode (S-14): ' +
       removed
     );
-    Assert.isFalse(
-      removed.contains('Subject'),
-      'It can set the dispute\'s own fields'
+    Assert.isNull(
+      blocked,
+      'Every other field of a dispute is the agent user\'s to set: ' + blocked
     );
   }
 
@@ -364,18 +375,18 @@ private class AgentAccessTest {
   }
 
   /**
-   * Fails with the logged details of the last failure, so a missing permission names itself.
-   * @param action the action's label
+   * Fails with what the action logged, so a missing permission names itself.
+   * @param action the action's class name
    * @param outcome what it answered
    */
   private static void assertCompleted(String action, String outcome) {
     if (outcome == StewardOutcome.COMPLETED) {
       return;
     }
-    List<Agent_Action_Log__c> failures = [
-      SELECT Action__c, Reason_Code__c, Details__c
+    List<Agent_Action_Log__c> logged = [
+      SELECT Outcome__c, Reason_Code__c, Details__c
       FROM Agent_Action_Log__c
-      WHERE Outcome__c != 'Completed'
+      WHERE Action__c = :action
       WITH SYSTEM_MODE
       ORDER BY Name DESC
       LIMIT 1
@@ -384,7 +395,7 @@ private class AgentAccessTest {
       action +
         ' answered ' +
         outcome +
-        (failures.isEmpty() ? '' : ': ' + JSON.serialize(failures[0]))
+        (logged.isEmpty() ? '' : ': ' + JSON.serialize(logged[0]))
     );
   }
 
