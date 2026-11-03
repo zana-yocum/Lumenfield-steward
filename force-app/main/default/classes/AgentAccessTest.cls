@@ -318,7 +318,9 @@ private class AgentAccessTest {
     Id agentGroup
   ) {
     List<SObject> shares = new List<SObject>();
+    Set<Id> accountIds = new Set<Id>();
     for (StewardTestData.Household household : households) {
+      accountIds.add(household.account.Id);
       shares.add(
         new AccountShare(
           AccountId = household.account.Id,
@@ -328,9 +330,16 @@ private class AgentAccessTest {
           OpportunityAccessLevel = 'None'
         )
       );
+    }
+    for (ServiceContract agreement : [
+      SELECT Id
+      FROM ServiceContract
+      WHERE AccountId IN :accountIds
+      WITH SYSTEM_MODE
+    ]) {
       shares.add(
         new ServiceContractShare(
-          ParentId = household.agreement.Id,
+          ParentId = agreement.Id,
           UserOrGroupId = agentGroup,
           AccessLevel = 'Read'
         )
