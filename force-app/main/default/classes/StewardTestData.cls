@@ -248,8 +248,7 @@ public class StewardTestData {
     String type,
     String status
   ) {
-    return new Adjustment__c(
-      Name = type + ' ' + nextSuffix(),
+    Adjustment__c credit = new Adjustment__c(
       Account__c = statement.Account__c,
       Billing_Statement__c = statement.Id,
       Amount__c = amount,
@@ -260,6 +259,12 @@ public class StewardTestData {
         ? 'Not supported by the records'
         : null
     );
+    // Accord's plan numbers adjustments ADJ-00001 onward. While the name is still plain text,
+    // it's required, so the test names it; once it's an auto-number, the platform does.
+    if (!Schema.SObjectType.Adjustment__c.fields.Name.isAutoNumber()) {
+      credit.Name = type + ' ' + nextSuffix();
+    }
+    return credit;
   }
 
   /**

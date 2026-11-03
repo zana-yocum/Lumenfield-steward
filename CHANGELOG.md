@@ -29,6 +29,18 @@ Everything the service agent will run, and the access it runs with, built and te
 - **Sixth** (`0Afaj00000qIpm5CAC`) and **seventh** (`0Afaj00000qIDfCCAW`): as the agent user, everything passed except opening a dispute. The test was made to name the failing action's own log line, and it found the last gap: a lookup to an object the user can't read is hidden, so the agent couldn't read the household's primary contact or name it on the case. `PS_Steward_Agent` gets read on the Contact object, with no contact field
 - **Eighth** (`0Afaj00000qHxAdCAK`): 291 components, 214 of 214 tests, every class at 90% or more. The new classes run from 97.7% (`AgentSession`) to 100%, and Code Analyzer reports 0 at every severity
 
+### Deployed, 2026-11-03
+- Merged at 2:29 PM CT and quick-deployed as Steward CI (`0Afaj00000qIxoTCAS`, of validation `0Afaj00000qIvl3CAC`: 214 of 214 tests, 0 Code Analyzer findings).
+- Checked in the org afterwards:
+  - The household rule shares all 88 Residential Agreement accounts with the Steward Agent group (Edit, cases Read), and none of the 12 Organization accounts.
+  - The agreement rule shares all 100 agreements, read only.
+  - Accord's own account rule still shares the 34 accounts in collections.
+  - `PS_Steward_Supervisor` is in the supervisor group, which recalculated.
+
+### Pull request #18
+- `StewardTestData.credit` names an adjustment only while the name field is plain text. This makes Steward's tests ready for Accord's switch to the planned auto-number (`ADJ-{00000}`), which is Accord's half of the change
+- #17's deploy and org checks recorded here, in the open items and in S-01
+
 ## v0.5 — 2026-10-26 — Phase 5: Rep assistant
 
 The rep assistant: three buttons in the Collections Console. **Briefing** writes a pre-call briefing on a household, **Dispute Summary** a first-pass summary of a billing dispute, and **Follow-up Draft** an email after today's call, opened in the composer for the rep to edit and send. Each runs a Prompt Builder template grounded in Apex that reads the records with the clicking person's own access. One pull request, #9.

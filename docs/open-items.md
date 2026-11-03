@@ -50,7 +50,12 @@ Pull request #17 built everything the agent will run, and the access it runs wit
   - the actions' answers and the Trust Layer recommendations in `docs/agent-governance.md`
   - 12 explainers
   - traceability, pipeline and this file
-- ☐ **Merge #17 and check in the org:** share rows from each rule for the Steward Agent group on every Residential Agreement account and every agreement, none on an Organization account; `PS_Steward_Supervisor` in the supervisor group, recalculated
+- ☑ **#17 merged and checked in the org (2026-11-03).** Merged at 2:29 PM CT and quick-deployed (`0Afaj00000qIxoTCAS`, of validation `0Afaj00000qIvl3CAC`: 214 of 214 tests). In the org:
+  - The household rule shares all 88 Residential Agreement accounts with the Steward Agent group (Edit, cases Read), and none of the 12 Organization accounts.
+  - The agreement rule shares all 100 agreements, read only. That includes the 12 on Organization accounts, which the agent never reaches.
+  - Accord's own account rule still shares the 34 accounts in collections with Collections Team.
+  - `PS_Steward_Supervisor` is in the supervisor group, which recalculated (status Updated).
+- ☑ **Ready for Accord's adjustment numbers** (pull request #18): Steward's test data names an adjustment only while the name is still plain text. Accord can now switch it to the planned auto-number, `ADJ-{00000}`, without breaking Steward's tests
 - ☐ **Next sitting, after your steps 1–3:**
   - the Agent Script
   - publish and activate in `deploy.yml` (S-10)
