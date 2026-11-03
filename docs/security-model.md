@@ -41,11 +41,12 @@ The agent user is created with the agent, on the **Einstein Agent User** profile
 | Service Agreement | Read | Read: `Escalator_Rate__c`, `First_Due_Date__c`, `StartDate` |
 | Promise to Pay | Read, Create | Date, amount and status (required fields). Read: `Grace_Ends__c` |
 | Case | Read, Create | Read: `AccountId`. Create: contact, description, dispute reason, disputed statement, origin, subject. Record type: Billing Dispute |
+| Contact | Read | No fields. A lookup to an object the user can't read is hidden, so without this the agent couldn't read the household's primary contact or name it on a dispute. Customers have it for the same reason |
 | Apex classes | The nine actions | `GetAccountSummaryAction`, `GetCommitmentsAction`, `ExplainStatementAction`, `CheckPaymentArrangementAction`, `CreatePaymentArrangementAction`, `GetDisputeReasonsAction`, `OpenDisputeAction`, `GetDisputeStatusAction`, `RecordHandoffAction` |
 
-Nothing else, so it has no Delete, no Edit on any object, no View All or Modify All, and no approval rights. It also gets nothing on Contact, Opportunity, Commitment, the action log, messaging records or users. The services reach the commitments, the log and the session for it, through the named exceptions above.
+Nothing else, so it has no Delete, no Edit on any object, no View All or Modify All, and no approval rights. It also gets nothing on Opportunity, Commitment, the action log, messaging records or users, and no contact field. The services reach the commitments, the log and the session for it, through the named exceptions above.
 
-**Record access.** Account, Case, Contact and Service Agreement are Private, and the detail objects follow the account. So the agent user gets its records through one public group:
+**Record access.** Accounts, cases and service agreements are Private, and statements, payments, promises and adjustments follow their account. So the agent user gets its records through one public group:
 
 | Component | What it gives the **Steward Agent** group |
 |---|---|

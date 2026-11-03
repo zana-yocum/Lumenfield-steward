@@ -48,7 +48,7 @@ The decisions that shape Steward, the options considered, and why one was chosen
 **Consequences:** `PS_Steward_Agent` is the whole of the agent's access, listed in `docs/security-model.md`. The agent has to serve any household, so it gets access to Residential Agreement accounts through a criteria-based sharing rule, not View All, and Organization accounts stay out of reach. Any new action that needs more access needs an entry here first.
 
 **Confirmed in Phase 6.**
-- The Einstein Agent User profile grants no object permissions (read 2026-11-03). So `PS_Steward_Agent` really is the whole list: the nine action classes, read on what the services read in user mode, and create on promises to pay and billing disputes. Nothing else.
+- The Einstein Agent User profile grants no object permissions (read 2026-11-03). So `PS_Steward_Agent` really is the whole list: the nine action classes, read on what the services read in user mode, create on promises to pay and billing disputes, and read on the Contact object with no contact fields, which a dispute needs to name the household's primary contact. Nothing else.
 - Record access comes through the **Steward Agent** public group and two rules:
   - `Households_to_Steward_Agent`: Residential Agreement accounts, with Read on their cases.
   - `Agreements_to_Steward_Agent`: service agreements, read only.

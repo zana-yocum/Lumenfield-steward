@@ -37,9 +37,10 @@ Pull request #17 built everything the agent will run, and the access it runs wit
 - ☑ **How a chat finds its household (S-07, S-23):** `AgentSession` follows the platform's own link, `MessagingEndUser.AuthenticatedEndUserId`, to the verified portal user and that user's account. It serves only the portal's web chat, only an open session, and only an active customer user. Tests can't open a chat, so `AgentTestSessions` stands in
 - ☑ **Shared plumbing:** `AgentActions.Calls`. The first version passed every test but brought 22 Code Analyzer findings into a codebase that had none. Rebuilt on `Calls`, it's back to 0 at every severity. Prettier and the personal-details check are clean
 - ☑ **Access (S-01):** `PS_Steward_Agent`, the Steward Agent group, and sharing rules `Households_to_Steward_Agent` and `Agreements_to_Steward_Agent`. `PS_Steward_Supervisor` is in the Collections Supervisor group (ST-11). Written up in `docs/security-model.md`
-- ☑ **`AgentAccessTest`** runs the nine actions as an Einstein Agent User with only that access. Writing it found three things the plan had missed:
+- ☑ **`AgentAccessTest`** runs the nine actions as an Einstein Agent User with only that access. Writing it found four things the plan had missed:
   - The statement explanation reads the agreement's start date, so the agent needs read on it.
   - A promise to pay is a master-detail child of its account, so adding one needs edit access to the account. The sharing rule gives Edit, and the permission set keeps every account field read only.
+  - Opening a dispute reads the household's primary contact and names it on the case. Both are lookups to Contact, and a lookup to an object the user can't read is hidden. So the agent gets read on the Contact object, though no contact field, as customers do.
   - A check-only deployment doesn't apply the sharing rules it brings, so the test grants the group the same access by hand. The rules themselves are checked in the org after the merge.
 - ☑ **S-14's open question:** the agent user can't set a case's account, so the dispute insert stays in system mode (`AgentAccessTest`)
 - ☑ **Graph Engine** with the actions as entry points: the same two S-08 findings as Phase 4, and nothing from the agent's paths (`docs/pipeline.md`)

@@ -10,7 +10,7 @@ Everything the service agent will run, and the access it runs with, built and te
 - **Nine agent actions (ST-01 to ST-07):** `GetAccountSummaryAction`, `GetCommitmentsAction`, `ExplainStatementAction`, `CheckPaymentArrangementAction`, `CreatePaymentArrangementAction`, `GetDisputeReasonsAction`, `OpenDisputeAction`, `GetDisputeStatusAction` and `RecordHandoffAction`. Each takes the messaging session's ID, never an account, calls its Phase 3 service once for the whole call, and returns the service's outcome, reason code and figures, with the log's number to quote on a failure. The two write actions roll back the whole call on an exception
 - **The household from the chat (S-07, S-23):** `AgentSession` follows the session to the portal user the platform verified, and from that user to their account, in system mode. A session that isn't the portal's chat, has ended, or has no active customer behind it gets no household and a reason
 - **Shared plumbing:** `AgentActions.Calls` declines a chat with no customer before anything is read, sends only a blank or well-formed record ID on, fails every request that reached the service when it throws, and logs every request. `AgentTestSessions` stands in for chats in tests
-- **The agent user's access (S-01):** `PS_Steward_Agent`; the Steward Agent public group; sharing rules `Households_to_Steward_Agent` (Edit on Residential Agreement accounts, Read on their cases) and `Agreements_to_Steward_Agent` (Read on agreements)
+- **The agent user's access (S-01):** `PS_Steward_Agent`, with read on Contact but no contact field; the Steward Agent public group; sharing rules `Households_to_Steward_Agent` (Edit on Residential Agreement accounts, Read on their cases) and `Agreements_to_Steward_Agent` (Read on agreements)
 - **The supervisor's access to the log (ST-11):** `PS_Steward_Supervisor`, in the Collections Supervisor group
 - **Tests:** `AgentSessionTest` (11), `AgentActionsTest` (5), `AgentAccessTest` (4), a class per action (34), and one more in `AgentActionLoggerTest`
 - **Docs:** `docs/security-model.md`; decisions S-23 and S-24, and S-01 confirmed; the agent's actions in `docs/agent-governance.md`, with Trust Layer recommendations; 12 explainers
@@ -25,7 +25,9 @@ Everything the service agent will run, and the access it runs with, built and te
 - **Second** (`0Afaj00000qIgndCAC`): two descriptions over Salesforce's 255-character limit
 - **Third** (`0Afaj00000qI1m8CAC`): `AgentAccessTest` found the agent user could see no household. A check-only deployment doesn't apply the sharing rules it brings, and the tests make their own records. The test now gives the group exactly what the two rules give it, and the rules themselves are checked in the org after the release
 - **Fourth** (`0Afaj00000qImD7CAK`): `AccountShare.ContactAccessLevel` isn't writeable in this org, so the test doesn't set it
-- **Fifth** (FINAL_RUN)
+- **Fifth** (`0Afaj00000qInSXCA0`): the test read each household's agreement from a helper that doesn't fill it in. It now queries the agreements
+- **Sixth** (`0Afaj00000qIpm5CAC`) and **seventh** (`0Afaj00000qIDfCCAW`): as the agent user, everything passed except opening a dispute. The test was made to name the failing action's own log line, and it found the last gap: a lookup to an object the user can't read is hidden, so the agent couldn't read the household's primary contact or name it on the case. `PS_Steward_Agent` gets read on the Contact object, with no contact field
+- **Eighth** (FINAL_RUN)
 
 ## v0.5 — 2026-10-26 — Phase 5: Rep assistant
 
