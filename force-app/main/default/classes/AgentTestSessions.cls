@@ -72,8 +72,8 @@ public class AgentTestSessions implements AgentSession.SessionSource {
    */
   public static Id fakeId(Integer n) {
     return Id.valueOf(
-      MessagingSession.SObjectType.getDescribe().getKeyPrefix() +
-      String.valueOf(n).leftPad(12, '0')
+      MessagingSession.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+        .getKeyPrefix() + String.valueOf(n).leftPad(12, '0')
     );
   }
 
