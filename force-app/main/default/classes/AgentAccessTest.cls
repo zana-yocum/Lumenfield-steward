@@ -325,7 +325,6 @@ private class AgentAccessTest {
           UserOrGroupId = agentGroup,
           AccountAccessLevel = 'Edit',
           CaseAccessLevel = 'Read',
-          ContactAccessLevel = 'None',
           OpportunityAccessLevel = 'None'
         )
       );
