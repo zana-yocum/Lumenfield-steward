@@ -1,9 +1,14 @@
 /**
- * S-01, ST-12, S-07. Runs the agent's actions the way the agent will run them: as a user on the
- * Einstein Agent User profile, whose only access is PS_Steward_Agent and the Steward Agent group's
- * sharing. Every action answers a logged-in customer in full, so the permission set and the
- * sharing rules are enough; and with every household shared to it, the agent still acts only for
- * the customer behind the chat. If an action ever needs more access, this test fails first.
+ * S-01, ST-12, S-07, S-14. Runs the agent's actions the way the agent will run them: as a user on
+ * the Einstein Agent User profile, whose only access is PS_Steward_Agent and what the Steward Agent
+ * group is given. Every action answers a logged-in customer in full, so that access is enough; and
+ * with every household shared to it, the agent still acts only for the customer behind the chat.
+ * If an action ever needs more access, this test fails first.
+ *
+ * The group gets here, by hand, exactly what the two sharing rules give it: Edit on households with
+ * Read on their cases, and Read on agreements. A check-only deployment doesn't apply sharing rules
+ * it brings, and these tests make their own records, so the rules themselves are checked in the org
+ * after each release (docs/security-model.md).
  *
  * The first household has three statements, the last one after its agreement's first anniversary
  * (the escalator), two of them past due, and was promised two covered payments at signing. The
@@ -228,9 +233,39 @@ private class AgentAccessTest {
     Assert.isNull(output.statement, 'Nothing about it comes back');
   }
 
+  @IsTest
+  static void theAgentUserCantSetACasesAccountSoDisputesStayAnException() {
+    List<StewardTestData.Household> households = StewardTestData.existingHouseholds();
+    User agent = createAgentUser();
+
+    SObjectAccessDecision decision;
+    System.runAs(agent) {
+      decision = Security.stripInaccessible(
+        AccessType.CREATABLE,
+        new List<Case>{
+          new Case(
+            AccountId = households[0].account.Id,
+            Subject = 'Billing dispute'
+          )
+        }
+      );
+    }
+
+    Set<String> removed = decision.getRemovedFields().get('Case');
+    Assert.isTrue(
+      removed != null && removed.contains('AccountId'),
+      'The agent user can\'t set a case\'s account, so the dispute insert stays in system mode (S-14): ' +
+      removed
+    );
+    Assert.isFalse(
+      removed.contains('Subject'),
+      'It can set the dispute\'s own fields'
+    );
+  }
+
   /**
    * A user like the agent user: the Einstein Agent User profile, which grants nothing, plus the
-   * agent's permission set and group.
+   * agent's permission set and group, and the group's sharing.
    * @return the user
    */
   private static User createAgentUser() {
@@ -247,6 +282,14 @@ private class AgentAccessTest {
       TimeZoneSidKey = 'America/New_York',
       Username = 'steward.agent.' + unique + '@example.com'
     );
+    Id agentGroup = [
+      SELECT Id
+      FROM Group
+      WHERE DeveloperName = :AGENT_GROUP AND Type = 'Regular'
+      LIMIT 1
+    ]
+    .Id;
+    shareLikeTheRules(StewardTestData.existingHouseholds(), agentGroup);
     // Users, permission set assignments and group members are setup records: their own context.
     System.runAs(new User(Id = UserInfo.getUserId())) {
       insert agent;
@@ -260,18 +303,41 @@ private class AgentAccessTest {
         ]
         .Id
       );
-      insert new GroupMember(
-        GroupId = [
-          SELECT Id
-          FROM Group
-          WHERE DeveloperName = :AGENT_GROUP AND Type = 'Regular'
-          LIMIT 1
-        ]
-        .Id,
-        UserOrGroupId = agent.Id
-      );
+      insert new GroupMember(GroupId = agentGroup, UserOrGroupId = agent.Id);
     }
     return agent;
+  }
+
+  /**
+   * What Households_to_Steward_Agent and Agreements_to_Steward_Agent give the group.
+   * @param households the test's households
+   * @param agentGroup the Steward Agent group
+   */
+  private static void shareLikeTheRules(
+    List<StewardTestData.Household> households,
+    Id agentGroup
+  ) {
+    List<SObject> shares = new List<SObject>();
+    for (StewardTestData.Household household : households) {
+      shares.add(
+        new AccountShare(
+          AccountId = household.account.Id,
+          UserOrGroupId = agentGroup,
+          AccountAccessLevel = 'Edit',
+          CaseAccessLevel = 'Read',
+          ContactAccessLevel = 'None',
+          OpportunityAccessLevel = 'None'
+        )
+      );
+      shares.add(
+        new ServiceContractShare(
+          ParentId = household.agreement.Id,
+          UserOrGroupId = agentGroup,
+          AccessLevel = 'Read'
+        )
+      );
+    }
+    insert shares;
   }
 
   /**
