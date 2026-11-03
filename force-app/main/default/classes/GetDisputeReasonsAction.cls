@@ -68,53 +68,43 @@ public with sharing class GetDisputeReasonsAction {
     category='Steward Service Agent'
   )
   public static List<Output> run(List<Input> inputs) {
-    List<String> sessionIds = new List<String>();
-    for (Input input : inputs) {
-      sessionIds.add(input?.sessionId);
-    }
-    Map<String, AgentSession.Identity> identities = AgentActions.identities(
-      sessionIds
+    AgentActions.Calls calls = new AgentActions.Calls(
+      ACTION,
+      sessionIdsOf(inputs)
     );
-
-    List<DisputeReason> catalog;
-    String failure;
+    for (Integer i = 0; i < calls.count(); i++) {
+      calls.begin(i, new Answer(), 'Dispute reasons');
+    }
     try {
       AgentActions.failIfSimulated();
-      catalog = toReasons(DisputeEvidenceCatalog.getReasons());
-    } catch (Exception error) {
-      failure = AgentActions.describe(error);
-    }
-
-    List<Answer> results = new List<Answer>();
-    List<AgentActionLogger.Entry> entries = new List<AgentActionLogger.Entry>();
-    for (String sessionId : sessionIds) {
-      AgentSession.Identity identity = identities.get(sessionId);
-      Answer result = new Answer();
-      String details = 'Dispute reasons';
-      if (!identity.isVerified()) {
-        AgentActions.declineUnverified(result, identity);
-      } else if (failure != null) {
-        AgentActions.markFailed(result);
-        details = failure;
-      } else {
-        result.setOutcome(StewardOutcome.COMPLETED, null);
-        result.reasons = catalog;
+      List<DisputeReason> catalog = toReasons(
+        DisputeEvidenceCatalog.getReasons()
+      );
+      for (Integer i = 0; i < calls.count(); i++) {
+        calls.serve(i, completed(catalog));
       }
-      results.add(result);
-      entries.add(AgentActions.entry(identity, ACTION, result, details));
+    } catch (Exception error) {
+      calls.fail(error);
     }
-    AgentActions.log(entries, results);
 
     List<Output> outputs = new List<Output>();
-    for (Answer result : results) {
+    for (StewardOutcome.Result result : calls.finish()) {
+      Answer answer = (Answer) result;
       Output output = new Output();
-      output.outcome = result.outcome;
-      output.reasonCode = result.reasonCode;
-      output.reference = result.reference;
-      output.reasons = result.reasons;
+      output.outcome = answer.outcome;
+      output.reasonCode = answer.reasonCode;
+      output.reference = answer.reference;
+      output.reasons = answer.reasons;
       outputs.add(output);
     }
     return outputs;
+  }
+
+  private static Answer completed(List<DisputeReason> reasons) {
+    Answer answer = new Answer();
+    answer.reasons = reasons;
+    answer.setOutcome(StewardOutcome.COMPLETED, null);
+    return answer;
   }
 
   private static List<DisputeReason> toReasons(
@@ -129,5 +119,13 @@ public with sharing class GetDisputeReasonsAction {
       reasons.add(reason);
     }
     return reasons;
+  }
+
+  private static List<String> sessionIdsOf(List<Input> inputs) {
+    List<String> sessionIds = new List<String>();
+    for (Input input : inputs) {
+      sessionIds.add(input?.sessionId);
+    }
+    return sessionIds;
   }
 }

@@ -70,88 +70,65 @@ public with sharing class ExplainStatementAction {
     category='Steward Service Agent'
   )
   public static List<Output> run(List<Input> inputs) {
+    AgentActions.Calls calls = new AgentActions.Calls(
+      ACTION,
+      sessionIdsOf(inputs)
+    );
+    List<StatementExplanationService.Request> requests = new List<StatementExplanationService.Request>();
+    List<Integer> sent = new List<Integer>();
+    for (Integer i = 0; i < inputs.size(); i++) {
+      String statementId = inputs[i]?.statementId;
+      String asked =
+        'Explain statement ' +
+        (String.isBlank(statementId) ? '(latest)' : statementId);
+      if (
+        calls.begin(i, new StatementExplanationService.Explanation(), asked) &&
+        calls.acceptsId(i, statementId)
+      ) {
+        requests.add(
+          new StatementExplanationService.Request(
+            calls.household(i),
+            AgentActions.toId(statementId)
+          )
+        );
+        sent.add(i);
+      }
+    }
+    try {
+      AgentActions.failIfSimulated();
+      calls.serveAll(sent, StatementExplanationService.explain(requests));
+    } catch (Exception error) {
+      calls.fail(error);
+    }
+
+    List<Output> outputs = new List<Output>();
+    for (StewardOutcome.Result result : calls.finish()) {
+      outputs.add(toOutput((StatementExplanationService.Explanation) result));
+    }
+    return outputs;
+  }
+
+  private static Output toOutput(
+    StatementExplanationService.Explanation explanation
+  ) {
+    Output output = new Output();
+    output.outcome = explanation.outcome;
+    output.reasonCode = explanation.reasonCode;
+    output.reference = explanation.reference;
+    if (explanation.outcome == StewardOutcome.COMPLETED) {
+      output.statement = explanation.statement;
+      output.priorStatement = explanation.priorStatement;
+      output.reasons = explanation.reasons;
+      output.fullyExplained = explanation.fullyExplained;
+    }
+    return output;
+  }
+
+  private static List<String> sessionIdsOf(List<Input> inputs) {
     List<String> sessionIds = new List<String>();
     for (Input input : inputs) {
       sessionIds.add(input?.sessionId);
     }
-    Map<String, AgentSession.Identity> identities = AgentActions.identities(
-      sessionIds
-    );
-
-    // First pass: answer what needs no reading, and queue the rest for one service call.
-    List<StatementExplanationService.Explanation> results = new List<StatementExplanationService.Explanation>();
-    List<StatementExplanationService.Request> requests = new List<StatementExplanationService.Request>();
-    List<Integer> queued = new List<Integer>();
-    for (Integer i = 0; i < inputs.size(); i++) {
-      AgentSession.Identity identity = identities.get(sessionIds[i]);
-      String statementId = inputs[i]?.statementId;
-      StatementExplanationService.Explanation result = new StatementExplanationService.Explanation();
-      if (!identity.isVerified()) {
-        AgentActions.declineUnverified(result, identity);
-      } else if (
-        String.isNotBlank(statementId) && AgentActions.toId(statementId) == null
-      ) {
-        AgentActions.declineNotFound(result);
-      } else {
-        requests.add(
-          new StatementExplanationService.Request(
-            identity.accountId,
-            AgentActions.toId(statementId)
-          )
-        );
-        queued.add(i);
-      }
-      results.add(result);
-    }
-
-    String failure;
-    try {
-      AgentActions.failIfSimulated();
-      List<StatementExplanationService.Explanation> explained = StatementExplanationService.explain(
-        requests
-      );
-      for (Integer q = 0; q < queued.size(); q++) {
-        results[queued[q]] = explained[q];
-      }
-    } catch (Exception error) {
-      failure = AgentActions.describe(error);
-      for (Integer i : queued) {
-        AgentActions.markFailed(results[i]);
-      }
-    }
-
-    List<AgentActionLogger.Entry> entries = new List<AgentActionLogger.Entry>();
-    for (Integer i = 0; i < inputs.size(); i++) {
-      String statementId = inputs[i]?.statementId;
-      String details = results[i].outcome == StewardOutcome.FAILED
-        ? failure
-        : 'Explain statement ' +
-          (String.isBlank(statementId) ? '(latest)' : statementId);
-      entries.add(
-        AgentActions.entry(
-          identities.get(sessionIds[i]),
-          ACTION,
-          results[i],
-          details
-        )
-      );
-    }
-    AgentActions.log(entries, results);
-
-    List<Output> outputs = new List<Output>();
-    for (StatementExplanationService.Explanation result : results) {
-      Output output = new Output();
-      output.outcome = result.outcome;
-      output.reasonCode = result.reasonCode;
-      output.reference = result.reference;
-      if (result.outcome == StewardOutcome.COMPLETED) {
-        output.statement = result.statement;
-        output.priorStatement = result.priorStatement;
-        output.reasons = result.reasons;
-        output.fullyExplained = result.fullyExplained;
-      }
-      outputs.add(output);
-    }
-    return outputs;
+    return sessionIds;
   }
 }

@@ -71,14 +71,15 @@ public with sharing class RecordHandoffAction {
         reasonCodeFrom(inputs[i]?.reasonCode)
       );
       results.add(result);
-      entries.add(
-        AgentActions.entry(
-          identities.get(sessionIds[i]),
-          ACTION,
-          result,
-          String.isBlank(inputs[i]?.summary) ? 'Handoff' : inputs[i].summary
-        )
+      AgentActionLogger.Entry entry = AgentActions.entry(
+        identities.get(sessionIds[i]),
+        ACTION,
+        result
       );
+      entry.details = String.isBlank(inputs[i]?.summary)
+        ? 'Handoff'
+        : inputs[i].summary;
+      entries.add(entry);
     }
     List<Database.SaveResult> saved = AgentActionLogger.log(entries);
     Set<Id> logIds = new Set<Id>();

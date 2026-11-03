@@ -81,97 +81,94 @@ public with sharing class OpenDisputeAction {
     category='Steward Service Agent'
   )
   public static List<Output> run(List<Input> inputs) {
-    List<String> sessionIds = new List<String>();
-    for (Input input : inputs) {
-      sessionIds.add(input?.sessionId);
-    }
-    Map<String, AgentSession.Identity> identities = AgentActions.identities(
-      sessionIds
+    AgentActions.Calls calls = new AgentActions.Calls(
+      ACTION,
+      sessionIdsOf(inputs)
     );
-
-    List<DisputeIntakeService.DisputeResult> results = new List<DisputeIntakeService.DisputeResult>();
-    List<DisputeIntakeService.Request> requests = new List<DisputeIntakeService.Request>();
-    List<Integer> queued = new List<Integer>();
+    List<Integer> sent = new List<Integer>();
+    List<DisputeIntakeService.Request> disputes = new List<DisputeIntakeService.Request>();
     for (Integer i = 0; i < inputs.size(); i++) {
-      AgentSession.Identity identity = identities.get(sessionIds[i]);
-      String statementId = inputs[i]?.statementId;
-      DisputeIntakeService.DisputeResult result = new DisputeIntakeService.DisputeResult();
-      if (!identity.isVerified()) {
-        AgentActions.declineUnverified(result, identity);
-      } else if (
-        String.isNotBlank(statementId) && AgentActions.toId(statementId) == null
+      Input input = inputs[i];
+      String asked =
+        'Open dispute: ' +
+        input?.reason +
+        ' on statement ' +
+        input?.statementId;
+      if (
+        calls.begin(i, new DisputeIntakeService.DisputeResult(), asked) &&
+        calls.acceptsId(i, input.statementId)
       ) {
-        AgentActions.declineNotFound(result);
-      } else {
-        DisputeIntakeService.Request request = new DisputeIntakeService.Request(
-          identity.accountId,
-          AgentActions.toId(statementId),
-          inputs[i]?.reason
-        );
-        request.description = inputs[i]?.description;
-        requests.add(request);
-        queued.add(i);
+        sent.add(i);
+        disputes.add(requestFor(calls.household(i), input));
       }
-      results.add(result);
     }
+    open(calls, sent, disputes);
 
-    String failure;
+    List<Output> outputs = new List<Output>();
+    for (StewardOutcome.Result result : calls.finish()) {
+      outputs.add(toOutput((DisputeIntakeService.DisputeResult) result));
+    }
+    return outputs;
+  }
+
+  private static DisputeIntakeService.Request requestFor(
+    Id household,
+    Input input
+  ) {
+    DisputeIntakeService.Request request = new DisputeIntakeService.Request(
+      household,
+      AgentActions.toId(input.statementId),
+      input.reason
+    );
+    request.description = input.description;
+    return request;
+  }
+
+  /**
+   * Opens the disputes in one call. An exception rolls every one of them back, so nothing
+   * half-saved stays behind an error the customer is told about.
+   * @param calls the action's requests
+   * @param sent the positions of the requests sent on, in order
+   * @param disputes their service requests, in the same order
+   */
+  private static void open(
+    AgentActions.Calls calls,
+    List<Integer> sent,
+    List<DisputeIntakeService.Request> disputes
+  ) {
     Savepoint beforeSave = Database.setSavepoint();
     try {
       AgentActions.failIfSimulated();
       List<DisputeIntakeService.DisputeResult> opened = DisputeIntakeService.openDisputes(
-        requests
+        disputes
       );
-      for (Integer q = 0; q < queued.size(); q++) {
-        results[queued[q]] = opened[q];
+      for (Integer q = 0; q < sent.size(); q++) {
+        calls.serve(sent[q], opened[q]);
+        calls.logFailureDetail(sent[q], opened[q].failureDetail);
       }
     } catch (Exception error) {
-      // Nothing half-saved stays behind an error the customer is told about.
       Database.rollback(beforeSave);
-      failure = AgentActions.describe(error);
-      for (Integer i : queued) {
-        AgentActions.markFailed(results[i]);
-      }
+      calls.fail(error);
     }
+  }
 
-    List<AgentActionLogger.Entry> entries = new List<AgentActionLogger.Entry>();
-    for (Integer i = 0; i < inputs.size(); i++) {
-      DisputeIntakeService.DisputeResult result = results[i];
-      String details;
-      if (failure != null && result.outcome == StewardOutcome.FAILED) {
-        details = failure;
-      } else if (result.failureDetail != null) {
-        details = result.failureDetail;
-      } else {
-        details =
-          'Open dispute: ' +
-          inputs[i]?.reason +
-          ' on statement ' +
-          inputs[i]?.statementId;
-      }
-      entries.add(
-        AgentActions.entry(
-          identities.get(sessionIds[i]),
-          ACTION,
-          result,
-          details
-        )
-      );
-    }
-    AgentActions.log(entries, results);
+  private static Output toOutput(DisputeIntakeService.DisputeResult result) {
+    Output output = new Output();
+    output.outcome = result.outcome;
+    output.reasonCode = result.reasonCode;
+    output.reference = result.reference;
+    output.caseNumber = result.caseNumber;
+    output.caseStatus = result.caseStatus;
+    output.reason = result.reason;
+    output.evidence = AgentActions.evidenceLines(result.evidence);
+    return output;
+  }
 
-    List<Output> outputs = new List<Output>();
-    for (DisputeIntakeService.DisputeResult result : results) {
-      Output output = new Output();
-      output.outcome = result.outcome;
-      output.reasonCode = result.reasonCode;
-      output.reference = result.reference;
-      output.caseNumber = result.caseNumber;
-      output.caseStatus = result.caseStatus;
-      output.reason = result.reason;
-      output.evidence = AgentActions.evidenceLines(result.evidence);
-      outputs.add(output);
+  private static List<String> sessionIdsOf(List<Input> inputs) {
+    List<String> sessionIds = new List<String>();
+    for (Input input : inputs) {
+      sessionIds.add(input?.sessionId);
     }
-    return outputs;
+    return sessionIds;
   }
 }

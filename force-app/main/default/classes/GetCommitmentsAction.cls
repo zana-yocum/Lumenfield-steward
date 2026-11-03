@@ -52,61 +52,56 @@ public with sharing class GetCommitmentsAction {
     category='Steward Service Agent'
   )
   public static List<Output> run(List<Input> inputs) {
+    AgentActions.Calls calls = new AgentActions.Calls(
+      ACTION,
+      sessionIdsOf(inputs)
+    );
+    for (Integer i = 0; i < calls.count(); i++) {
+      calls.begin(
+        i,
+        new CommitmentReadService.HouseholdCommitments(),
+        'Commitments from signing'
+      );
+    }
+    try {
+      AgentActions.failIfSimulated();
+      Map<Id, CommitmentReadService.HouseholdCommitments> found = CommitmentReadService.forHouseholds(
+        calls.households()
+      );
+      for (Integer i = 0; i < calls.count(); i++) {
+        calls.serve(i, found.get(calls.household(i)));
+      }
+    } catch (Exception error) {
+      calls.fail(error);
+    }
+
+    List<Output> outputs = new List<Output>();
+    for (StewardOutcome.Result result : calls.finish()) {
+      outputs.add(
+        toOutput((CommitmentReadService.HouseholdCommitments) result)
+      );
+    }
+    return outputs;
+  }
+
+  private static Output toOutput(
+    CommitmentReadService.HouseholdCommitments household
+  ) {
+    Output output = new Output();
+    output.outcome = household.outcome;
+    output.reasonCode = household.reasonCode;
+    output.reference = household.reference;
+    if (household.outcome == StewardOutcome.COMPLETED) {
+      output.commitments = household.commitments;
+    }
+    return output;
+  }
+
+  private static List<String> sessionIdsOf(List<Input> inputs) {
     List<String> sessionIds = new List<String>();
     for (Input input : inputs) {
       sessionIds.add(input?.sessionId);
     }
-    Map<String, AgentSession.Identity> identities = AgentActions.identities(
-      sessionIds
-    );
-    Set<Id> households = new Set<Id>();
-    for (AgentSession.Identity identity : identities.values()) {
-      if (identity.isVerified()) {
-        households.add(identity.accountId);
-      }
-    }
-
-    Map<Id, CommitmentReadService.HouseholdCommitments> found;
-    String failure;
-    try {
-      AgentActions.failIfSimulated();
-      found = CommitmentReadService.forHouseholds(households);
-    } catch (Exception error) {
-      failure = AgentActions.describe(error);
-    }
-
-    List<CommitmentReadService.HouseholdCommitments> results = new List<CommitmentReadService.HouseholdCommitments>();
-    List<AgentActionLogger.Entry> entries = new List<AgentActionLogger.Entry>();
-    for (String sessionId : sessionIds) {
-      AgentSession.Identity identity = identities.get(sessionId);
-      CommitmentReadService.HouseholdCommitments result;
-      String details = 'Commitments from signing';
-      if (!identity.isVerified()) {
-        result = new CommitmentReadService.HouseholdCommitments();
-        AgentActions.declineUnverified(result, identity);
-      } else if (failure != null) {
-        result = new CommitmentReadService.HouseholdCommitments();
-        AgentActions.markFailed(result);
-        details = failure;
-      } else {
-        result = found.get(identity.accountId);
-      }
-      results.add(result);
-      entries.add(AgentActions.entry(identity, ACTION, result, details));
-    }
-    AgentActions.log(entries, results);
-
-    List<Output> outputs = new List<Output>();
-    for (CommitmentReadService.HouseholdCommitments result : results) {
-      Output output = new Output();
-      output.outcome = result.outcome;
-      output.reasonCode = result.reasonCode;
-      output.reference = result.reference;
-      if (result.outcome == StewardOutcome.COMPLETED) {
-        output.commitments = result.commitments;
-      }
-      outputs.add(output);
-    }
-    return outputs;
+    return sessionIds;
   }
 }

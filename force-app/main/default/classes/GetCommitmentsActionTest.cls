@@ -83,14 +83,9 @@ private class GetCommitmentsActionTest {
 
   @IsTest
   static void aChatWithNoCustomerBehindItGetsNothing() {
-    AgentTestSessions sessions = new AgentTestSessions()
-      .add(
-        AgentTestSessions.fakeId(1),
-        'Ended',
-        AgentTestSessions.WEB_CHAT,
-        null
-      )
-      .install();
+    AgentSession.SessionFacts ended = AgentTestSessions.webChat(1, null);
+    ended.status = 'Ended';
+    AgentTestSessions sessions = new AgentTestSessions().add(ended).install();
 
     GetCommitmentsAction.Output output = GetCommitmentsAction.run(
       new List<GetCommitmentsAction.Input>{ input(sessions.id(1)) }

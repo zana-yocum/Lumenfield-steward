@@ -31,6 +31,9 @@ public with sharing class AgentSession {
     'PowerCustomerSuccess',
     'CustomerSuccess'
   };
+  /** Where session facts come from: the org's messaging records, or a test's stand-in. */
+  @TestVisible
+  private static SessionSource source = new Elevated();
 
   /** Who a session is for. */
   public class Identity {
@@ -68,9 +71,6 @@ public with sharing class AgentSession {
      */
     Map<Id, SessionFacts> load(Set<Id> sessionIds);
   }
-
-  @TestVisible
-  private static SessionSource source = new Elevated();
 
   /**
    * The household for one session.

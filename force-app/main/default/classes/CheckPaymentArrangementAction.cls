@@ -85,73 +85,47 @@ public with sharing class CheckPaymentArrangementAction {
     category='Steward Service Agent'
   )
   public static List<Output> run(List<Input> inputs) {
-    List<String> sessionIds = new List<String>();
-    for (Input input : inputs) {
-      sessionIds.add(input?.sessionId);
-    }
-    Map<String, AgentSession.Identity> identities = AgentActions.identities(
-      sessionIds
+    AgentActions.Calls calls = new AgentActions.Calls(
+      ACTION,
+      sessionIdsOf(inputs)
     );
-
-    List<PaymentArrangementService.ArrangementResult> results = new List<PaymentArrangementService.ArrangementResult>();
     List<PaymentArrangementService.Request> requests = new List<PaymentArrangementService.Request>();
-    List<Integer> queued = new List<Integer>();
+    List<Integer> sent = new List<Integer>();
     for (Integer i = 0; i < inputs.size(); i++) {
-      AgentSession.Identity identity = identities.get(sessionIds[i]);
-      PaymentArrangementService.ArrangementResult result = new PaymentArrangementService.ArrangementResult();
-      if (identity.isVerified()) {
+      Input input = inputs[i];
+      String asked =
+        'Check arrangement: ' +
+        input?.amount +
+        ' on ' +
+        input?.promiseDate;
+      if (
+        calls.begin(i, new PaymentArrangementService.ArrangementResult(), asked)
+      ) {
         requests.add(
           new PaymentArrangementService.Request(
-            identity.accountId,
-            inputs[i]?.promiseDate,
-            inputs[i]?.amount
+            calls.household(i),
+            input.promiseDate,
+            input.amount
           )
         );
-        queued.add(i);
-      } else {
-        AgentActions.declineUnverified(result, identity);
+        sent.add(i);
       }
-      results.add(result);
     }
-
-    String failure;
     try {
       AgentActions.failIfSimulated();
-      List<PaymentArrangementService.ArrangementResult> checked = PaymentArrangementService.checkEligibility(
-        requests
+      calls.serveAll(
+        sent,
+        PaymentArrangementService.checkEligibility(requests)
       );
-      for (Integer q = 0; q < queued.size(); q++) {
-        results[queued[q]] = checked[q];
-      }
     } catch (Exception error) {
-      failure = AgentActions.describe(error);
-      for (Integer i : queued) {
-        AgentActions.markFailed(results[i]);
-      }
+      calls.fail(error);
     }
-
-    List<AgentActionLogger.Entry> entries = new List<AgentActionLogger.Entry>();
-    for (Integer i = 0; i < inputs.size(); i++) {
-      String details = results[i].outcome == StewardOutcome.FAILED
-        ? failure
-        : 'Check arrangement: ' +
-          inputs[i]?.amount +
-          ' on ' +
-          inputs[i]?.promiseDate;
-      entries.add(
-        AgentActions.entry(
-          identities.get(sessionIds[i]),
-          ACTION,
-          results[i],
-          details
-        )
-      );
-    }
-    AgentActions.log(entries, results);
 
     List<Output> outputs = new List<Output>();
-    for (PaymentArrangementService.ArrangementResult result : results) {
-      outputs.add(toOutput(result));
+    for (StewardOutcome.Result result : calls.finish()) {
+      outputs.add(
+        toOutput((PaymentArrangementService.ArrangementResult) result)
+      );
     }
     return outputs;
   }
@@ -172,5 +146,13 @@ public with sharing class CheckPaymentArrangementAction {
     output.existingPromiseDate = result.existingPromiseDate;
     output.existingPromiseStatus = result.existingPromiseStatus;
     return output;
+  }
+
+  private static List<String> sessionIdsOf(List<Input> inputs) {
+    List<String> sessionIds = new List<String>();
+    for (Input input : inputs) {
+      sessionIds.add(input?.sessionId);
+    }
+    return sessionIds;
   }
 }

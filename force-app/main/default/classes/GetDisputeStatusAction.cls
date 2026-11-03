@@ -52,61 +52,52 @@ public with sharing class GetDisputeStatusAction {
     category='Steward Service Agent'
   )
   public static List<Output> run(List<Input> inputs) {
+    AgentActions.Calls calls = new AgentActions.Calls(
+      ACTION,
+      sessionIdsOf(inputs)
+    );
+    for (Integer i = 0; i < calls.count(); i++) {
+      calls.begin(
+        i,
+        new DisputeStatusService.HouseholdDisputes(),
+        'Dispute status'
+      );
+    }
+    try {
+      AgentActions.failIfSimulated();
+      Map<Id, DisputeStatusService.HouseholdDisputes> found = DisputeStatusService.forHouseholds(
+        calls.households()
+      );
+      for (Integer i = 0; i < calls.count(); i++) {
+        calls.serve(i, found.get(calls.household(i)));
+      }
+    } catch (Exception error) {
+      calls.fail(error);
+    }
+
+    List<Output> outputs = new List<Output>();
+    for (StewardOutcome.Result result : calls.finish()) {
+      outputs.add(toOutput((DisputeStatusService.HouseholdDisputes) result));
+    }
+    return outputs;
+  }
+
+  private static Output toOutput(DisputeStatusService.HouseholdDisputes found) {
+    Output output = new Output();
+    output.outcome = found.outcome;
+    output.reasonCode = found.reasonCode;
+    output.reference = found.reference;
+    if (found.outcome == StewardOutcome.COMPLETED) {
+      output.disputes = found.disputes;
+    }
+    return output;
+  }
+
+  private static List<String> sessionIdsOf(List<Input> inputs) {
     List<String> sessionIds = new List<String>();
     for (Input input : inputs) {
       sessionIds.add(input?.sessionId);
     }
-    Map<String, AgentSession.Identity> identities = AgentActions.identities(
-      sessionIds
-    );
-    Set<Id> households = new Set<Id>();
-    for (AgentSession.Identity identity : identities.values()) {
-      if (identity.isVerified()) {
-        households.add(identity.accountId);
-      }
-    }
-
-    Map<Id, DisputeStatusService.HouseholdDisputes> found;
-    String failure;
-    try {
-      AgentActions.failIfSimulated();
-      found = DisputeStatusService.forHouseholds(households);
-    } catch (Exception error) {
-      failure = AgentActions.describe(error);
-    }
-
-    List<DisputeStatusService.HouseholdDisputes> results = new List<DisputeStatusService.HouseholdDisputes>();
-    List<AgentActionLogger.Entry> entries = new List<AgentActionLogger.Entry>();
-    for (String sessionId : sessionIds) {
-      AgentSession.Identity identity = identities.get(sessionId);
-      DisputeStatusService.HouseholdDisputes result;
-      String details = 'Dispute status';
-      if (!identity.isVerified()) {
-        result = new DisputeStatusService.HouseholdDisputes();
-        AgentActions.declineUnverified(result, identity);
-      } else if (failure != null) {
-        result = new DisputeStatusService.HouseholdDisputes();
-        AgentActions.markFailed(result);
-        details = failure;
-      } else {
-        result = found.get(identity.accountId);
-      }
-      results.add(result);
-      entries.add(AgentActions.entry(identity, ACTION, result, details));
-    }
-    AgentActions.log(entries, results);
-
-    List<Output> outputs = new List<Output>();
-    for (DisputeStatusService.HouseholdDisputes result : results) {
-      Output output = new Output();
-      output.outcome = result.outcome;
-      output.reasonCode = result.reasonCode;
-      output.reference = result.reference;
-      if (result.outcome == StewardOutcome.COMPLETED) {
-        output.disputes = result.disputes;
-      }
-      outputs.add(output);
-    }
-    return outputs;
+    return sessionIds;
   }
 }

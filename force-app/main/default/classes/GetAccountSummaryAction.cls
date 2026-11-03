@@ -82,52 +82,28 @@ public with sharing class GetAccountSummaryAction {
     category='Steward Service Agent'
   )
   public static List<Output> run(List<Input> inputs) {
-    List<String> sessionIds = new List<String>();
-    for (Input input : inputs) {
-      sessionIds.add(input?.sessionId);
-    }
-    Map<String, AgentSession.Identity> identities = AgentActions.identities(
-      sessionIds
+    AgentActions.Calls calls = new AgentActions.Calls(
+      ACTION,
+      sessionIdsOf(inputs)
     );
-    Set<Id> households = new Set<Id>();
-    for (AgentSession.Identity identity : identities.values()) {
-      if (identity.isVerified()) {
-        households.add(identity.accountId);
-      }
+    for (Integer i = 0; i < calls.count(); i++) {
+      calls.begin(i, new AccountSnapshotService.Snapshot(), 'Account summary');
     }
-
-    List<AccountSnapshotService.Snapshot> results = new List<AccountSnapshotService.Snapshot>();
-    List<AgentActionLogger.Entry> entries = new List<AgentActionLogger.Entry>();
-    Map<Id, AccountSnapshotService.Snapshot> snapshots;
-    String failure;
     try {
       AgentActions.failIfSimulated();
-      snapshots = AccountSnapshotService.getSnapshots(households);
-    } catch (Exception error) {
-      failure = AgentActions.describe(error);
-    }
-    for (String sessionId : sessionIds) {
-      AgentSession.Identity identity = identities.get(sessionId);
-      AccountSnapshotService.Snapshot result;
-      String details = 'Account summary';
-      if (!identity.isVerified()) {
-        result = new AccountSnapshotService.Snapshot();
-        AgentActions.declineUnverified(result, identity);
-      } else if (failure != null) {
-        result = new AccountSnapshotService.Snapshot();
-        AgentActions.markFailed(result);
-        details = failure;
-      } else {
-        result = snapshots.get(identity.accountId);
+      Map<Id, AccountSnapshotService.Snapshot> snapshots = AccountSnapshotService.getSnapshots(
+        calls.households()
+      );
+      for (Integer i = 0; i < calls.count(); i++) {
+        calls.serve(i, snapshots.get(calls.household(i)));
       }
-      results.add(result);
-      entries.add(AgentActions.entry(identity, ACTION, result, details));
+    } catch (Exception error) {
+      calls.fail(error);
     }
-    AgentActions.log(entries, results);
 
     List<Output> outputs = new List<Output>();
-    for (AccountSnapshotService.Snapshot result : results) {
-      outputs.add(toOutput(result));
+    for (StewardOutcome.Result result : calls.finish()) {
+      outputs.add(toOutput((AccountSnapshotService.Snapshot) result));
     }
     return outputs;
   }
@@ -147,5 +123,13 @@ public with sharing class GetAccountSummaryAction {
       output.openPromise = snapshot.openPromise;
     }
     return output;
+  }
+
+  private static List<String> sessionIdsOf(List<Input> inputs) {
+    List<String> sessionIds = new List<String>();
+    for (Input input : inputs) {
+      sessionIds.add(input?.sessionId);
+    }
+    return sessionIds;
   }
 }

@@ -129,9 +129,9 @@ private class ExplainStatementActionTest {
 
   @IsTest
   static void aChatWithNoCustomerBehindItGetsNothing() {
-    AgentTestSessions sessions = new AgentTestSessions()
-      .add(AgentTestSessions.fakeId(1), 'Active', 'Text', null)
-      .install();
+    AgentSession.SessionFacts text = AgentTestSessions.webChat(1, null);
+    text.channelType = 'Text';
+    AgentTestSessions sessions = new AgentTestSessions().add(text).install();
 
     ExplainStatementAction.Output output = ExplainStatementAction.run(
       new List<ExplainStatementAction.Input>{ input(sessions.id(1), null) }

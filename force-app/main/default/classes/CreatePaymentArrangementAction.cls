@@ -86,85 +86,69 @@ public with sharing class CreatePaymentArrangementAction {
     category='Steward Service Agent'
   )
   public static List<Output> run(List<Input> inputs) {
-    List<String> sessionIds = new List<String>();
-    for (Input input : inputs) {
-      sessionIds.add(input?.sessionId);
-    }
-    Map<String, AgentSession.Identity> identities = AgentActions.identities(
-      sessionIds
+    AgentActions.Calls calls = new AgentActions.Calls(
+      ACTION,
+      sessionIdsOf(inputs)
     );
-
-    List<PaymentArrangementService.ArrangementResult> results = new List<PaymentArrangementService.ArrangementResult>();
-    List<PaymentArrangementService.Request> requests = new List<PaymentArrangementService.Request>();
-    List<Integer> queued = new List<Integer>();
+    List<Integer> confirmed = new List<Integer>();
+    List<PaymentArrangementService.Request> arrangements = new List<PaymentArrangementService.Request>();
     for (Integer i = 0; i < inputs.size(); i++) {
-      AgentSession.Identity identity = identities.get(sessionIds[i]);
-      PaymentArrangementService.ArrangementResult result = new PaymentArrangementService.ArrangementResult();
-      if (identity.isVerified()) {
-        requests.add(
+      Input input = inputs[i];
+      String asked =
+        'Create arrangement: ' +
+        input?.amount +
+        ' on ' +
+        input?.promiseDate;
+      if (
+        calls.begin(i, new PaymentArrangementService.ArrangementResult(), asked)
+      ) {
+        confirmed.add(i);
+        arrangements.add(
           new PaymentArrangementService.Request(
-            identity.accountId,
-            inputs[i]?.promiseDate,
-            inputs[i]?.amount
+            calls.household(i),
+            input.promiseDate,
+            input.amount
           )
         );
-        queued.add(i);
-      } else {
-        AgentActions.declineUnverified(result, identity);
       }
-      results.add(result);
     }
+    save(calls, confirmed, arrangements);
 
-    String failure;
+    List<Output> outputs = new List<Output>();
+    for (StewardOutcome.Result result : calls.finish()) {
+      outputs.add(
+        toOutput((PaymentArrangementService.ArrangementResult) result)
+      );
+    }
+    return outputs;
+  }
+
+  /**
+   * Saves the confirmed arrangements in one call. An exception rolls every one of them back, so
+   * nothing half-saved stays behind an error the customer is told about.
+   * @param calls the action's requests
+   * @param confirmed the positions of the requests sent on, in order
+   * @param arrangements their service requests, in the same order
+   */
+  private static void save(
+    AgentActions.Calls calls,
+    List<Integer> confirmed,
+    List<PaymentArrangementService.Request> arrangements
+  ) {
     Savepoint beforeSave = Database.setSavepoint();
     try {
       AgentActions.failIfSimulated();
       List<PaymentArrangementService.ArrangementResult> created = PaymentArrangementService.createArrangements(
-        requests
+        arrangements
       );
-      for (Integer q = 0; q < queued.size(); q++) {
-        results[queued[q]] = created[q];
+      for (Integer q = 0; q < confirmed.size(); q++) {
+        calls.serve(confirmed[q], created[q]);
+        calls.logFailureDetail(confirmed[q], created[q].failureDetail);
       }
     } catch (Exception error) {
-      // Nothing half-saved stays behind an error the customer is told about.
       Database.rollback(beforeSave);
-      failure = AgentActions.describe(error);
-      for (Integer i : queued) {
-        AgentActions.markFailed(results[i]);
-      }
+      calls.fail(error);
     }
-
-    List<AgentActionLogger.Entry> entries = new List<AgentActionLogger.Entry>();
-    for (Integer i = 0; i < inputs.size(); i++) {
-      PaymentArrangementService.ArrangementResult result = results[i];
-      String details;
-      if (failure != null && result.outcome == StewardOutcome.FAILED) {
-        details = failure;
-      } else if (result.failureDetail != null) {
-        details = result.failureDetail;
-      } else {
-        details =
-          'Create arrangement: ' +
-          inputs[i]?.amount +
-          ' on ' +
-          inputs[i]?.promiseDate;
-      }
-      entries.add(
-        AgentActions.entry(
-          identities.get(sessionIds[i]),
-          ACTION,
-          result,
-          details
-        )
-      );
-    }
-    AgentActions.log(entries, results);
-
-    List<Output> outputs = new List<Output>();
-    for (PaymentArrangementService.ArrangementResult result : results) {
-      outputs.add(toOutput(result));
-    }
-    return outputs;
   }
 
   private static Output toOutput(
@@ -186,5 +170,13 @@ public with sharing class CreatePaymentArrangementAction {
     output.existingPromiseDate = result.existingPromiseDate;
     output.existingPromiseStatus = result.existingPromiseStatus;
     return output;
+  }
+
+  private static List<String> sessionIdsOf(List<Input> inputs) {
+    List<String> sessionIds = new List<String>();
+    for (Input input : inputs) {
+      sessionIds.add(input?.sessionId);
+    }
+    return sessionIds;
   }
 }

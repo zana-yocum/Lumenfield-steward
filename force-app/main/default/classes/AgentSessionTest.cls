@@ -6,7 +6,6 @@
 @IsTest
 private class AgentSessionTest {
   private static final String WEB_CHAT = AgentTestSessions.WEB_CHAT;
-  private static final String ACTIVE = AgentTestSessions.ACTIVE;
 
   @TestSetup
   static void createData() {
@@ -21,8 +20,8 @@ private class AgentSessionTest {
     Id first = AgentTestSessions.fakeId(1);
     Id second = AgentTestSessions.fakeId(2);
     AgentTestSessions sessions = new AgentTestSessions()
-      .add(first, ACTIVE, WEB_CHAT, customers[0].Id)
-      .add(second, ACTIVE, WEB_CHAT, customers[1].Id);
+      .chat(1, customers[0].Id)
+      .chat(2, customers[1].Id);
     sessions.install();
 
     Test.startTest();
@@ -54,7 +53,7 @@ private class AgentSessionTest {
   @IsTest
   static void anAnonymousChatHasNoHousehold() {
     Id session = AgentTestSessions.fakeId(1);
-    new AgentTestSessions().add(session, ACTIVE, WEB_CHAT, null).install();
+    new AgentTestSessions().chat(1, null).install();
 
     AgentSession.Identity identity = AgentSession.resolve(session);
 
@@ -66,9 +65,7 @@ private class AgentSessionTest {
   @IsTest
   static void anEmployeeLoggedInIsNotACustomer() {
     Id session = AgentTestSessions.fakeId(1);
-    new AgentTestSessions()
-      .add(session, ACTIVE, WEB_CHAT, UserInfo.getUserId())
-      .install();
+    new AgentTestSessions().chat(1, UserInfo.getUserId()).install();
 
     AgentSession.Identity identity = AgentSession.resolve(session);
 
@@ -87,9 +84,7 @@ private class AgentSessionTest {
       update new User(Id = customer.Id, IsActive = false);
     }
     Id session = AgentTestSessions.fakeId(1);
-    new AgentTestSessions()
-      .add(session, ACTIVE, WEB_CHAT, customer.Id)
-      .install();
+    new AgentTestSessions().chat(1, customer.Id).install();
 
     AgentSession.Identity identity = AgentSession.resolve(session);
 
@@ -104,10 +99,10 @@ private class AgentSessionTest {
   static void anEndedChatActsForNobody() {
     List<StewardTestData.Household> households = StewardTestData.existingHouseholds();
     User customer = PortalTestData.createCustomers(households)[0];
-    Id session = AgentTestSessions.fakeId(1);
-    new AgentTestSessions()
-      .add(session, 'Ended', WEB_CHAT, customer.Id)
-      .install();
+    AgentSession.SessionFacts ended = AgentTestSessions.webChat(1, customer.Id);
+    ended.status = 'Ended';
+    new AgentTestSessions().add(ended).install();
+    Id session = ended.sessionId;
 
     AgentSession.Identity identity = AgentSession.resolve(session);
 
@@ -119,8 +114,10 @@ private class AgentSessionTest {
   static void onlyThePortalsWebChatIsServed() {
     List<StewardTestData.Household> households = StewardTestData.existingHouseholds();
     User customer = PortalTestData.createCustomers(households)[0];
-    Id session = AgentTestSessions.fakeId(1);
-    new AgentTestSessions().add(session, ACTIVE, 'Text', customer.Id).install();
+    AgentSession.SessionFacts text = AgentTestSessions.webChat(1, customer.Id);
+    text.channelType = 'Text';
+    new AgentTestSessions().add(text).install();
+    Id session = text.sessionId;
 
     AgentSession.Identity identity = AgentSession.resolve(session);
 
