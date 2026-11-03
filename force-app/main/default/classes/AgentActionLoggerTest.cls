@@ -257,6 +257,44 @@ private class AgentActionLoggerTest {
     );
   }
 
+  // NFR-07. The service agent's actions log a batch, then look up every failure's number at once.
+  @IsTest
+  static void referencesForSeveralEntriesInOneLookup() {
+    Id accountId = householdId();
+    List<Database.SaveResult> saved = AgentActionLogger.log(
+      new List<AgentActionLogger.Entry>{
+        entry(accountId, StewardOutcome.FAILED, 'UNEXPECTED_ERROR'),
+        entry(accountId, StewardOutcome.COMPLETED, null)
+      }
+    );
+    Set<Id> ids = new Set<Id>{ saved[0].getId(), saved[1].getId() };
+
+    Test.startTest();
+    Map<Id, String> references = AgentActionLogger.referencesFor(ids);
+    Integer queriesUsed = Limits.getQueries();
+    Test.stopTest();
+
+    Map<Id, Agent_Action_Log__c> rows = new Map<Id, Agent_Action_Log__c>(
+      [SELECT Id, Name FROM Agent_Action_Log__c WITH SYSTEM_MODE]
+    );
+    for (Id logId : ids) {
+      Assert.areEqual(
+        rows.get(logId).Name,
+        references.get(logId),
+        'Each reference is that record\'s number'
+      );
+    }
+    Assert.areEqual(1, queriesUsed, 'One query for all of them');
+    Assert.isTrue(
+      AgentActionLogger.referencesFor(new Set<Id>()).isEmpty(),
+      'Nothing asked, nothing looked up'
+    );
+    Assert.isTrue(
+      AgentActionLogger.referencesFor(null).isEmpty(),
+      'A null set looks up nothing'
+    );
+  }
+
   @IsTest
   static void nothingToLogReturnsNothing() {
     Assert.isTrue(

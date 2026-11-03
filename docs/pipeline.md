@@ -81,7 +81,7 @@ The pipeline runs Code Analyzer's Recommended rules. Changes to the defaults liv
 - Jest tests are left out of the scan. They run in Node and are never deployed, and their documented patterns, such as waiting with `setTimeout`, break rules meant for component code.
 - The site bundle is left out. Experience Builder writes it, and the next retrieve would undo any change.
 
-Graph Engine, Code Analyzer's data-flow engine, isn't in the Recommended set; it's run by hand when entry points change (`sf code-analyzer run --rule-selector sfge`). On 2026-10-18 it reported two findings, both the S-08 commitments read: missing field-level and sharing checks, which is that decision's design, covered by `CommitmentReadServiceTest`.
+Graph Engine, Code Analyzer's data-flow engine, isn't in the Recommended set; it's run by hand when entry points change (`sf code-analyzer run --rule-selector sfge`). On 2026-10-18 it reported two findings, both the S-08 commitments read: missing field-level and sharing checks, which is that decision's design, covered by `CommitmentReadServiceTest`. On 2026-11-03, with the nine agent actions as new entry points, it reported the same two and nothing else. Its parser can't read the `??` operator, which `DisputeSummaryPrompt` uses, so that run left out `DisputeSummaryPrompt`, `RepAssistantController` and their tests; neither is reachable from the agent's actions. New Steward code avoids `??` so the engine can keep reading it.
 
 ## Retrieving what's built outside source
 
@@ -109,7 +109,7 @@ Stored in GitHub: Settings → Secrets and variables → Actions.
 - **Up-to-date rule and doc commits.** Committing docs straight to `main` puts any open pull request behind; it then needs **Update branch** and a fresh validation before it can merge.
 - **Actions pinned to major versions** for readability. A stricter setup pins each action to a commit SHA.
 - **Coverage measures lines run, not checks made.** A test can run a line without asserting anything about it. That's why NFR-03 also requires every test method to assert an outcome. Review enforces that, not the gate.
-- **Graph Engine data-flow rules aren't run yet.** They start from entry points such as invocable and Aura-enabled methods, and Steward has none until the agent actions in Phase 6.
+- **Graph Engine runs by hand,** not in the pipeline, and can't parse the `??` operator (above).
 - **Agent releases.** Publishing and activating agent versions joins the deploy workflow in Phase 6 (S-10).
 
 ## Rotating the key

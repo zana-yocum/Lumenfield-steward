@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingCriteriaRules>
+        <fullName>Delinquent_Accounts_to_Collections</fullName>
+        <accessLevel>Edit</accessLevel>
+        <accountSettings>
+            <caseAccessLevel>None</caseAccessLevel>
+            <contactAccessLevel>Edit</contactAccessLevel>
+            <opportunityAccessLevel>Read</opportunityAccessLevel>
+        </accountSettings>
+        <description>Grants collections access to accounts once they go delinquent, and read on their deals so the commitments made at signing are visible, without moving ownership away from sales. Access ends automatically when status returns to Current. D-08, DEF-10.</description>
+        <label>Delinquent Accounts to Collections</label>
+        <sharedTo>
+            <group>Collections_Team</group>
+        </sharedTo>
+        <criteriaItems>
+            <field>Account_Status__c</field>
+            <operation>equals</operation>
+            <value>Default Review,Delinquent,Hardship Review</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Households_to_Steward_Agent</fullName>
+        <accessLevel>Edit</accessLevel>
+        <accountSettings>
+            <caseAccessLevel>Read</caseAccessLevel>
+            <contactAccessLevel>None</contactAccessLevel>
+            <opportunityAccessLevel>None</opportunityAccessLevel>
+        </accountSettings>
+        <description>S-01. The service agent reads any household it may serve and its billing disputes. Edit because a promise to pay is a master-detail child of the account. The agent's permission set leaves every account field read only. Organization accounts stay out.</description>
+        <label>Households to Steward Agent</label>
+        <sharedTo>
+            <group>Steward_Agent</group>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Residential Agreement</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+</SharingRules>

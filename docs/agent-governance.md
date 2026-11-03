@@ -2,7 +2,7 @@
 
 What each AI feature can read, what it sends to the model, and what's kept (ST-17). Written for a security review: every object and field below is read from the code, and every setting from the org, with the date it was read.
 
-Phase 5 covers the rep assistant's three prompt templates. Phase 6 adds the service agent's actions and decides the Trust Layer settings.
+Phase 5 covers the rep assistant's three prompt templates. Phase 6 adds the service agent's actions (below). The Trust Layer settings for the agent are decided in Setup once the agent exists, with the recommendations at the end of the settings section.
 
 ---
 
@@ -77,6 +77,39 @@ After the model has written the body, `RepAssistantController` reads the primary
 
 ---
 
+## What the service agent's actions return (Phase 6)
+
+The agent's model never reads records itself. It calls the nine actions, and each one returns a typed answer from a Phase 3 service. The service reads in user mode, as the agent user, whose whole access is in `docs/security-model.md`. Every answer carries an outcome and a reason code, and on a failure, the log number to quote. Error messages go only to the log. On a decline or failure, an answer carries no figures.
+
+| Action | What the model gets back |
+|---|---|
+| Get Account Summary | Balance, past-due balance, oldest past-due date, next due date and amount. Each statement's number, ID, dates, amounts, status and open dispute's case number. Each payment's number, date and amount. The open promise's amount, date, status and grace end |
+| Get Commitments | Each commitment's type, value, months covered, terms as the rep recorded them, and status |
+| Explain Statement | The statement and the one before it: number, ID, dates, amounts and status. Each reason's code and figures: the escalator rate and anniversary, a credit's type and posted date, an unpaid statement |
+| Check Payment Arrangement | The rule that decided it, and the figures it allows: past-due balance, minimum amount, latest date, any existing promise. A hand-off carries no figures |
+| Create Payment Arrangement | The same as the check, and after a save, the promise's number, status, date, amount and hold-until date |
+| Get Dispute Reasons | The eight reasons and each one's evidence list |
+| Open Dispute | The case number, status, reason and evidence list |
+| Get Dispute Status | Each billing dispute's case number, status, whether it's closed, reason, statement number and date opened |
+| Record Handoff | The reason code and the log number |
+
+**What never comes back from an action:**
+- Names, email addresses, phone numbers and street addresses.
+- The payment method and the processor reference.
+- Anything from another household.
+- A commitment's internal fields. Only the five customer fields come back.
+- Error messages.
+
+**Record IDs do come back,** unlike in the rep assistant. They're the household's own statement, payment, promise and case IDs. The customer picks a statement by its date or number, and the model passes that statement's ID to Explain Statement or Open Dispute. Any ID the model passes is looked for only in the session's household (ST-12). So a changed or invented ID is simply not found.
+
+**Which household:** no action has an account input. Each one takes the messaging session's ID, which the agent binds to `$Context.RoutableId`, and finds the household from the portal user the platform verified for the chat (S-07, S-23).
+
+**Text the model sends in:** the dispute description, which is saved on the case, and the handoff summary, which is saved in the log. Card numbers are removed from both before they're saved (`SensitiveText`). Neither one is sent to a model by Steward's Apex.
+
+**Every request is logged:** one `Agent_Action_Log__c` record per action, declines and failures included. Each record holds the household, the action, the outcome, the reason code, a short line of what was asked, and the session ID as the conversation (S-09, S-24). Supervisors read the log through `PS_Steward_Supervisor`.
+
+---
+
 ## Einstein and Trust Layer settings
 
 Read on 2026-10-23 through the setup pages' own API and the Einstein settings metadata. A reason is given where Steward depends on the value; the rest are decided in Phase 6.
@@ -94,6 +127,13 @@ Read on 2026-10-23 through the setup pages' own API and the Einstein settings me
 | Data retention by the model provider | None, by Salesforce's policy | Salesforce's zero data retention policy: the provider keeps no prompts or responses ([Trailhead: The Einstein Trust Layer](https://trailhead.salesforce.com/content/learn/modules/the-einstein-trust-layer/follow-the-response-journey)). It's a contract, not a setting, so it can't be read from the org |
 
 **ST-17's audit-trail check** (a briefing for a record with an email address and a phone number, then the audit trail showing what was sent and whether it was masked) needs audit storage, so it moves to Phase 6. What's already proven: the briefing's DATA for such a record holds neither (`AccountBriefingPromptTest.leavesOutNamesAndContactDetails`), and the org checks below show the same in generated output.
+
+**For the agent: Zana decides these in Setup once the agent exists.** The pages need a person: the API reads some of them as off even for a user who can't open the page. Recommendations, in order:
+1. **Prompt Security.** Its feature gate read closed on 2026-10-16 and 2026-10-23. If the page now offers it, turn it on. Prompt injection and toxicity detection depend on it, and the agent reads text customers type. If it's still closed, record that it isn't available in this org.
+2. **Prompt injection and toxicity detection.** On, if available. The actions already treat every value the model passes as untrusted: IDs are looked for only in the household, and a reason code must look like one.
+3. **Data masking.** Not provisioned here. The actions return no names or contact details, so there's nothing in their answers to mask. A customer can still type their own details into the chat, which is the next item.
+4. **The chat transcript.** Check whether Enhanced Chat can mask a card number a customer types (ST-05). The Tooling API in this org doesn't offer sensitive data rules (2026-11-03), so look in Setup once the channel exists. Steward's own saves already remove card numbers.
+5. **Audit and feedback.** This needs Data 360, which is capped in Developer Edition. Turn it on if the cap allows, then run ST-17's audit-trail check. If not, record why, and keep the action log (S-09) as the agent's audit trail.
 
 ---
 

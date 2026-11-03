@@ -6,7 +6,7 @@ The decisions that shape Steward, the options considered, and why one was chosen
 
 | ID | Decision | Status |
 |---|---|---|
-| S-01 | The service agent runs as its own least-privilege user | Proposed · Phase 6 |
+| S-01 | The service agent runs as its own least-privilege user | Decided · confirmed in Phase 6 |
 | S-02 | Salesforce asks the payment provider; the provider never calls Salesforce | Proposed · Phase 7 |
 | S-03 | Apex for agent actions; Accord's flows keep the policy | Decided |
 | S-04 | Customer Community licenses with sharing sets | Decided · confirmed in Phase 4 |
@@ -28,11 +28,13 @@ The decisions that shape Steward, the options considered, and why one was chosen
 | S-20 | The rep assistant's templates read records in Apex, with the user's own access | Decided |
 | S-21 | The assistant's buttons check before any model runs; the follow-up opens in the email composer | Decided |
 | S-22 | Steward permission sets close the collections groups' access gaps | Decided |
+| S-23 | The agent finds the household in system mode, from the session's authenticated user | Decided |
+| S-24 | The action log's conversation ID is the messaging session's ID | Decided |
 
 ---
 
 ### S-01 — The service agent runs as its own least-privilege user
-**Status:** Proposed · confirm in Phase 6
+**Status:** Decided · confirmed in Phase 6
 
 **Context:** Every agent action runs as a user. Whatever that user can reach, a cleverly worded conversation might reach too.
 
@@ -44,6 +46,17 @@ The decisions that shape Steward, the options considered, and why one was chosen
 **Why:** Option 2 turns the agent's reach into a short list someone can review line by line (ST-12). Option 1 leaves that list to defaults nobody chose. Option 3 sounds safest, but service agent actions run as the agent user, and the customer's identity still has to be carried into each action deliberately (S-07).
 
 **Consequences:** `PS_Steward_Agent` is the whole of the agent's access, listed in `docs/security-model.md`. The agent has to serve any household, so it gets access to Residential Agreement accounts through a criteria-based sharing rule, not View All, and Organization accounts stay out of reach. Any new action that needs more access needs an entry here first.
+
+**Confirmed in Phase 6.**
+- The Einstein Agent User profile grants no object permissions (read 2026-11-03). So `PS_Steward_Agent` really is the whole list: the nine action classes, read on what the services read in user mode, create on promises to pay and billing disputes, and read on the Contact object with no contact fields, which a dispute needs to name the household's primary contact. Nothing else.
+- Record access comes through the **Steward Agent** public group and two rules:
+  - `Households_to_Steward_Agent`: Residential Agreement accounts, with Read on their cases.
+  - `Agreements_to_Steward_Agent`: service agreements, read only.
+- The household rule gives Edit, not Read. A promise to pay is a master-detail child of its account, and with the relationship's default setting, adding a child needs edit access to the parent. The permission set still leaves every account field read only, and no action updates an account.
+- `Account.sharingRules` also carries Accord's `Delinquent_Accounts_to_Collections` rule, unchanged, so deploying the file can't drop it. Steward's source is now that rule's copy of record, as for the layouts and groups (S-21, S-22).
+- `AgentAccessTest` runs every action as an Einstein Agent User with only this access. All nine answer in full. A second customer's chat can't reach the first household, though the agent user can see it. And the agent user can't see an Organization account.
+- A check-only deployment doesn't apply the sharing rules it brings, so the test grants the group the rules' access by hand. The rules themselves are checked in the org after the release.
+- The agent user is created with the agent, which is Zana's step. It then gets the permission set and joins the group.
 
 ---
 
@@ -143,6 +156,8 @@ The agent never:
 **Why:** Option 1 makes security depend on the model following instructions, which is exactly what injection attacks target. Option 2 makes it structural: no action has an account parameter to abuse. Option 3 suits a chat open to the public; Steward's chat sits behind the portal login, so the login is the verification.
 
 **Consequences:** Hidden pre-chat fields are set by the browser, so they don't count as identity. The identity must come from the platform's link between the logged-in user and the conversation, confirmed in Phase 6. Every action re-checks that any record ID it's given belongs to the verified account (ST-12).
+
+**Confirmed in Phase 6.** The link is `MessagingEndUser.AuthenticatedEndUserId`, the portal user the platform verified for the chat. `AgentSession` reads it in system mode (S-23). No action has an account input. Each one takes the session ID, which the agent binds to `$Context.RoutableId`, and any record ID the model passes is looked for only in that household. The live check, a real chat from the logged-in portal, comes when the chat is set up (open items).
 
 ---
 
@@ -259,7 +274,7 @@ The agent never:
 
 **Why:** Option 3 changes nobody's access, and it works however the platform answers for a given user. All system mode adds is the one field the agent and customers can't count on setting, on a record the caller is otherwise allowed to create in full. The account it sets is always the verified household, already checked in user mode. Option 1 would give the agent a standing ability to move cases between households, which is exactly the reach S-06 rules out.
 
-**Consequences:** `DisputeIntakeService` refuses with `ACCESS_DENIED`, and saves nothing, when the caller can't create cases or set any field other than the account. A test proves it for a user with no Case access, and it passed in the org on 2026-10-18. The field-level refusal had no test in Phase 3, because no license was free for a user who can create cases but not one of the dispute fields. Phase 4 tests it with a customer user whose permission set can't set the dispute reason: refused with `ACCESS_DENIED`, nothing saved, and the log names the field (`PortalControllersTest`, passed in the org on 2026-10-21). This is the third named exception to user mode (NFR-01), after S-08 and S-09. It's one statement with a comment citing S-14. The agent user still needs Case create and access to the dispute fields, and read access through sharing to see the case number once the case is in the queue (Phase 6). Phase 6 also checks what the agent user's create access to `Case.AccountId` really is. If the agent can set it, or edit on it is granted for another reason, the insert can move to user mode and this exception can be removed.
+**Consequences:** `DisputeIntakeService` refuses with `ACCESS_DENIED`, and saves nothing, when the caller can't create cases or set any field other than the account. A test proves it for a user with no Case access, and it passed in the org on 2026-10-18. The field-level refusal had no test in Phase 3, because no license was free for a user who can create cases but not one of the dispute fields. Phase 4 tests it with a customer user whose permission set can't set the dispute reason: refused with `ACCESS_DENIED`, nothing saved, and the log names the field (`PortalControllersTest`, passed in the org on 2026-10-21). This is the third named exception to user mode (NFR-01), after S-08 and S-09. **Phase 6:** the agent user can't set `Case.AccountId` either. As an Einstein Agent User with `PS_Steward_Agent`, `Security.stripInaccessible` removes it (`AgentAccessTest`). So the exception stays, for the agent as for customers. It's one statement with a comment citing S-14. The agent user still needs Case create and access to the dispute fields, and read access through sharing to see the case number once the case is in the queue (Phase 6). Phase 6 also checks what the agent user's create access to `Case.AccountId` really is. If the agent can set it, or edit on it is granted for another reason, the insert can move to user mode and this exception can be removed.
 
 ---
 
@@ -404,3 +419,38 @@ The agent never:
 - `PS_Steward_Rep_Assistant`: Execute Prompt Templates and the four Apex classes, in all three groups. The permission needs the Einstein Prompt Templates license, so everyone in those groups needs it too. Test Persona, the only member, got it on 2026-10-23.
 - Steward deploys Accord's three groups from source, retrieved as they were first (S-15), so Steward's source is now their copy of record, as for the layouts (S-21). Accord's changelog gets an entry (open items).
 - What each template reads, field by field, is in `docs/agent-governance.md`.
+
+---
+
+### S-23 — The agent finds the household in system mode, from the session's authenticated user
+**Status:** Decided
+
+**Context:** S-07 requires the customer's identity to come from the platform's link between the logged-in user and the conversation. Phase 6 found that link. When a customer opens Enhanced Chat from the logged-in portal with user verification on, the platform records the verified portal user on the conversation's messaging user, in `MessagingEndUser.AuthenticatedEndUserId`. The API describes the field as neither createable nor updateable, so no API call, rep or model can set it. An agent action can receive the conversation's ID, `$Context.RoutableId`, which for a chat is the `MessagingSession` record's ID. But the agent user shouldn't be able to read conversations or customers' user records.
+
+**Options**
+1. Pre-chat hidden fields carrying the account ID. The browser sets these, so a customer could change them. S-07 already rules them out.
+2. Give the agent user read access to `MessagingSession`, `MessagingEndUser` and `User`.
+3. Follow the links in system mode, in one inner class: from the session ID the agent binds to `$Context.RoutableId`, to the authenticated user, to that user's account. Return only the account ID. **← decided**
+
+**Why:** Option 3 keeps the agent user's access down to the households it serves. The read starts from an ID the model can't set, follows links only the platform sets, and returns nothing but an account ID. Every check sits in one place with its tests: the channel, whether the session has ended, and whether the user is an active customer with a contact and an account. Option 2 would let the agent read every customer's user record and every conversation in the org.
+
+**Consequences:**
+- `AgentSession` is the fourth named exception to user mode (NFR-01), with S-08, S-09 and S-14. It lives in an inner `Elevated` class with a comment citing S-23.
+- Every action's session input must be bound to `$Context.RoutableId` in the agent, never left for the model to fill. The input's description says so, and the agent test suite checks it (Phase 10).
+- Only Enhanced Chat is served (`WRONG_CHANNEL` otherwise), only open sessions (`SESSION_ENDED`), and only an active customer user (`NOT_VERIFIED`).
+- A test can't create a messaging session, so `AgentTestSessions` stands in for the org's records. The mapping from a real record is tested on one built in memory. The live check comes when the chat is set up (open items): a chat from the logged-in portal resolves to that customer's household, and an anonymous one doesn't.
+
+---
+
+### S-24 — The action log's conversation ID is the messaging session's ID
+**Status:** Decided
+
+**Context:** S-09's log has a `Conversation_Id__c` field, left open in Phase 3. A supervisor reviewing a declined request needs to find the conversation it came from, and a report needs to group one conversation's actions.
+
+**Options**
+1. An identifier from the agent runtime. Nothing like it reaches an Apex action as an input.
+2. The messaging session's ID, which every action already receives as its session input. **← decided**
+
+**Why:** It's the platform's own ID for the conversation. The transcript, the participants and the routing all hang off that `MessagingSession` record, and every action in one conversation logs the same value.
+
+**Consequences:** `AgentActions.entry` sets the field from the session the action was given. A person with access to messaging sessions opens the conversation at `/lightning/r/MessagingSession/<ID>/view`. A request whose session ID wasn't a messaging session's still logs the value it was given, so a bad binding shows up in the log rather than disappearing.

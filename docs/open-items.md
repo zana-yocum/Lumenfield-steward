@@ -6,6 +6,64 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ---
 
+## Phase 6 — Service agent — in progress
+
+Pull request #17 built everything the agent will run, and the access it runs with, before the agent itself exists. That covers the nine actions, how a chat finds its household, the shared plumbing, the agent user's permission set and sharing, the supervisor's access to the log, and the docs. Next come the agent itself, its chat on the portal and its Trust Layer settings. Those start with you in Setup.
+
+**Your steps**
+- ☐ 1. **Create the agent and its user**, about 10 minutes. If a screen doesn't match these steps, stop and tell Claude what you see. Agentforce Builder changes often.
+  1. In Salesforce: the gear icon → **Setup** → type `Agentforce Agents` in Quick Find → **Agentforce Agents** → **New Agent**.
+  2. Choose the template for customers, **Agentforce Service Agent**.
+  3. Name it `Lumenfield Service Agent`, with the API name `Lumenfield_Service_Agent` (conventions).
+  4. When it asks about the agent user, choose to **create a new agent user**. If it lets you name the user, use `Steward Agent`.
+  5. Add no topics or actions, and don't activate it. Claude writes those in its Agent Script.
+- ☐ 2. **Give the agent user its access**, about 3 minutes:
+  1. Setup → Quick Find `Users` → **Users** → open the new agent user.
+  2. **Permission Set Assignments** → **Edit Assignments** → move **Steward Agent** to Enabled → **Save**.
+  3. Setup → Quick Find `Public Groups` → **Public Groups** → **Steward Agent** → **Edit**. Under **Search**, choose **Users**, add the agent user, and click **Save**. If the agent user isn't in the list, tell Claude, who can add it through the API.
+- ☐ 3. **Look at the Trust Layer page for Claude**, about 5 minutes. Setup → Quick Find `Einstein Trust Layer`. Note which of these the page offers, and whether each can be turned on: Prompt Security (the master switch), data masking, prompt injection detection, toxicity detection, and audit and feedback (Data 360). Don't change anything yet. The recommendations are at the end of `docs/agent-governance.md`'s settings section.
+- ☐ 4. Then tell Claude "agent created". In the next sitting, Claude:
+  - retrieves the agent into this repository
+  - writes its Agent Script: the subagents and their instructions, each action's session input bound to `$Context.RoutableId`, and a confirmation before every write (GR-05)
+  - builds the Enhanced Chat channel and the portal's chat through the pipeline
+  - walks you through the live check: a chat from the logged-in portal answers for that customer's household, and an anonymous one doesn't (S-23)
+
+**Mine**
+- ☑ **Nine agent actions** (`<Verb><Noun>Action`), one per service call. Each takes the messaging session's ID, never an account, logs every request, and has its own test class covering:
+  - its own household
+  - another household's records, where it takes an ID
+  - a chat with no customer behind it
+  - a failure, which gives a reference instead of the error
+- ☑ **How a chat finds its household (S-07, S-23):** `AgentSession` follows the platform's own link, `MessagingEndUser.AuthenticatedEndUserId`, to the verified portal user and that user's account. It serves only the portal's web chat, only an open session, and only an active customer user. Tests can't open a chat, so `AgentTestSessions` stands in
+- ☑ **Shared plumbing:** `AgentActions.Calls`. The first version passed every test but brought 22 Code Analyzer findings into a codebase that had none. Rebuilt on `Calls`, it's back to 0 at every severity. Prettier and the personal-details check are clean
+- ☑ **Access (S-01):** `PS_Steward_Agent`, the Steward Agent group, and sharing rules `Households_to_Steward_Agent` and `Agreements_to_Steward_Agent`. `PS_Steward_Supervisor` is in the Collections Supervisor group (ST-11). Written up in `docs/security-model.md`
+- ☑ **`AgentAccessTest`** runs the nine actions as an Einstein Agent User with only that access. Writing it found four things the plan had missed:
+  - The statement explanation reads the agreement's start date, so the agent needs read on it.
+  - A promise to pay is a master-detail child of its account, so adding one needs edit access to the account. The sharing rule gives Edit, and the permission set keeps every account field read only.
+  - Opening a dispute reads the household's primary contact and names it on the case. Both are lookups to Contact, and a lookup to an object the user can't read is hidden. So the agent gets read on the Contact object, though no contact field, as customers do.
+  - A check-only deployment doesn't apply the sharing rules it brings, so the test grants the group the same access by hand. The rules themselves are checked in the org after the merge.
+- ☑ **S-14's open question:** the agent user can't set a case's account, so the dispute insert stays in system mode (`AgentAccessTest`)
+- ☑ **Graph Engine** with the actions as entry points: the same two S-08 findings as Phase 4, and nothing from the agent's paths (`docs/pipeline.md`)
+- ☑ **Docs:**
+  - decisions S-23 and S-24, and S-01 confirmed
+  - `docs/security-model.md`
+  - the actions' answers and the Trust Layer recommendations in `docs/agent-governance.md`
+  - 12 explainers
+  - traceability, pipeline and this file
+- ☐ **Merge #17 and check in the org:** share rows from each rule for the Steward Agent group on every Residential Agreement account and every agreement, none on an Organization account; `PS_Steward_Supervisor` in the supervisor group, recalculated
+- ☐ **Next sitting, after your steps 1–3:**
+  - the Agent Script
+  - publish and activate in `deploy.yml` (S-10)
+  - the Enhanced Chat channel, deployment and portal chat
+  - the live S-23 check
+  - the Trust Layer settings
+  - passing the reason code into the handoff summary (ST-07)
+  - the Steward Agent dashboard (ST-11)
+  - two escalator statements on a demo household (ST-03)
+  - the agent test suites
+
+---
+
 ## Phase 5 — Rep assistant — closed 2026-10-26
 
 Pull request #9 built it: the three prompt templates and the Apex behind them, the three buttons, and the permission sets. #10 activated the templates and added the docs. #11 fixed what the org checks found and recorded their evidence. #13 records what the hand check found and finishes Accord's DEF-07 on the account layout. #14 lets a supervisor change Collection Hold Until from that layout. #15 records #14's deploy, and #16 closes the phase. Claude pushes each one, merges it once its final commit validates, and checks the deploy.
@@ -206,13 +264,13 @@ The first change went through the whole pipeline: pull request #1 validated as S
 - ☐ Confirm in the org that customer licenses can't be given opportunity access (S-08) and that Enhanced Chat works in an LWR site (S-11)
 
 **Phase 6 — Service agent**
-- ☐ Confirm how the logged-in customer's identity reaches the agent (S-07)
+- ☑ How the logged-in customer's identity reaches the agent (S-07): `MessagingEndUser.AuthenticatedEndUserId`, read in system mode by `AgentSession` (S-23). ☐ The live check with a real chat is in Phase 6's steps
 - ☐ Confirm whether the chat transcript can mask a typed card number (ST-05)
 - ☐ Decide the Trust Layer settings and record them in `docs/agent-governance.md` (ST-17)
-- ☐ Add agent publish and activate to `deploy.yml` (S-10)
-- ☐ Invocable actions, one per service call (`<Verb><Noun>Action`): each takes the verified account from the session, calls the service, writes one log record through `AgentActionLogger`, and returns the typed result
-- ☐ Decide what `Agent_Action_Log__c.Conversation_Id__c` holds (the messaging session's ID is the likely answer) and how a supervisor opens the conversation from it
-- ☐ `PS_Steward_Agent`, from what the Phase 3 services read and write in user mode. This becomes `docs/security-model.md`:
+- ☐ Add agent publish and activate to `deploy.yml` (S-10), once the agent's script is in the repo
+- ☑ Invocable actions, one per service call (`<Verb><Noun>Action`): each takes the verified account from the session, calls the service, writes one log record through `AgentActionLogger`, and returns the typed result. Nine, in pull request #17
+- ☑ `Agent_Action_Log__c.Conversation_Id__c` holds the messaging session's ID; a supervisor opens the conversation at `/lightning/r/MessagingSession/<ID>/view` (S-24)
+- ☑ `PS_Steward_Agent`, from what the Phase 3 services read and write in user mode, now in `docs/security-model.md`. Two changes from this plan: the agreement's `StartDate` is read too, and nothing is needed on `Case.Service_Contract__c`, which a flow stamps (S-19). The plan was:
   - **Account:** read `Account_Status__c`, `Broken_Promises_90d__c`, `Current_Balance__c`, `Past_Due_Balance__c`, `Oldest_Past_Due_Date__c`, `Primary_Contact__c`. Residential Agreement accounts reached through a criteria-based sharing rule (S-01)
   - **Billing Statement:** read the statement fields, including `Service_Contract__c`
   - **Service Contract:** read `Escalator_Rate__c`, `First_Due_Date__c`, `StartDate`
@@ -221,10 +279,10 @@ The first change went through the whole pipeline: pull request #1 validated as S
   - **Promise to Pay:** read and create `Promise_Date__c`, `Promise_Amount__c`, `Status__c`; read `Grace_Ends__c`
   - **Case:** create, plus create on `Disputed_Statement__c`, `Service_Contract__c`, `Dispute_Reason__c`, Origin, Subject, Description and Contact. Without them `DisputeIntakeService` answers `ACCESS_DENIED`. Also read access to Billing Dispute cases through sharing, so the agent can read back the case number once the case is in the Dispute Specialists queue
   - **Nothing on** `Commitment__c`, `Opportunity` or `Agent_Action_Log__c`: the services handle those (S-08, S-09)
-- ☐ S-14 with the agent user, two checks. First, what its create access to `Case.AccountId` really is: if it can set the field, the dispute insert moves to user mode and the exception goes. Second, a dispute from a user who can create cases but not one of the dispute fields comes back `ACCESS_DENIED` naming that field, with nothing saved. Phase 3 could only test a user with no Case access (no Salesforce license is free), and the third validation shows the field-level lines never ran
-- ☐ `PS_Steward_Supervisor`: read on `Agent_Action_Log__c`, for the Steward Agent dashboard (ST-11). Reps get nothing on it
-- ☐ When a service returns `HANDOFF`, the reason code goes into the handoff summary, so the rep knows which limit was hit (ST-07)
-- ☐ Run Code Analyzer's Graph Engine rules once the actions exist
+- ☑ S-14 with the agent user, two checks. First: it can't set `Case.AccountId` (`AgentAccessTest`), so the exception stays. Second: Phase 4 proved the field-level refusal with a customer user (`PortalControllersTest`), through the same service the agent calls. The original note: First, what its create access to `Case.AccountId` really is: if it can set the field, the dispute insert moves to user mode and the exception goes. Second, a dispute from a user who can create cases but not one of the dispute fields comes back `ACCESS_DENIED` naming that field, with nothing saved. Phase 3 could only test a user with no Case access (no Salesforce license is free), and the third validation shows the field-level lines never ran
+- ☑ `PS_Steward_Supervisor`: read on `Agent_Action_Log__c`, for the Steward Agent dashboard (ST-11), in the Collections Supervisor group. Reps get nothing on it
+- ☐ When a service returns `HANDOFF`, the reason code goes into the handoff summary, so the rep knows which limit was hit (ST-07). `RecordHandoffAction` takes the code and logs it; the Agent Script passes it on
+- ☑ Run Code Analyzer's Graph Engine rules once the actions exist (2026-11-03): the same two S-08 findings, nothing from the agent's paths
 - ☐ Add two statements showing an escalator step to one demo household, so ST-03 can be shown on real data, not just in tests
 
 **Phase 7 — Payments**
@@ -240,5 +298,6 @@ The first change went through the whole pipeline: pull request #1 validated as S
 - **Five customer licenses.** The plan uses three test households, which leaves room for a fourth if a test needs one.
 - **No spare Salesforce licenses** now that Steward CI has the fourth. A second persona user would mean switching Test Persona between roles, as Accord did. Apex tests use a Salesforce Platform user instead.
 - **Apex test time.** Every pull request now runs 83 tests in the org, and five of them build 200 households through Accord's flows. Phase 3's three runs took 227, 114 and 149 seconds of test time. In the third, the slowest test, opening 200 disputes, took 32 seconds. If a run nears the CPU limit, the bulk tests are where to look.
-- **Nobody can read the action log's fields yet**, the admin included, until `PS_Steward_Supervisor` in Phase 6. Records are written and counted, but anyone opening one would see only its number and outcome. Expected for now.
+- **Steward's source carries Accord's account sharing rule** `Delinquent_Accounts_to_Collections`, unchanged, in the same file as the agent's rule, so deploying the file can't drop it. Like the layouts and groups, a change to it in Setup is undone by Steward's next deploy unless it's retrieved first.
+- **Nobody but supervisors reads the action log**, and they do once pull request #17 deploys `PS_Steward_Supervisor`. The admin isn't in that group and has no access to the log's fields, so reading the log as the admin needs `PS_Steward_Supervisor` assigned too.
 - ☑ **Accord's DEF-07 finished by pull request #13:** the Commitments related list is on the Residential Agreement layout, which this repository maintains. Steward depends only on the `Account__c` field.
