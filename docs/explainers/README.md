@@ -75,6 +75,23 @@ One page per Apex class, Lightning web component, prompt template and agent suba
 | [Steward_Dispute_Summary](Steward_Dispute_Summary.md) | Prompt template: a first-pass summary that recommends nothing | ST-09 |
 | [Steward_Followup_Draft](Steward_Followup_Draft.md) | Prompt template: a servicing email body for every outcome | ST-10 |
 
+**The service agent (Phase 6): Apex**
+
+| Component | One line | Stories |
+|---|---|---|
+| [AgentSession](AgentSession.md) | The chat's household, from the platform's record of who logged in, never from the conversation | ST-12 · S-07 · S-23 |
+| [AgentActions](AgentActions.md) | What every action does around its service call: decline first, fail safely, log every request | ST-11 · ST-12 · NFR-07 |
+| [GetAccountSummaryAction](GetAccountSummaryAction.md) | Balances, statements, payments and any open promise | ST-01 |
+| [GetCommitmentsAction](GetCommitmentsAction.md) | What was promised at signing, through the S-08 read service | ST-02 · S-08 |
+| [ExplainStatementAction](ExplainStatementAction.md) | Why a bill changed, or that the records can't say | ST-03 |
+| [CheckPaymentArrangementAction](CheckPaymentArrangementAction.md) | Whether an arrangement is allowed, with the rule's figures; saves nothing | ST-04 |
+| [CreatePaymentArrangementAction](CreatePaymentArrangementAction.md) | The confirmed arrangement, saved through Accord's flow, never left for approval | ST-04 · GR-03 |
+| [GetDisputeReasonsAction](GetDisputeReasonsAction.md) | The eight dispute reasons and the evidence each needs | ST-06 |
+| [OpenDisputeAction](OpenDisputeAction.md) | The confirmed dispute, on the household's own statement | ST-06 · S-14 |
+| [GetDisputeStatusAction](GetDisputeStatusAction.md) | The household's billing disputes and where each one stands | ST-06 |
+| [RecordHandoffAction](RecordHandoffAction.md) | Why the chat is going to a person, for the supervisor and the person | ST-07 · ST-11 |
+| [AgentTestSessions](AgentTestSessions.md) | Stand-in chats, because a test can't open a real one | S-07 |
+
 **Shared building blocks**
 
 | Component | One line |

@@ -4,7 +4,7 @@ Steward is the second Lumenfield Home Energy project, built on the same Salesfor
 
 **The rule it's built around:** the agent can never do what a person in the same seat can't. It acts only for the logged-in customer's household, every record it creates goes through Accord's policy, and every action it takes, or declines, is logged for a supervisor.
 
-**Status:** Phases 1–5 of 10 done. Phase 5, the rep assistant, closed on 2026-10-26: three buttons in the Collections Console that write a pre-call briefing, a dispute summary and a follow-up email draft from the records, each with the clicking person's own access, checked in the org and by hand in the console as a collections rep. Next: the service agent. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
+**Status:** Phases 1–5 of 10 done; Phase 6, the service agent, is under way. Its nine actions, how a chat finds the logged-in customer's household, and the agent user's least-privilege access are built and tested: 214 Apex tests, including every action run as an Einstein Agent User with only the agent's access. Next: the agent itself, written in Agent Script, and its chat on the portal. Phase 5, the rep assistant, closed on 2026-10-26. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
 
 ---
 
@@ -31,7 +31,7 @@ The same way as Accord: requirements before configuration, decisions written dow
 | 3 | Apex services and the agent action log: 13 classes, 83 tests, a 90% per-class coverage gate | Done, 2026-10-18 |
 | 4 | Customer portal: six pages on an LWR site, household sharing, 6 more classes, 105 Apex tests in all and 48 Jest tests with accessibility checks | Done, 2026-10-21 |
 | 5 | Rep assistant: three prompt templates grounded in Apex with the user's own access, three console buttons, and `docs/agent-governance.md`; 159 Apex tests in all and 68 Jest tests | Done, 2026-10-26 |
-| 6 | Service agent | Planned |
+| 6 | Service agent: nine actions, the household from the chat's verified user, least-privilege access proved by test; next the Agent Script and the portal chat | In progress |
 | 7 | Payments | Planned |
 | 8 | Data 360 | Planned |
 | 9 | Customer timeline component | Planned |
@@ -57,7 +57,8 @@ tests/
 docs/
   brief.md                The problem, scope, architecture and phases
   requirements.md         Stories, guardrails, what each audience can see, traceability
-  decision-log.md         S-01 to S-22
+  decision-log.md         S-01 to S-24
+  security-model.md       Who can reach what, the agent user line by line, and the tests that prove it
   agent-governance.md     What each AI feature reads, what reaches a model, and the Trust Layer settings
   pipeline.md             How a change reaches the org, and how the pipeline was set up
   conventions.md          Naming and coding standards
@@ -70,7 +71,9 @@ CHANGELOG.md
 
 ## The Apex, in one paragraph
 
-Every service checks the household first, in user mode, so an ID from someone else's household gets the same answer as an ID that doesn't exist. Services return outcome codes and figures, never sentences, so the agent can only word what the records say. Every limit comes from Accord's policy records, and writes go through Accord's own flows and rules. If Accord would send a new promise for approval, the service rolls it back rather than leave a supervisor something to approve. Only three operations run outside user mode, and each is a named decision with its own tests: the commitments read (S-08), the action log write (S-09) and the dispute insert (S-14). The rep assistant's Apex reads in user mode too, so a briefing holds only what the rep can see, and names, contact details and record IDs never reach a model (S-20). The [explainers](docs/explainers/README.md) walk through each class.
+Every service checks the household first, in user mode, so an ID from someone else's household gets the same answer as an ID that doesn't exist. Services return outcome codes and figures, never sentences, so the agent can only word what the records say. Every limit comes from Accord's policy records, and writes go through Accord's own flows and rules. If Accord would send a new promise for approval, the service rolls it back rather than leave a supervisor something to approve. Only four operations run outside user mode, and each is a named decision with its own tests: the commitments read (S-08), the action log write (S-09), the dispute insert (S-14), and the agent's lookup of whose chat it is (S-23). The rep assistant's Apex reads in user mode too, so a briefing holds only what the rep can see, and names, contact details and record IDs never reach a model (S-20). The [explainers](docs/explainers/README.md) walk through each class.
+
+The agent's actions add one rule: none of them takes an account. Each takes the chat's session ID, which the agent binds to the conversation's own ID so the model can't fill it, and finds the household from the portal user the platform verified for that chat (S-07, S-23). The agent user can see every household, because it serves whichever customer is logged in, and a test proves that a chat still can't reach anyone else's (`AgentAccessTest`).
 
 Component descriptions cite stories (`ST-xx`) and decisions (`S-xx`), so anything in `force-app/` can be traced back to why it exists.
 
