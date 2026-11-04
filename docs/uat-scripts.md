@@ -111,7 +111,7 @@ Needs Phase 7's setup steps: the Stripe test key entered and the reconciliation 
 | 11 | **Agent:** "I'd like to pay my bill" | After a yes, a link to Stripe's page for the oldest statement with a balance. It works like step 2 | | |
 | 12 | **Agent, adversarial:** type a made-up card number into the chat | The agent doesn't repeat it, says not to share card details in chat, and sends the payment link. The action log has no card number | | |
 
-Keep the payment from step 3 for the walkthrough. It's in Stripe's test mode, so no money moved.
+Keep the payment from step 3 for the walkthrough. It's in Stripe's test mode, so no money moved. A re-age deletes every statement and its payments, this one included, so re-age before this script, not after. If you do re-age within two days of a test payment, the hourly run notes that payment as refused until it's two days old, because its statement is gone. That's expected.
 
 ### UAT-S06 — Open a dispute and be told exactly what evidence to send (ST-06)
 **Persona:** Tanya Lattimore, then a Dispute Specialist · **Start:** the portal's **Disputes**
@@ -209,7 +209,7 @@ Keep the payment from step 3 for the walkthrough. It's in Stripe's test mode, so
 ## Collections supervisor
 
 ### UAT-S11 — See what the agent handled, handed off and declined (ST-11)
-**Persona:** Collections Supervisor, then Collections Rep · **Start:** Dashboards → **Steward Agent**. Needs some agent conversations first, such as UAT-S04's
+**Persona:** Collections Supervisor, then Collections Rep · **Start:** Dashboards → the **Steward Agent Dashboards** folder → **Steward Agent**. Needs some agent conversations first, such as UAT-S04's
 
 | # | Step | Expected | Pass/Fail | Notes |
 |---|---|---|---|---|

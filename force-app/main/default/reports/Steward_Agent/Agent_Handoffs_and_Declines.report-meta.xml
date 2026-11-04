@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>CUST_NAME</field>
+    </columns>
+    <columns>
+        <field>CUST_CREATED_DATE</field>
+    </columns>
+    <columns>
+        <field>Agent_Action_Log__c.Action__c</field>
+    </columns>
+    <columns>
+        <field>Agent_Action_Log__c.Account__c</field>
+    </columns>
+    <columns>
+        <field>Agent_Action_Log__c.Conversation_Id__c</field>
+    </columns>
+    <description>ST-07, ST-11. Requests the agent handed to a person or declined by policy in the last 30 days, by reason code, so a supervisor sees which limits customers reach.</description>
+    <filter>
+        <criteriaItems>
+            <column>Agent_Action_Log__c.Outcome__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Handed Off,Declined by Policy</value>
+        </criteriaItems>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Agent_Action_Log__c.Reason_Code__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Agent_Action_Log__c.Outcome__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Agent Handoffs and Declines</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$Agent_Action_Log__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>CUST_CREATED_DATE</dateColumn>
+        <interval>INTERVAL_LAST30</interval>
+    </timeFrameFilter>
+</Report>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Collections access plus credit approval, reporting, payment fields and overrides on automated account fields (Accord DEF-09). No Promise to Pay delete (OBS-01). US-12, US-13, US-14. Steward adds assistant, timeline, contact, dispute and agent log access.</description>
+    <description>Collections access plus credit approval, reporting, payment fields and overrides on automated account fields (Accord DEF-09). No Promise to Pay delete (OBS-01). US-12, US-13, US-14. Steward adds assistant, timeline, contact, dispute and both logs.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Collections Supervisor</label>
     <permissionSets>PS_Collections_Core</permissionSets>
@@ -11,6 +11,7 @@
     <permissionSets>PS_Payment_Detail</permissionSets>
     <permissionSets>PS_Steward_Collections_Contact</permissionSets>
     <permissionSets>PS_Steward_Dispute_Specialist</permissionSets>
+    <permissionSets>PS_Steward_Integration_Log</permissionSets>
     <permissionSets>PS_Steward_Rep_Assistant</permissionSets>
     <permissionSets>PS_Steward_Supervisor</permissionSets>
     <permissionSets>PS_Steward_Timeline</permissionSets>

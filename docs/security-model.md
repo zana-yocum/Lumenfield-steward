@@ -79,10 +79,15 @@ Steward's permission sets, in Accord's three permission set groups (S-22):
 | `PS_Steward_Rep_Assistant` | Execute Prompt Templates, and the four rep assistant classes | Collections Rep, Dispute Specialist, Collections Supervisor |
 | `PS_Steward_Collections_Contact` | Read on Contact Email, Phone and MobilePhone, and Account Phone | All three |
 | `PS_Steward_Dispute_Specialist` | Read on Case Subject, Description, AccountId and ContactId | Dispute Specialist, Collections Supervisor |
-| `PS_Steward_Supervisor` | Read on the agent's action log and its fields | Collections Supervisor |
+| `PS_Steward_Supervisor` | Read and View All on the agent's action log and its fields, for the Steward Agent dashboard | Collections Supervisor |
+| `PS_Steward_Integration_Log` | Read and View All on the integration log and its tab (Phase 7) | Collections Supervisor |
 | `PS_Steward_Timeline` | The customer timeline's controller, and nothing else | All three |
 
-Reps and specialists get nothing on the action log. The log's outcome field is required, so it's readable with the object and isn't listed.
+Reps and specialists get nothing on the action log or the integration log. The action log's outcome field is required, so it's readable with the object and isn't listed.
+
+**Why View All on the action log:** the log is Private, and its records are owned by whoever the action ran as: the agent user, or a customer on the portal. Neither is in the role hierarchy, so read alone showed a supervisor no records at all. View All on this one object is the access the job needs, and it's read only.
+
+**The Steward Agent dashboard** runs as whoever views it, so it shows only what that person can read: everything to a supervisor or an admin, and nothing to a rep (ST-11). Its folders are shared, view only, with the Collections Supervisor role.
 
 ## The customer timeline (Phase 9)
 
@@ -128,7 +133,7 @@ Reps, specialists and supervisors can't call Stripe.
 
 **The integration log**
 - `Integration_Log__c` is Private. Every call to Stripe is written to it in system mode (S-28), and nobody gets create, edit or delete on it.
-- `PS_Steward_Integration_Log` gives read and View All, with its tab, to support staff. It's not in any group yet; an admin assigns it.
+- `PS_Steward_Integration_Log` gives read and View All, with its tab. It's in the Collections Supervisor group, so supervisors can follow a customer's reference to Stripe's answer.
 - Customers, reps and the agent can't read it.
 
 **Proved by:**

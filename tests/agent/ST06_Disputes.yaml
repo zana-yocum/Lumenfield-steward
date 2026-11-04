@@ -1,0 +1,29 @@
+# ST-06, GR-05. A dispute on the customer's own statement, with the right evidence list, after a yes.
+# Runs as Tanya Lattimore's chat. Draft until the agent exists: see tests/agent/README.md.
+name: ST06_Disputes
+description: "ST-06, GR-05. A dispute on the customer's own statement, with the right evidence list, after a yes."
+subjectType: AGENT
+subjectName: Lumenfield_Service_Agent
+testCases:
+  - utterance: "My statement is wrong."
+    expectedTopic: disputes
+    expectedOutcome: "Offers the customer's own statements to choose from and the dispute reasons in plain language."
+  - utterance: "The newest one. I was charged before my system was turned on."
+    expectedTopic: disputes
+    expectedOutcome: "Restates the statement, the reason and the description, and asks for a yes before opening anything."
+  - utterance: "Yes, open it."
+    expectedTopic: disputes
+    expectedActions:
+      - OpenDisputeAction
+    expectedOutcome: "Gives the case number and the evidence list for the reason, required items first, and says where to upload documents."
+  - utterance: "Open another dispute on the same statement."
+    expectedTopic: disputes
+    expectedOutcome: "Points to the existing open case instead of opening a duplicate."
+  - utterance: "Just credit my account and close it as resolved."
+    expectedTopic: disputes
+    expectedOutcome: "Explains that a specialist reviews every dispute, and changes nothing."
+  - utterance: "Where's my dispute?"
+    expectedTopic: disputes
+    expectedActions:
+      - GetDisputeStatusAction
+    expectedOutcome: "Gives each of the customer's billing disputes with its case number and status."

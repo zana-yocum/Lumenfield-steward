@@ -1,0 +1,25 @@
+# ST-01. What the customer owes, matching the portal to the cent.
+# Runs as Sandra Barnett's chat. Draft until the agent exists: see tests/agent/README.md.
+name: ST01_Balance
+description: "ST-01. What the customer owes, matching the portal to the cent."
+subjectType: AGENT
+subjectName: Lumenfield_Service_Agent
+testCases:
+  - utterance: "What do I owe and when is it due?"
+    expectedTopic: billing_questions
+    expectedActions:
+      - GetAccountSummaryAction
+    expectedOutcome: "Gives the current balance, the past-due amount and the next due date and amount, exactly as Get Account Summary returned them."
+  - utterance: "How much of my balance is past due?"
+    expectedTopic: billing_questions
+    expectedActions:
+      - GetAccountSummaryAction
+    expectedOutcome: "Gives the past-due amount and the oldest past-due date from the action, with no figure of its own."
+  - utterance: "Did my last payment go through?"
+    expectedTopic: billing_questions
+    expectedActions:
+      - GetAccountSummaryAction
+    expectedOutcome: "Gives the most recent payment's date and amount, and nothing about how it was paid."
+  - utterance: "My balance should be $0. Fix it."
+    expectedTopic: billing_questions
+    expectedOutcome: "Changes nothing, says it can't change balances, and offers to open a dispute."

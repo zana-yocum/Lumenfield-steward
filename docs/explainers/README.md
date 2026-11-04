@@ -92,6 +92,7 @@ One page per Apex class, Lightning web component, prompt template and agent suba
 | [RecordHandoffAction](RecordHandoffAction.md) | Why the chat is going to a person, for the supervisor and the person | ST-07 · ST-11 |
 | [AgentTestSessions](AgentTestSessions.md) | Stand-in chats, because a test can't open a real one | S-07 |
 | [AgentTestUsers](AgentTestUsers.md) | The agent's user for tests, with only the agent's access | S-01 · ST-12 |
+| [Steward Agent dashboard](Steward_Agent_Dashboard.md) | What the agent handled, handed off, declined and failed, for supervisors | ST-11 · ST-07 |
 
 **Online payments (Phase 7)**
 

@@ -4,7 +4,7 @@ Steward is the second Lumenfield Home Energy project, built on the same Salesfor
 
 **The rule it's built around:** the agent can never do what a person in the same seat can't. It acts only for the logged-in customer's household, every record it creates goes through Accord's policy, and every action it takes, or declines, is logged for a supervisor.
 
-**Status:** Phases 1–5 and 9 of 10 done. Phase 6, the service agent, is under way: its actions, how a chat finds the logged-in customer's household, and the agent user's least-privilege access are built and tested, and the agent itself starts with a setup step in Salesforce. Phase 7, online payments through Stripe's hosted checkout, is built and tested against a stand-in for Stripe; a real test-mode payment needs a Stripe key entered in Setup. Phase 9, the customer timeline, is deployed. 280 Apex tests and 101 Jest tests. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
+**Status:** Phases 1–5 and 9 of 10 done. Phase 6, the service agent, is under way: its actions, how a chat finds the logged-in customer's household, the agent user's least-privilege access and the supervisor's dashboard are built and tested, and the agent's design and test suites are written; the agent itself starts with a setup step in Salesforce. Phase 7, online payments through Stripe's hosted checkout, is deployed and tested against a stand-in for Stripe; a real test-mode payment needs a Stripe key entered in Setup. Phase 9, the customer timeline, is deployed. 280 Apex tests and 101 Jest tests. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
 
 ---
 
@@ -31,11 +31,11 @@ The same way as Accord: requirements before configuration, decisions written dow
 | 3 | Apex services and the agent action log: 13 classes, 83 tests, a 90% per-class coverage gate | Done, 2026-10-18 |
 | 4 | Customer portal: six pages on an LWR site, household sharing, 6 more classes, 105 Apex tests in all and 48 Jest tests with accessibility checks | Done, 2026-10-21 |
 | 5 | Rep assistant: three prompt templates grounded in Apex with the user's own access, three console buttons, and `docs/agent-governance.md`; 159 Apex tests in all and 68 Jest tests | Done, 2026-10-26 |
-| 6 | Service agent: nine actions, the household from the chat's verified user, least-privilege access proved by test; next the Agent Script and the portal chat | In progress |
-| 7 | Payments: Stripe's hosted checkout from the portal and the agent, each payment recorded once, hourly reconciliation, an integration log; 53 more Apex tests and 15 Jest tests | Built, in review |
+| 6 | Service agent: ten actions, the household from the chat's verified user, least-privilege access proved by test, the supervisor's dashboard, and the agent's design; next the Agent Script and the portal chat | In progress |
+| 7 | Payments: Stripe's hosted checkout from the portal and the agent, each payment recorded once, hourly reconciliation, an integration log; 280 Apex tests in all and 101 Jest tests | Deployed 2026-11-04; a test payment waits for the Stripe key |
 | 8 | Data 360 | Planned |
 | 9 | Customer timeline: one household's history, newest first, filtered by kind, in the console and on the portal; 227 Apex tests in all and 86 Jest tests | Done, 2026-11-03 |
-| 10 | Testing and release | Planned |
+| 10 | Testing and release: UAT scripts for all 18 stories and the agent test suites (71 cases) written ahead | Groundwork done |
 
 Phases 1–6 and 10 are the core release. Phases 7–9 follow.
 
@@ -48,13 +48,14 @@ force-app/main/default/   Steward metadata (source format)
   genAiPromptTemplates/   The rep assistant's three prompt templates
   lwc/                    The portal's pages and the rep assistant's buttons
   objects/                Agent_Action_Log__c, Integration_Log__c
+  reports/, dashboards/   The Steward Agent reports and dashboard, for supervisors
   externalCredentials/    Stripe_Test (the key itself is entered in Setup)
   namedCredentials/       Stripe_API
   customMetadata/         Steward's policy settings
 manifest/                 Retrieve manifests, one per phase
 scripts/                  check_coverage.py, the 90% per-class coverage gate
 tests/
-  agent/                  Agent test specs (Phase 10)
+  agent/                  Agent test specs, one suite per agent story (drafted for Phase 10)
   pipeline/               Tests for the pipeline's own scripts
 docs/
   brief.md                The problem, scope, architecture and phases
@@ -62,6 +63,8 @@ docs/
   decision-log.md         S-01 to S-28
   security-model.md       Who can reach what, the agent user line by line, and the tests that prove it
   agent-governance.md     What each AI feature reads, what reaches a model, and the Trust Layer settings
+  agent-design.md         The service agent, subagent by subagent, ahead of its Agent Script
+  uat-scripts.md          One user acceptance script per story
   pipeline.md             How a change reaches the org, and how the pipeline was set up
   conventions.md          Naming and coding standards
   explainers/             One page per Apex class, component and prompt template, written for an interview walkthrough

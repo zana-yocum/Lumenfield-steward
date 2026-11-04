@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>ST-11, S-09. Read on the agent's action log, for the supervisors who review what the agent handled, handed off and declined. Reps and specialists get nothing on it. In the Collections Supervisor group.</description>
+    <description>ST-11, S-09. Read and View All on the agent's action log, for the supervisors who review what the agent handled, handed off and declined. Reps and specialists get nothing on it. In the Collections Supervisor group.</description>
     <fieldPermissions>
         <editable>false</editable>
         <field>Agent_Action_Log__c.Account__c</field>
@@ -35,6 +35,6 @@
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
         <object>Agent_Action_Log__c</object>
-        <viewAllRecords>false</viewAllRecords>
+        <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
 </PermissionSet>

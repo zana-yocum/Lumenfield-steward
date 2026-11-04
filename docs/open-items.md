@@ -6,7 +6,24 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ---
 
-## Phase 7 — Online payments — pull request #20
+## Phase 10 — Testing and release — groundwork
+
+Written ahead, so testing can start as soon as each piece is live.
+
+**Mine**
+- ☑ **UAT scripts** (`docs/uat-scripts.md`): one per story, UAT-S01 to UAT-S18, in Accord's format, each with its negative case and, where the agent is involved, its adversarial case. A table says which can run now, which need the agent, and which need Data 360
+- ☑ **Agent test suites, drafted** (`tests/agent/`): ten specs, 71 cases. `ST12_Cross_Household` has 28, and one failure blocks activation (ST-12)
+- ☐ Turn the suites into test definitions and run them, once the agent exists (`tests/agent/README.md`)
+- ☐ Release notes and the `v1.0` tag's summary, once Phases 6 and 10 close: what's in the core release, the evidence for each story, and what's left
+- ☐ README and changelog for the release, and the Project docs synced
+
+**Your steps, when the pieces are live**
+- ☐ Run the UAT scripts as the table in `docs/uat-scripts.md` allows, with screenshots in `docs/screenshots/uat/`. Tell Claude each result, and Claude records it here and in the changelog
+- ☐ Tag each phase once its UAT passes, the way you tagged `v0.4`: `v0.9` on `5b155ec` (pull request #19) after UAT-S15, and `v0.7` on `1c59185` (pull request #20) after UAT-S05. Claude names Phase 6's and Phase 8's commits when they close. Tags are yours to push
+
+---
+
+## Phase 7 — Online payments — deployed 2026-11-04
 
 Customers pay a statement on Stripe's hosted checkout page, in test mode, from the statement's portal page or from a link the agent sends (ST-05). Card details are typed on Stripe's page and never reach Salesforce. Salesforce asks Stripe whether a checkout was paid, when the customer comes back and hourly as a safety net (S-02). Everything is built and tested against a stand-in for Stripe. What's left needs your Stripe account and your hands in Setup.
 
@@ -30,7 +47,7 @@ Customers pay a statement on Stripe's hosted checkout page, in test mode, from t
 - ☐ 5. **Pay a statement as Sandra Barnett (UAT-S05)**, about 15 minutes. Follow `docs/uat-scripts.md`, UAT-S05. In short: log in to the portal as Sandra, open her oldest past-due statement, **Pay**, and pay with the test card **4242 4242 4242 4242**, any future expiry date, any CVC and any ZIP code. The statement shows the payment straight away. Take the screenshots the script names.
 - ☐ 6. Tell Claude "payments tested", with anything that looked wrong. Claude then checks the payment, the logs and the hourly run in the org, and records the evidence.
 
-Admins already see the integration log, so `PS_Steward_Integration_Log` is for a support user later. You don't need it.
+Admins already see the integration log, and supervisors get it through their group (pull request #21). You don't need to assign anything for it.
 
 **Mine**
 - ☑ **The Stripe integration (S-02):** `StripeClient`, the `Stripe_API` Named Credential and `Stripe_Test` External Credential, `StripeMock` for tests
@@ -45,7 +62,10 @@ Admins already see the integration log, so `PS_Steward_Integration_Log` is for a
   - A log row naming a statement that doesn't exist was lost; it's now saved without the link.
   - **Customers can't publish a platform event,** so payments are recorded directly, in system mode, by one class (S-27). Granting them the event would have let them publish payments through the API.
 - ☑ **Docs:** S-02 decided; S-27 and S-28; payments in `docs/security-model.md` and `docs/agent-governance.md`; conventions; 13 explainers; ST-05's traceability; UAT-S05
-- ☐ Merge, deploy, and check in the org: the log object and tab, the credentials, the principal access in the three permission sets
+- ☑ **Merged and deployed, 2026-11-04.** Merged at 9:33 AM CT and quick-deployed as Steward CI (`0Afaj00000qNPJ8CAO`, of validation `0Afaj00000qNh6MCAS`: 390 components, 280 of 280 tests). The pipeline republished the portal. In the org afterwards:
+  - The `Stripe_Test` External Credential and `Stripe_API` Named Credential are in.
+  - `PS_Steward_Customer`, `PS_Steward_Agent` and `PS_Steward_Payment_Reconciliation` each reach the `Stripe_Test_Key` principal, and nothing else does.
+  - The payment classes are in, the integration log is empty, and `Payment_Reconciliation_Hours` reads 48.
 - ☐ After your steps 1–6: check the payment, its logs and an hourly run in the org, and record the evidence here and in the changelog
 
 **Known and accepted**
@@ -132,16 +152,19 @@ Pull request #17 built everything the agent will run, and the access it runs wit
   - Accord's own account rule still shares the 34 accounts in collections with Collections Team.
   - `PS_Steward_Supervisor` is in the supervisor group, which recalculated (status Updated).
 - ☑ **Ready for Accord's adjustment numbers** (pull request #18): Steward's test data named an adjustment only while the name was still plain text. That turned out not to be enough: Apex checks the field can be written when the class compiles, so Accord's switch stopped Steward's tests compiling. Fixed in pull request #19 (Phase 9)
+- ☑ **Done without the agent (pull request #21):**
+  - **The Steward Agent dashboard (ST-11):** five reports and a dashboard that runs as the viewer, shared with the Collections Supervisor role.
+  - **Supervisors can see the log now.** `PS_Steward_Supervisor` had read but not View All, and the log's records belong to the agent user and customers, so a supervisor saw none. Found while building the dashboard.
+  - **The agent's design** (`docs/agent-design.md`): every subagent's instructions and actions, the confirmation step, the welcome message, and the reason code passed into the handoff (ST-07). Writing the Agent Script becomes a conversion.
+  - **The agent test suites, drafted:** ten specs, 71 cases, in `tests/agent/`.
 - ☐ **Next sitting, after your steps 1–3:**
-  - the Agent Script
+  - the Agent Script, from `docs/agent-design.md`, in the retrieved bundle
   - publish and activate in `deploy.yml` (S-10)
   - the Enhanced Chat channel, deployment and portal chat
   - the live S-23 check
   - the Trust Layer settings
-  - passing the reason code into the handoff summary (ST-07)
-  - the Steward Agent dashboard (ST-11)
-  - two escalator statements on a demo household (ST-03)
-  - the agent test suites
+  - the agent test suites in their final form, once it's clear how a suite gets a logged-in customer (`docs/agent-design.md`, open questions)
+- ⊘ **Two escalator statements on a demo household (ST-03), moved to Accord.** A re-age deletes and rebuilds every statement (Accord's `data/regen/RUNBOOK.md`), so statements added by hand would vanish at the next one. The escalator step belongs in Accord's generator, as an Accord change with its own changelog entry. Until then ST-03's escalator is shown by `StatementExplanationServiceTest` ($120.00, then $123.48)
 
 ---
 
@@ -362,9 +385,9 @@ The first change went through the whole pipeline: pull request #1 validated as S
   - **Nothing on** `Commitment__c`, `Opportunity` or `Agent_Action_Log__c`: the services handle those (S-08, S-09)
 - ☑ S-14 with the agent user, two checks. First: it can't set `Case.AccountId` (`AgentAccessTest`), so the exception stays. Second: Phase 4 proved the field-level refusal with a customer user (`PortalControllersTest`), through the same service the agent calls. The original note: First, what its create access to `Case.AccountId` really is: if it can set the field, the dispute insert moves to user mode and the exception goes. Second, a dispute from a user who can create cases but not one of the dispute fields comes back `ACCESS_DENIED` naming that field, with nothing saved. Phase 3 could only test a user with no Case access (no Salesforce license is free), and the third validation shows the field-level lines never ran
 - ☑ `PS_Steward_Supervisor`: read on `Agent_Action_Log__c`, for the Steward Agent dashboard (ST-11), in the Collections Supervisor group. Reps get nothing on it
-- ☐ When a service returns `HANDOFF`, the reason code goes into the handoff summary, so the rep knows which limit was hit (ST-07). `RecordHandoffAction` takes the code and logs it; the Agent Script passes it on
+- ☑ When a service returns `HANDOFF`, the reason code goes into the handoff summary, so the rep knows which limit was hit (ST-07). `RecordHandoffAction` takes the code and logs it; the design has the script keep the last reason code and pass it on (`docs/agent-design.md`). ☐ Built into the Agent Script with the rest
 - ☑ Run Code Analyzer's Graph Engine rules once the actions exist (2026-11-03): the same two S-08 findings, nothing from the agent's paths
-- ☐ Add two statements showing an escalator step to one demo household, so ST-03 can be shown on real data, not just in tests
+- → Two statements showing an escalator step on a demo household: moved to Accord's generator (Phase 6, above), since a re-age rebuilds every statement
 
 **Phase 7 — Payments**
 - → Moved to Phase 7's steps 1 and 2 above: a free Stripe account in test mode, with the test secret key in the `Stripe_Test` External Credential and nowhere else
