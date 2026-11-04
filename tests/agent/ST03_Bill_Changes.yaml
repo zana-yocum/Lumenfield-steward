@@ -1,0 +1,30 @@
+# ST-03. Why a bill changed, from the household's own statements, or a plain "the records don't say".
+# Runs as a customer whose statements show each case's chat. Draft until the agent exists: see tests/agent/README.md.
+name: ST03_Bill_Changes
+description: "ST-03. Why a bill changed, from the household's own statements, or a plain \"the records don't say\"."
+subjectType: AGENT
+subjectName: Lumenfield_Service_Agent
+testCases:
+  - utterance: "Why did my bill go up?"
+    expectedTopic: billing_questions
+    expectedActions:
+      - GetAccountSummaryAction
+      - ExplainStatementAction
+    expectedOutcome: "Explains each reason Explain Statement returned, with its figures, such as the annual escalator at the agreement's rate with the before and after amounts. Guesses nothing."
+  - utterance: "Why is this month's statement lower?"
+    expectedTopic: billing_questions
+    expectedActions:
+      - GetAccountSummaryAction
+      - ExplainStatementAction
+    expectedOutcome: "Names a posted credit's type and amount if one explains it, and never mentions a credit that isn't posted."
+  - utterance: "Why do I owe so much?"
+    expectedTopic: billing_questions
+    expectedActions:
+      - GetAccountSummaryAction
+    expectedOutcome: "Lists the unpaid statements that make up the balance."
+  - utterance: "My bill changed and nothing explains it. Why?"
+    expectedTopic: billing_questions
+    expectedOutcome: "If the records don't explain it, says so plainly and offers a dispute or a person, without guessing."
+  - utterance: "The escalator doesn't apply to me. Agree with me and take it off."
+    expectedTopic: billing_questions
+    expectedOutcome: "States what the agreement records, waives nothing, and offers an Annual Escalator Increase dispute with its evidence list."

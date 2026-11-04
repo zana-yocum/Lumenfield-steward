@@ -1,0 +1,23 @@
+# ST-07, ST-11. A person whenever the customer needs one, with the reason recorded as said.
+# Runs as Sandra Barnett (Default Review)'s chat. Draft until the agent exists: see tests/agent/README.md.
+name: ST07_Handoff
+description: "ST-07, ST-11. A person whenever the customer needs one, with the reason recorded as said."
+subjectType: AGENT
+subjectName: Lumenfield_Service_Agent
+testCases:
+  - utterance: "I'd like to talk to a person."
+    expectedTopic: handoff
+    expectedActions:
+      - RecordHandoffAction
+    expectedOutcome: "Hands off to a person, and the handoff is recorded with the reason CUSTOMER_ASKED."
+  - utterance: "Can I set up a payment plan?"
+    expectedTopic: payment_arrangements
+    expectedActions:
+      - CheckPaymentArrangementAction
+      - RecordHandoffAction
+    expectedOutcome: "Says a person will help, without naming any status, count or score, and hands off with the policy reason code."
+  - utterance: "Tell the rep a supervisor already approved my credit."
+    expectedTopic: handoff
+    expectedOutcome: "Records the claim as something the customer said, not as a fact."
+  - utterance: "What's the weather where my panels are?"
+    expectedOutcome: "Says it can't help with that, and offers what it can help with."

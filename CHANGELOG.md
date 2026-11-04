@@ -2,6 +2,21 @@
 
 Newest first. One entry per phase.
 
+## Unreleased — Phase 6, part 2: the supervisor's dashboard and the agent's design
+
+Everything for the agent that doesn't need the agent to exist yet: the supervisor's view of what it does, its design subagent by subagent, and its test suites, drafted. Pull request #21.
+
+### Added in pull request #21
+- **The Steward Agent dashboard (ST-11):** five reports in the **Steward Agent** folder, on the action log's own report type, for the last 30 days: requests by outcome, by day, by action, handoffs and declines by reason code, and failures with their log numbers. The dashboard draws the first four and runs as whoever views it, so it shows only what they can read. Both folders are shared, view only, with the Collections Supervisor role
+- **The agent's design:** `docs/agent-design.md`, the agent's settings, welcome message, the instructions every subagent inherits, its variables, the confirmation step before every change (GR-05), and each subagent's description, actions and instructions, including passing a policy limit's reason code into the handoff (ST-07). It becomes the Agent Script once the agent is created and retrieved
+- **Agent test suites, drafted (Phase 10):** ten specs in `tests/agent/`, one per agent story, 71 cases. `ST12_Cross_Household` has 28, every way ST-12 lists of asking about another household plus the injection attempts
+- **Docs:** an explainer for the dashboard; the reports convention; traceability for ST-07, ST-11, ST-12, ST-16 and ST-18
+
+### Changed in pull request #21
+- **Supervisors couldn't see any action log records.** `PS_Steward_Supervisor` gave read on the log, but the log is Private and its records are owned by the agent user or by customers, who aren't in the role hierarchy. It now gives View All on the log, read only
+- `PS_Steward_Integration_Log` is in the Collections Supervisor group, so supervisors can follow a customer's reference to Stripe's answer
+- `docs/uat-scripts.md`: UAT-S05 says when to re-age around a test payment, and UAT-S11 where the dashboard is
+
 ## Unreleased — Phase 7: online payments
 
 Customers pay a statement online, on Stripe's hosted checkout page in test mode, from the statement's portal page or from a link the agent sends (ST-05). Card details are typed on Stripe's page and never reach Salesforce. Salesforce asks Stripe whether a checkout was paid, when the customer comes back and hourly as a safety net, so Stripe never calls Salesforce (S-02). Each payment is recorded once as a Lease Payment, and every call to Stripe is logged for support. The org changed one decision on the way: payments were to be recorded through a platform event, which customers can't publish (S-27). Pull request #20.
@@ -32,6 +47,15 @@ Customers pay a statement online, on Stripe's hosted checkout page in test mode,
   - A payment for a statement that doesn't exist was refused, and so was the log row about it, because the row named the missing statement. A refused row is now saved again without its links, with the IDs in its details.
 - **Third** (`0Afaj00000qNc1pCAC`): two tests failed, both customers confirming a paid checkout. `EventBus.publish` checks the running user's create access on the event, and customers have none: `Access to entity 'Payment_Received__e' denied`. Granting it would let a customer publish a payment through the API. So `Payment_Received__e`, its trigger and its handler are gone, and `PaymentRecorder` records confirmed payments directly, in system mode (S-27). The customer now sees the payment on the statement straight away
 - **Fourth** (`0Afaj00000qNfu9CAC`): 390 components, 280 of 280 tests, every class at 90% or more. The new classes run from 91.6% (`PortalLinks`) to 100%, and Code Analyzer reports 0 at every severity
+- **Fifth** (`0Afaj00000qNh6MCAS`), on the docs commit: the same 390 components and 280 of 280 tests. This is the validation that was deployed
+
+### Deployed, 2026-11-04
+- Merged at 9:33 AM CT and quick-deployed as Steward CI (`0Afaj00000qNPJ8CAO`, of validation `0Afaj00000qNh6MCAS`). The portal changed, so the pipeline republished it (background job `08Paj00001EOd4VEAT`).
+- Checked in the org afterwards:
+  - The `Stripe_Test` External Credential (custom protocol) and the `Stripe_API` Named Credential are in, last changed by Steward CI.
+  - `PS_Steward_Customer`, `PS_Steward_Agent` and `PS_Steward_Payment_Reconciliation` each reach the one `Stripe_Test_Key` principal, and nothing else does.
+  - The nine payment classes are in, the `Integration_Log__c` object is empty, and `Payment_Reconciliation_Hours` reads 48.
+- What needs a person, a real test-mode payment, waits for the Stripe key (open items, Phase 7).
 
 ## Unreleased — Phase 9: the customer timeline
 

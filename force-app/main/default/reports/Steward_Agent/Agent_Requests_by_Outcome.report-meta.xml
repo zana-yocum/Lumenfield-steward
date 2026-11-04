@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>CUST_NAME</field>
+    </columns>
+    <columns>
+        <field>CUST_CREATED_DATE</field>
+    </columns>
+    <columns>
+        <field>Agent_Action_Log__c.Action__c</field>
+    </columns>
+    <columns>
+        <field>Agent_Action_Log__c.Reason_Code__c</field>
+    </columns>
+    <columns>
+        <field>Agent_Action_Log__c.Account__c</field>
+    </columns>
+    <columns>
+        <field>Agent_Action_Log__c.Conversation_Id__c</field>
+    </columns>
+    <description>ST-11. Every request the service agent handled in the last 30 days, by outcome: completed, declined by policy, handed off or failed. One row per action log record.</description>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Agent_Action_Log__c.Outcome__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Agent Requests by Outcome</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$Agent_Action_Log__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>CUST_CREATED_DATE</dateColumn>
+        <interval>INTERVAL_LAST30</interval>
+    </timeFrameFilter>
+</Report>

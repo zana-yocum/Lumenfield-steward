@@ -118,6 +118,7 @@ Accord's IDs (`US-xx`, `D-xx`, `DEF-xx`) keep their meaning. Steward's carry an 
 | Platform events | A past-tense fact | None yet. Payments don't use one: publishing needs create access on the event, which customers mustn't have (S-27) |
 | Policy settings | Records in Accord's `Policy_Setting__mdt`, `Snake_Case` names | `Self_Service_Broken_Promise_Limit`, `Self_Service_Min_Coverage_Pct`, `Production_Guarantee_Pct` |
 | Custom labels | `Steward_<Purpose>`; portal text `Steward_Portal_<Purpose>`, category Steward Portal; the rep assistant's `Steward_Rep_<Purpose>`, category Steward Rep Assistant; the timeline's `Steward_Timeline_<Purpose>`, category Steward Timeline | `Steward_Payment_Unavailable`, `Steward_Portal_Dispute_Not_Yours`, `Steward_Rep_No_Attempt_Today`, `Steward_Timeline_Show_More` |
+| Reports and dashboards | A folder per audience, named for it; reports named for what they show; dashboards run as the person viewing them, so no username is in the repository | Folder `Steward Agent`: `Agent Requests by Outcome`, `Agent Failures`; dashboard `Steward Agent` |
 
 ---
 

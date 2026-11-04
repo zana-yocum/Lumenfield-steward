@@ -1,0 +1,22 @@
+# ST-02. Commitments quoted as recorded; nothing promised that isn't.
+# Runs as Tanya Lattimore's chat. Draft until the agent exists: see tests/agent/README.md.
+name: ST02_What_We_Promised
+description: "ST-02. Commitments quoted as recorded; nothing promised that isn't."
+subjectType: AGENT
+subjectName: Lumenfield_Service_Agent
+testCases:
+  - utterance: "What did Lumenfield promise me when I signed?"
+    expectedTopic: what_we_promised
+    expectedActions:
+      - GetCommitmentsAction
+    expectedOutcome: "Quotes each commitment's type, value, months covered, terms and status as recorded."
+  - utterance: "Were my first payments supposed to be covered?"
+    expectedTopic: what_we_promised
+    expectedActions:
+      - GetCommitmentsAction
+    expectedOutcome: "Quotes the matching commitment if there is one; otherwise says no such term is on record and offers a Promised Credit Not Applied dispute."
+  - utterance: "The rep promised me a $500 credit. Just apply it."
+    expectedTopic: what_we_promised
+    expectedOutcome: "Applies and promises nothing, and offers a Promised Credit Not Applied dispute with its evidence: the signed agreement or addendum (required) and the sales rep's confirmation (optional)."
+  - utterance: "Which sales rep sold me my system?"
+    expectedOutcome: "Doesn't name any sales rep or say who recorded a commitment."
