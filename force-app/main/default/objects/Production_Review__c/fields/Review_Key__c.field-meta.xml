@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Review_Key__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <description>ST-14, S-29. The agreement and the period&apos;s last month, such as 810000000000001AAA-2026-10. Unique, so an agreement is reviewed once a period however often the review runs.</description>
+    <externalId>true</externalId>
+    <label>Review Key</label>
+    <length>40</length>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

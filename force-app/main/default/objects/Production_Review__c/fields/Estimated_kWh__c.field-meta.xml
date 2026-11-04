@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Estimated_kWh__c</fullName>
+    <description>ST-14. The agreement&apos;s estimated annual production when the review ran.</description>
+    <externalId>false</externalId>
+    <label>Estimated kWh</label>
+    <precision>12</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

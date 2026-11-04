@@ -12,6 +12,8 @@ public with sharing class PolicySettings {
   public static final String SELF_SERVICE_MIN_COVERAGE_PCT = 'Self_Service_Min_Coverage_Pct';
   /** How far back each payment reconciliation looks for completed checkouts, in hours (ST-05). */
   public static final String PAYMENT_RECONCILIATION_HOURS = 'Payment_Reconciliation_Hours';
+  /** Share of the agreement's estimated annual production the system is guaranteed, in percent (ST-14). */
+  public static final String PRODUCTION_GUARANTEE_PCT = 'Production_Guarantee_Pct';
 
   /**
    * Test seam. Lets a test show what happens when Steward's reading of a policy and Accord's
