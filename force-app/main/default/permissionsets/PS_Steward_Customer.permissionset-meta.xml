@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <classAccesses>
+        <apexClass>CustomerTimelineController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>PortalAccountController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -12,7 +16,7 @@
         <apexClass>PortalDisputesController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
-    <description>ST-01, ST-02, ST-06, ST-12, S-04. A portal customer's access: read their household, its contacts, statements, payments and promises; open and read billing disputes. Nothing on commitments, opportunities or the action log.</description>
+    <description>ST-01, ST-02, ST-06, ST-12, ST-15, S-04. A portal customer's access: read their household, its contacts, statements, payments and promises, and its timeline; open and read billing disputes. Nothing on commitments, opportunities or the action log.</description>
     <fieldPermissions>
         <editable>false</editable>
         <field>Account.Current_Balance__c</field>

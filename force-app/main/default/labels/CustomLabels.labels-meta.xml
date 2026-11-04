@@ -904,4 +904,316 @@
         <shortDescription>Rep assistant: shown while the model writes</shortDescription>
         <value>Writing from this record…</value>
     </labels>
+    <labels>
+        <fullName>Steward_Timeline_Amount</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a credit's amount</shortDescription>
+        <value>Amount</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Amount_Due</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a statement's amount due</shortDescription>
+        <value>Amount due</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Amount_Paid</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a payment's amount</shortDescription>
+        <value>Amount paid</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Amount_Promised</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a promise's amount</shortDescription>
+        <value>Amount promised</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Balance</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a statement's balance</shortDescription>
+        <value>Balance</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Connection_Problem</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the request never got an answer</shortDescription>
+        <value>The history couldn't load. Check your connection, then try again.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Due</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a statement's due date</shortDescription>
+        <value>Due</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Empty</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the account has no history yet</shortDescription>
+        <value>There's no history on this account yet.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Empty_Filtered</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: nothing of the chosen kinds</shortDescription>
+        <value>Nothing of the kinds you chose yet.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Event_Commitment</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a commitment's heading; {0} is its number</shortDescription>
+        <value>Commitment {0}</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Event_Credit</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a credit's heading; {0} is its number</shortDescription>
+        <value>Credit {0}</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Event_Dispute</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a dispute's heading; {0} is its case number</shortDescription>
+        <value>Dispute {0}</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Event_Payment</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a payment's heading; {0} is its number</shortDescription>
+        <value>Payment {0}</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Event_Promise</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a promise's heading; {0} is its number</shortDescription>
+        <value>Promise to pay {0}</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Event_Statement</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a statement's heading; {0} is its number</shortDescription>
+        <value>Statement {0}</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Failed</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the server failed, no reference</shortDescription>
+        <value>The history couldn't load. Try again in a minute.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Failed_With_Reference</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the server failed; {0} is the reference</shortDescription>
+        <value>The history couldn't load. If it keeps happening, quote reference {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Filter_Legend</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the legend of the kind filter</shortDescription>
+        <value>Show</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Kind_Commitment</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the commitments filter</shortDescription>
+        <value>Commitments</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Kind_Credit</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the credits filter</shortDescription>
+        <value>Credits</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Kind_Dispute</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the disputes filter</shortDescription>
+        <value>Disputes</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Kind_Payment</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the payments filter</shortDescription>
+        <value>Payments</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Kind_Promise</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the promises filter</shortDescription>
+        <value>Promises to pay</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Kind_Statement</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the statements filter</shortDescription>
+        <value>Statements</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Loading</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: shown while the first page loads</shortDescription>
+        <value>Loading the account's history…</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Loading_More</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: shown while the next page loads</shortDescription>
+        <value>Loading more…</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_No_Access</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the person can read none of the kinds</shortDescription>
+        <value>None of this account's history is shared with you.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_None_Selected</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: every kind is unticked</shortDescription>
+        <value>Choose at least one kind of event to show.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Not_A_Household</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: in the console, an account that isn't a household</shortDescription>
+        <value>History is kept for household accounts.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Not_Available</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: on the portal, no household to show</shortDescription>
+        <value>Your account history isn't available right now.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Reason</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a dispute's reason</shortDescription>
+        <value>Reason</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Show_More</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the button that loads the next page</shortDescription>
+        <value>Show more</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Showing</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: count shown when more can load; {0} is the count</shortDescription>
+        <value>Events shown: {0}. More load as you scroll, or choose Show more.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Showing_All</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: count shown when nothing more can load; {0} is the count</shortDescription>
+        <value>Events shown: {0}. That's all of them.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Status</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: an event's status</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Title</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: the component's heading</shortDescription>
+        <value>Account history</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Type</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a credit's or commitment's type</shortDescription>
+        <value>Type</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Undated</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a record with no date</shortDescription>
+        <value>No date recorded</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Timeline_Value</fullName>
+        <categories>Steward Timeline</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Timeline: a commitment's value</shortDescription>
+        <value>Value</value>
+    </labels>
 </CustomLabels>

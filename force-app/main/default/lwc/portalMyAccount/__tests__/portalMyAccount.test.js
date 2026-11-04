@@ -7,6 +7,28 @@ jest.mock(
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
+// The page holds the customer timeline, which asks the server for the household's history.
+jest.mock(
+  "@salesforce/apex/CustomerTimelineController.getTimeline",
+  () => ({
+    default: jest.fn(() =>
+      Promise.resolve({
+        outcome: "COMPLETED",
+        availableKinds: ["STATEMENT", "PAYMENT", "PROMISE", "DISPUTE"],
+        events: [
+          {
+            kind: "PAYMENT",
+            recordId: "a02000000000001AAA",
+            name: "PAY-00031",
+            eventDate: "2026-09-30",
+            amount: 40
+          }
+        ]
+      })
+    )
+  }),
+  { virtual: true }
+);
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -56,6 +78,17 @@ describe("c-portal-my-account", () => {
     await expect(element).toBeAccessible();
   });
 
+  it("shows the household's history below its figures (ST-15)", async () => {
+    getMyAccount.mockResolvedValue(ACCOUNT);
+    const element = await render();
+    await Promise.resolve();
+    const timeline = element.shadowRoot.querySelector("c-customer-timeline");
+    expect(timeline).not.toBeNull();
+    expect(timeline.recordId).toBeUndefined();
+    expect(timeline.shadowRoot.textContent).toContain("Payment PAY-00031");
+    await expect(element).toBeAccessible();
+  });
+
   it("says when nothing is owed", async () => {
     getMyAccount.mockResolvedValue({
       ...ACCOUNT,
@@ -82,6 +115,7 @@ describe("c-portal-my-account", () => {
     const alert = element.shadowRoot.querySelector('[role="alert"]');
     expect(alert.textContent).toContain("AAL-000007");
     expect(element.shadowRoot.textContent).not.toContain("Current balance");
+    expect(element.shadowRoot.querySelector("c-customer-timeline")).toBeNull();
     await expect(element).toBeAccessible();
   });
 

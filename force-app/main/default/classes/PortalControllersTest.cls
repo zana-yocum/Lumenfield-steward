@@ -674,54 +674,10 @@ private class PortalControllersTest {
   // A copy of PS_Steward_Customer without create access on the dispute's reason: everything a
   // customer needs to reach the dispute form, except one field the dispute sets.
   private static Id customerAccessWithoutReason() {
-    Id original = [
-      SELECT Id
-      FROM PermissionSet
-      WHERE Name = :PortalTestData.CUSTOMER_PERMISSION_SET
-    ]
-    .Id;
-    PermissionSet copy = new PermissionSet(
-      Name = 'Steward_Test_No_Reason',
-      Label = 'Steward Test No Reason'
+    return PortalTestData.customerAccessWith(
+      'Steward_Test_No_Reason',
+      'Case.Dispute_Reason__c',
+      PortalTestData.KeptAccess.READ_ONLY
     );
-    List<ObjectPermissions> objectAccess = new List<ObjectPermissions>();
-    List<FieldPermissions> fieldAccess = new List<FieldPermissions>();
-    System.runAs(new User(Id = UserInfo.getUserId())) {
-      insert copy;
-      for (ObjectPermissions access : [
-        SELECT SobjectType, PermissionsRead, PermissionsCreate
-        FROM ObjectPermissions
-        WHERE ParentId = :original
-      ]) {
-        objectAccess.add(
-          new ObjectPermissions(
-            ParentId = copy.Id,
-            SobjectType = access.SobjectType,
-            PermissionsRead = access.PermissionsRead,
-            PermissionsCreate = access.PermissionsCreate
-          )
-        );
-      }
-      for (FieldPermissions access : [
-        SELECT SobjectType, Field, PermissionsRead, PermissionsEdit
-        FROM FieldPermissions
-        WHERE ParentId = :original
-      ]) {
-        fieldAccess.add(
-          new FieldPermissions(
-            ParentId = copy.Id,
-            SobjectType = access.SobjectType,
-            Field = access.Field,
-            PermissionsRead = access.PermissionsRead,
-            PermissionsEdit = access.Field == 'Case.Dispute_Reason__c'
-              ? false
-              : access.PermissionsEdit
-          )
-        );
-      }
-      insert objectAccess;
-      insert fieldAccess;
-    }
-    return copy.Id;
   }
 }

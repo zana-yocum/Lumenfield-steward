@@ -6,6 +6,36 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ---
 
+## Phase 9 — Customer timeline — built, pull request #19
+
+Built ahead of Phases 7 and 8, which start with your setup steps. One household's history on one timeline (ST-15): statements, payments, promises to pay, billing disputes, credits and commitments, newest first, filtered by kind. Reps get it as the first tab on the console's account page. Customers get their own household's on the portal's My Account page.
+
+**Your steps**
+- ☐ 1. **Make the new account page the console's default**, about 3 minutes. Claude may do this through the API after the deploy. If so, this step will say ☑ with the date.
+  1. Setup → Quick Find `Lightning App Builder` → **Lightning App Builder** → find **Steward Account Record Page** → **Edit**.
+  2. Top right: **Activation...** → the **App Default** tab → **Assign as App Default** → tick **Collections Console** → **Next** → **Desktop** → **Next** → **Save**.
+  3. Close App Builder. No other page or app changes.
+- ☐ 2. **Look at it yourself (UAT-S15)**, about 10 minutes:
+  1. In the Collections Console, open any household account, such as Sandra Barnett's. The first tab, **History**, shows the timeline. Untick **Payments**, then tick it again. Scroll to the bottom, or use **Show more** if there is one. Click a statement's heading: it opens in a subtab.
+  2. Use only the keyboard for a minute: Tab reaches each filter box and each link, Space ticks a box, and Show more moves you to the first new event.
+  3. Log in to the portal as Sandra Barnett, the same way as in Phase 4. **My Account** shows **Account history** below the figures: statements, payments, the promise and the dispute, and no credits or commitments.
+  4. Tell Claude anything that looks wrong, with a screenshot.
+
+**Mine**
+- ☑ **The server side (S-25):** `CustomerTimelineController`, `TimelineReader`, `TimelineKind`, `TimelineCursor`. Every read is in user mode and names only readable fields. Pages hold 20 events, and each kind keeps its own count between pages
+- ☑ **The component:** `customerTimeline`, with the filter, Show more plus loading on scroll, focus moved after Show more, loading, empty, no-access and error states, and 39 `Steward_Timeline_*` labels
+- ☑ **Where it appears (S-26):** `Steward_Account_Record_Page` (History, Related and Details tabs, activity alongside) and the portal's My Account page
+- ☑ **Access:** `PS_Steward_Timeline` in the three collections groups; the controller in `PS_Steward_Customer`
+- ☑ **Tests:** `CustomerTimelineControllerTest` (10), `TimelineCursorTest` (3), 17 Jest tests and one more for My Account, each state with an accessibility check. Code Analyzer 0 at every severity, Prettier and the personal-details check clean
+- ☑ **Found and fixed on the way** (`CHANGELOG.md`):
+  - Steward's tests had stopped compiling in the org when Accord's adjustments became auto-numbered (pull request #18's guard couldn't help).
+  - A `Date` passes `instanceof Datetime` in Apex, which had moved dates a day.
+- ☑ Fourth validation (`0Afaj00000qKAlFCAW`): 339 components, 227 of 227 tests, the four new classes at 100%
+- ☑ **Docs:** decisions S-25 and S-26; five explainers; `docs/security-model.md`; conventions; traceability; changelog
+- ☐ Merge, deploy, and check in the org: the page, the permission sets in the groups, and the timeline as a rep and as a customer
+
+---
+
 ## Phase 6 — Service agent — in progress
 
 Pull request #17 built everything the agent will run, and the access it runs with, before the agent itself exists. That covers the nine actions, how a chat finds its household, the shared plumbing, the agent user's permission set and sharing, the supervisor's access to the log, and the docs. Next come the agent itself, its chat on the portal and its Trust Layer settings. Those start with you in Setup.
@@ -55,7 +85,7 @@ Pull request #17 built everything the agent will run, and the access it runs wit
   - The agreement rule shares all 100 agreements, read only. That includes the 12 on Organization accounts, which the agent never reaches.
   - Accord's own account rule still shares the 34 accounts in collections with Collections Team.
   - `PS_Steward_Supervisor` is in the supervisor group, which recalculated (status Updated).
-- ☑ **Ready for Accord's adjustment numbers** (pull request #18): Steward's test data names an adjustment only while the name is still plain text. Accord can now switch it to the planned auto-number, `ADJ-{00000}`, without breaking Steward's tests
+- ☑ **Ready for Accord's adjustment numbers** (pull request #18): Steward's test data named an adjustment only while the name was still plain text. That turned out not to be enough: Apex checks the field can be written when the class compiles, so Accord's switch stopped Steward's tests compiling. Fixed in pull request #19 (Phase 9)
 - ☐ **Next sitting, after your steps 1–3:**
   - the Agent Script
   - publish and activate in `deploy.yml` (S-10)

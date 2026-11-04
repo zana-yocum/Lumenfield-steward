@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Collections reps working past-due accounts: Collections Core, including the Log Contact Attempt flow. No delete on Promise to Pay (Accord OBS-01). US-01, US-03, US-05, US-06. Steward adds its rep assistant and contact details (S-21, S-22).</description>
+    <description>Collections reps working past-due accounts: Collections Core, including the Log Contact Attempt flow. No delete on Promise to Pay (Accord OBS-01). US-01, US-03, US-05, US-06. Steward adds its assistant, contact details and timeline (S-21, S-22, ST-15).</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Collections Rep</label>
     <mutingPermissionSets>Mute_Rep_Promise_Delete</mutingPermissionSets>
     <permissionSets>PS_Collections_Core</permissionSets>
     <permissionSets>PS_Steward_Collections_Contact</permissionSets>
     <permissionSets>PS_Steward_Rep_Assistant</permissionSets>
+    <permissionSets>PS_Steward_Timeline</permissionSets>
     <status>Updated</status>
 </PermissionSetGroup>

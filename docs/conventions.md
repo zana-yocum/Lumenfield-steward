@@ -43,7 +43,7 @@ Accord's IDs (`US-xx`, `D-xx`, `DEF-xx`) keep their meaning. Steward's carry an 
 
 **Rules**
 - Every class declares `with sharing` or `inherited sharing`. `without sharing` appears only in an inner class named `Elevated`, with a comment citing the decision that allows it.
-- Queries use `WITH USER_MODE`. DML uses `Database.insert(records, AccessLevel.USER_MODE)` and its update and upsert equivalents.
+- Queries use `WITH USER_MODE`. DML uses `Database.insert(records, AccessLevel.USER_MODE)` and its update and upsert equivalents. A read that should show what it can rather than fail on one hidden field, such as the timeline's, describes first and names only readable fields, still in user mode (`Database.queryWithBinds(query, binds, AccessLevel.USER_MODE)`), with constant field paths and every value bound (S-25).
 - Four named exceptions, and no others without a decision first: the commitments read (S-08), the action log write (S-09) and the agent's session lookup (S-23), each in an `Elevated` inner class, and the dispute case insert (S-14), one system-mode statement after the caller's create access has been applied with `Security.stripInaccessible`.
 - Every service checks the household with `HouseholdScope` before reading anything else, and answers `NOT_FOUND` for a household or record out of reach, the same as one that doesn't exist (ST-12).
 - No limits, day counts or percentages in code. They come from `Policy_Setting__mdt` through `PolicySettings`, and a missing setting throws instead of falling back to a default.
@@ -54,6 +54,8 @@ Accord's IDs (`US-xx`, `D-xx`, `DEF-xx`) keep their meaning. Steward's carry an 
 - Services take lists, and nothing queries or saves inside a loop.
 - Request classes take at most three constructor parameters, the ones every request needs. Optional inputs are public fields set afterwards (`request.description = ...`).
 - Free text a customer typed passes through `SensitiveText.redact` before it's saved anywhere.
+- Never tell a `Date` from a `Datetime` with `instanceof`: a `Date` passes `instanceof Datetime`, and converting it moves it a day for users west of Greenwich. Know the field's type, as `TimelineKind` does.
+- Apex checks that a field can be written when a class compiles. A run-time check such as `isAutoNumber()` can't protect a line that writes a field Accord might make read-only, so after any Accord change to a field Steward's code names, Steward is validated again.
 - Text on its way to a model goes through `PromptFormat`: amounts and dates in one fixed format, and anything a person typed through `PromptFormat.quoted`, which removes card numbers, email addresses and phone numbers and fences it as quoted text. Names, contact details and record IDs never go into a prompt (S-20).
 - A prompt's data is read in user mode, and a related list the person can't read says so (`PromptSection.NOT_AVAILABLE`) instead of failing the whole prompt.
 - When a test reads back what a service stored, the query says `WITH SYSTEM_MODE`, and when a test sets a field nobody has access to, the save says `AccessLevel.SYSTEM_MODE`. The test checks what was saved, not who may see it. A plain query in a test checks field-level security, so it can't read a field nobody has access to yet, such as a field added in the same pull request. That's what failed the first Phase 3 validation.
@@ -66,7 +68,7 @@ Accord's IDs (`US-xx`, `D-xx`, `DEF-xx`) keep their meaning. Steward's carry an 
 
 ## Lightning web components
 
-- Folder names in camelCase, starting with what they show: `customerTimeline`, `portalStatements`, `portalCommitments`, `portalDisputes`. Code the portal's components share lives in `portalShared`, and their stylesheet in `portalStyles`. The rep assistant's buttons are `rep<Button>` (`repBriefing`), and share `repAssistantShared` and `repGeneratedText`.
+- Folder names in camelCase, starting with what they show: `customerTimeline`, `portalStatements`, `portalCommitments`, `portalDisputes`. Code the portal's components share lives in `portalShared`, and their stylesheet in `portalStyles`. The rep assistant's buttons are `rep<Button>` (`repBriefing`), and share `repAssistantShared` and `repGeneratedText`. `customerTimeline` runs in the console and on the portal, so it uses `portalShared`'s formatting and `portalStyles`' tokens, and keeps its own labels in `customerTimeline/labels.js`.
 - Jest tests in `__tests__/<component>.test.js`. Every component tests its loaded, empty and error states, and each state runs `toBeAccessible` (NFR-05).
 - Customer-facing text comes from custom labels (`Steward_<Purpose>`; the portal's are `Steward_Portal_<Purpose>`, the rep assistant's `Steward_Rep_<Purpose>`), so wording changes don't need code changes, and ST-18 is possible. The portal's labels are imported once, in `portalShared/labels.js`, and a label with values in it uses placeholders (`Dispute {0} is open`) filled by `format()`, so a translation can change the word order.
 - Styling uses SLDS styling hooks only, no hard-coded colors, so contrast is checked once, at the source. The portal's components use the tokens in `portalStyles`, each set from an SLDS global hook with a fallback value.
@@ -109,7 +111,7 @@ Accord's IDs (`US-xx`, `D-xx`, `DEF-xx`) keep their meaning. Steward's carry an 
 | Custom objects | Accord's: singular label, `Object_Name__c` | `Agent_Action_Log__c`, `Integration_Log__c` |
 | Platform events | A past-tense fact | `Payment_Received__e` |
 | Policy settings | Records in Accord's `Policy_Setting__mdt`, `Snake_Case` names | `Self_Service_Broken_Promise_Limit`, `Self_Service_Min_Coverage_Pct`, `Production_Guarantee_Pct` |
-| Custom labels | `Steward_<Purpose>`; portal text `Steward_Portal_<Purpose>`, category Steward Portal; the rep assistant's `Steward_Rep_<Purpose>`, category Steward Rep Assistant | `Steward_Payment_Unavailable`, `Steward_Portal_Dispute_Not_Yours`, `Steward_Rep_No_Attempt_Today` |
+| Custom labels | `Steward_<Purpose>`; portal text `Steward_Portal_<Purpose>`, category Steward Portal; the rep assistant's `Steward_Rep_<Purpose>`, category Steward Rep Assistant; the timeline's `Steward_Timeline_<Purpose>`, category Steward Timeline | `Steward_Payment_Unavailable`, `Steward_Portal_Dispute_Not_Yours`, `Steward_Rep_No_Attempt_Today`, `Steward_Timeline_Show_More` |
 
 ---
 

@@ -92,6 +92,16 @@ One page per Apex class, Lightning web component, prompt template and agent suba
 | [RecordHandoffAction](RecordHandoffAction.md) | Why the chat is going to a person, for the supervisor and the person | ST-07 · ST-11 |
 | [AgentTestSessions](AgentTestSessions.md) | Stand-in chats, because a test can't open a real one | S-07 |
 
+**The customer timeline (Phase 9)**
+
+| Component | One line | Stories |
+|---|---|---|
+| [CustomerTimelineController](CustomerTimelineController.md) | One household's history, a page at a time, for the console and the portal | ST-15 · ST-12 |
+| [TimelineReader](TimelineReader.md) | One user-mode query per kind, naming only fields the person can read, merged newest first | ST-15 · NFR-01 |
+| [TimelineKind](TimelineKind.md) | The six kinds of event: where each lives, what dates it, what it shows | ST-15 |
+| [TimelineCursor](TimelineCursor.md) | The place between pages: how many of each kind were shown | ST-15 · NFR-02 |
+| [customerTimeline](customerTimeline.md) | The timeline itself: filter by kind, more as you scroll, every item reachable by keyboard | ST-15 · NFR-05 |
+
 **Shared building blocks**
 
 | Component | One line |

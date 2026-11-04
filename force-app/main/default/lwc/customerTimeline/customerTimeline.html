@@ -1,0 +1,90 @@
+<template>
+  <section class={sectionClass} aria-labelledby="timeline-title">
+    <h2 class="section-title" id="timeline-title">{labels.title}</h2>
+    <template lwc:if={loading}>
+      <p role="status">{labels.loading}</p>
+    </template>
+    <template lwc:else>
+      <template lwc:if={hasKinds}>
+        <fieldset class="filters">
+          <legend class="filters-legend">{labels.filterLegend}</legend>
+          <div class="filter-options">
+            <template for:each={filters} for:item="filter">
+              <label key={filter.code} class="filter">
+                <input
+                  type="checkbox"
+                  value={filter.code}
+                  checked={filter.checked}
+                  onchange={handleFilterChange}
+                />
+                <span>{filter.label}</span>
+              </label>
+            </template>
+          </div>
+        </fieldset>
+      </template>
+      <template lwc:if={noneSelected}>
+        <p>{labels.noneSelected}</p>
+      </template>
+      <template lwc:elseif={refreshing}>
+        <p role="status">{labels.loading}</p>
+      </template>
+      <template lwc:elseif={problem}>
+        <p class="notice" role="alert">{problem}</p>
+      </template>
+      <template lwc:elseif={hasEvents}>
+        <ol class="plain-list events" aria-busy={busy}>
+          <template for:each={items} for:item="item">
+            <li key={item.key} class="event">
+              <h3 class="event-title" tabindex="-1" data-index={item.index}>
+                <template lwc:if={item.link}>
+                  <a
+                    href={item.link}
+                    data-id={item.recordId}
+                    onclick={handleOpen}
+                    >{item.heading}</a
+                  >
+                </template>
+                <template lwc:else>{item.heading}</template>
+              </h3>
+              <p class="event-date">
+                <template lwc:if={item.undated}>{labels.undated}</template>
+                <template lwc:else>
+                  <time datetime={item.isoDate}>{item.date}</time>
+                </template>
+              </p>
+              <template lwc:if={item.hasFacts}>
+                <dl class="facts">
+                  <template for:each={item.facts} for:item="fact">
+                    <div key={fact.key} class="fact">
+                      <dt>{fact.label}</dt>
+                      <dd>{fact.value}</dd>
+                    </div>
+                  </template>
+                </dl>
+              </template>
+            </li>
+          </template>
+        </ol>
+        <p class="count" role="status">{countMessage}</p>
+        <template lwc:if={moreProblem}>
+          <p class="notice" role="alert">{moreProblem}</p>
+        </template>
+        <template lwc:if={hasMore}>
+          <button
+            type="button"
+            class="more"
+            aria-disabled={busy}
+            onclick={handleShowMore}
+          >
+            {moreLabel}
+          </button>
+          <div class="end-of-list"></div>
+        </template>
+      </template>
+      <template lwc:else>
+        <p>{emptyMessage}</p>
+      </template>
+    </template>
+  </section>
+</template>
