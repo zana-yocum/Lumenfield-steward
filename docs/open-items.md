@@ -34,20 +34,20 @@ Everything left that needs you, across Steward and Accord, in the order that wor
 
 **The portfolio site**
 15. Read the site's Background section once: the roles, dates and numbers come from your résumé.
-16. **After you pass the Platform Administrator exam,** and not before: deploy version 5 (unzip `zana-salesforce-portfolio-v5.zip`, drag the folder onto app.netlify.com/drop), then add the link to your résumé, LinkedIn and Trailblazer profile. The site already says certified.
+16. **After you pass the Platform Administrator exam,** and not before: deploy version 6 (unzip `zana-salesforce-portfolio-v6.zip`, drag the folder onto app.netlify.com/drop), then add the link to your résumé, LinkedIn and Trailblazer profile. The site already says certified. Version 6 corrects the Steward card's figures, so don't deploy version 5.
 
 **What Claude does after your steps**
 - After "agent created": the Agent Script from `docs/agent-design.md`, publishing and activating it through the pipeline, the portal's chat, the live check that a chat reaches only its own household, the Trust Layer settings, and the test suites in their final form.
 - After "payments tested": the payment, its logs and an hourly run checked in the org and recorded, which closes Phase 7.
 - After "Data 360 ready": Phase 8, part 2.
 - After your Accord answers: the Organization accounts and DEF-11 in Accord, and the escalator step in Accord's data generator (ST-03).
-- Phase 10: the suites run, your UAT results recorded, the release notes and `v1.0`, and version 6 of the site with Steward's current figures.
+- Phase 10: the suites run, your UAT results recorded, the release notes and `v1.0`, and the site's Steward card brought up to date again.
 
 ---
 
-## Phase 8 — Data 360 and the production guarantee — part 1, pull request #22
+## Phase 8 — Data 360 and the production guarantee — part 1 deployed 2026-11-04
 
-ST-14's rules are built and tested: twelve months of production against the guarantee, and a review with a Draft credit for a shortfall (S-29). The readings come from Data 360, which is licensed in the org but not turned on. On 2026-11-04 its API answered "not currently enabled" for data streams and data spaces, though the Data Cloud license is active and you hold Data Cloud Architect.
+ST-14's rules are built, tested and deployed: twelve months of production against the guarantee, and a review with a Draft credit for a shortfall (S-29). The readings come from Data 360, which is licensed in the org but not turned on. On 2026-11-04 its API answered "not currently enabled" for data streams and data spaces, though the Data Cloud license is active and you hold Data Cloud Architect.
 
 **Your steps**
 - ☐ 1. **Decide whether to turn on Data 360**, and if yes, turn it on, about 5 minutes plus waiting. It can't be turned off again, and it counts against Developer Edition's Data 360 limits, which is why ST-14 is a Should. Setup → Quick Find `Data Cloud Setup` (it may say Data 360) → **Get Started**. Salesforce sets it up in the background, which can take an hour or more. If the page doesn't offer **Get Started**, take a screenshot for Claude instead.
@@ -56,7 +56,11 @@ ST-14's rules are built and tested: twelve months of production against the guar
 
 **Mine**
 - ☑ **Part 1 (pull request #22):** `ProductionGuaranteeService` with its `Readings` source, `Production_Review__c`, `ProductionReviewJob`, `PS_Steward_Production_Review` in the Dispute Specialist and Collections Supervisor groups; 10 tests; S-29; two explainers
-- ☐ Merge, deploy, and check in the org: the object and tab, the permission set in both groups
+- ☑ **Merged and deployed, 2026-11-04.** Merged at 10:26 AM CT and quick-deployed as Steward CI (`0Afaj00000qNtaYCAS`, of validation `0Afaj00000qNsTCCA0`: 419 components, 290 of 290 tests). Nothing on the portal changed, so it wasn't republished. In the org afterwards:
+  - **Production Reviews** and its tab exist.
+  - `PS_Steward_Production_Review` gives read and View All on reviews and read on their fields, with no create, edit or delete, and shows the tab.
+  - The Dispute Specialist and Collections Supervisor groups hold it, and both recalculated (status Updated).
+  - No reviews and no scheduled review job, as expected: nothing reads production until part 2.
 - ☐ **Part 2, after your step 3:**
   - the Ingestion API connector and the monthly production stream, mapped and matched to households
   - the `Production_vs_Guarantee` calculated insight, and the Data 360 readings source that reads it, tested with a query stub
@@ -240,7 +244,7 @@ Pull request #9 built it: the three prompt templates and the Apex behind them, t
 - ☐ 4. `v0.5` tag on `6b64a14`, the merge of pull request #16, which closes Phase 5. From `C:\Lumenfield-steward` in PowerShell: `git pull`, then `git tag v0.5 6b64a14`, then `git push https://Zana-yocum@github.com/zana-yocum/Lumenfield-steward.git v0.5`
 - ☑ 5. **GitHub email privacy on (2026-10-25).** Checked: pull request #13's merge commit carries your noreply address. The 19 earlier commits on `main` still carry your private address (the 12 pull-request merges and 7 commits pushed from your computer). Removing those means rewriting `main` and recreating the v0.1–v0.4 tags, which only you can push: say so if you want it, and Claude prepares it. If you push from your computer again, first run once in PowerShell: `git config --global user.email "333481738+zana-yocum@users.noreply.github.com"`
 - ☐ 6. Optional cleanup on GitHub, about 5 minutes. Claude can't delete branches.
-  - **Branches** (the repository's **Code** tab → **Branches**): every branch GitHub marks merged can be deleted with the trash icon, which since 2026-11-04 includes `fix/adjustment-names`, `phase-6/agent-actions`, `phase-7/payments` and `phase-9/customer-timeline`, and pull requests #21 and #22's branches once they merge. The 14 from earlier: `docs/open-items-tags`, `docs/phase-4-close`, `docs/phase-4-evidence`, `docs/phase-4-walkthrough`, `docs/phase-5-close-out`, `docs/phase-5-closed`, `docs/phase-5-closed-out`, `docs/phase-5-status`, `feature/phase-4a-digital-experiences`, `feature/phase-4b-portal`, `feature/phase-5-rep-assistant`, `fix/phase-5-hand-check-findings`, `fix/phase-5-match-flag`, `fix/supervisor-hold-override`. So can `tools/accord-restore`, `retrieve/5` and `retrieve/6`, which only restored Accord's repository. **Keep `retrieve/2` and `retrieve/3`:** these docs cite them as the record of what was retrieved
+  - **Branches** (the repository's **Code** tab → **Branches**): every branch GitHub marks merged can be deleted with the trash icon, which since 2026-11-04 includes `fix/adjustment-names`, `phase-6/agent-actions`, `phase-6/agent-dashboard-and-plans`, `phase-7/payments`, `phase-8/production-guarantee`, `phase-9/customer-timeline` and `docs/phase-8-part-1-deployed`. The 14 from earlier: `docs/open-items-tags`, `docs/phase-4-close`, `docs/phase-4-evidence`, `docs/phase-4-walkthrough`, `docs/phase-5-close-out`, `docs/phase-5-closed`, `docs/phase-5-closed-out`, `docs/phase-5-status`, `feature/phase-4a-digital-experiences`, `feature/phase-4b-portal`, `feature/phase-5-rep-assistant`, `fix/phase-5-hand-check-findings`, `fix/phase-5-match-flag`, `fix/supervisor-hold-override`. So can `tools/accord-restore`, `retrieve/5` and `retrieve/6`, which only restored Accord's repository. **Keep `retrieve/2` and `retrieve/3`:** these docs cite them as the record of what was retrieved
   - **Settings** → **General** → **Pull Requests** → tick **Automatically delete head branches**, so merged branches go away on their own. Accord's repository already has it
 
 **Mine**

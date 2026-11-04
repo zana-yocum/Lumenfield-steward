@@ -4,7 +4,7 @@ Steward is the second Lumenfield Home Energy project, built on the same Salesfor
 
 **The rule it's built around:** the agent can never do what a person in the same seat can't. It acts only for the logged-in customer's household, every record it creates goes through Accord's policy, and every action it takes, or declines, is logged for a supervisor.
 
-**Status:** Phases 1–5 and 9 of 10 done. Phase 6, the service agent, is under way: its actions, how a chat finds the logged-in customer's household, the agent user's least-privilege access and the supervisor's dashboard are built and tested, and the agent's design and test suites are written; the agent itself starts with a setup step in Salesforce. Phase 7, online payments through Stripe's hosted checkout, is deployed and tested against a stand-in for Stripe; a real test-mode payment needs a Stripe key entered in Setup. Phase 8's production guarantee rules are built and tested; the readings wait on Data 360 being turned on. Phase 9, the customer timeline, is deployed. 280 Apex tests and 101 Jest tests. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
+**Status:** Phases 1–5 and 9 of 10 done. Phase 6, the service agent, is under way: its actions, how a chat finds the logged-in customer's household, the agent user's least-privilege access and the supervisor's dashboard are built and tested, and the agent's design and test suites are written; the agent itself starts with a setup step in Salesforce. Phase 7, online payments through Stripe's hosted checkout, is deployed and tested against a stand-in for Stripe; a real test-mode payment needs a Stripe key entered in Setup. Phase 8's production guarantee rules are deployed; the readings wait on Data 360 being turned on. Phase 9, the customer timeline, is deployed. 280 Apex tests and 101 Jest tests. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
 
 ---
 
@@ -30,14 +30,14 @@ The same way as Accord: requirements before configuration, decisions written dow
 | 2 | Pipeline: validate on every pull request, quick deploy on merge, CI sign-in by certificate | Done, 2026-10-17 |
 | 3 | Apex services and the agent action log: 13 classes, 83 tests, a 90% per-class coverage gate | Done, 2026-10-18 |
 | 4 | Customer portal: six pages on an LWR site, household sharing, 6 more classes, 105 Apex tests in all and 48 Jest tests with accessibility checks | Done, 2026-10-21 |
-| 5 | Rep assistant: three prompt templates grounded in Apex with the user's own access, three console buttons, and `docs/agent-governance.md`; 159 Apex tests in all and 68 Jest tests | Done, 2026-10-26 |
+| 5 | Rep assistant: three prompt templates grounded in Apex with the user's own access, three console buttons, and `docs/agent-governance.md`; 149 Apex tests in all and 68 Jest tests | Done, 2026-10-26 |
 | 6 | Service agent: ten actions, the household from the chat's verified user, least-privilege access proved by test, the supervisor's dashboard, and the agent's design; next the Agent Script and the portal chat | In progress |
-| 7 | Payments: Stripe's hosted checkout from the portal and the agent, each payment recorded once, hourly reconciliation, an integration log; 280 Apex tests in all and 101 Jest tests | Deployed 2026-11-04; a test payment waits for the Stripe key |
-| 8 | Production guarantee: twelve months of production against the guarantee, and a review with a Draft credit for a shortfall; part 2 adds Data 360 as the readings source | Part 1 built, in review |
-| 9 | Customer timeline: one household's history, newest first, filtered by kind, in the console and on the portal; 227 Apex tests in all and 86 Jest tests | Done, 2026-11-03 |
+| 7 | Payments: Stripe's hosted checkout from the portal and the agent, each payment recorded once, hourly reconciliation, an integration log; 270 Apex tests in all and 101 Jest tests | Deployed 2026-11-04; a test payment waits for the Stripe key |
+| 8 | Production guarantee: twelve months of production against the guarantee, and a review with a Draft credit for a shortfall; 280 Apex tests in all. Part 2 adds Data 360 as the readings source | Part 1 deployed 2026-11-04; part 2 waits on Data 360 |
+| 9 | Customer timeline: one household's history, newest first, filtered by kind, in the console and on the portal; 217 Apex tests in all and 86 Jest tests | Done, 2026-11-03 |
 | 10 | Testing and release: UAT scripts for all 18 stories and the agent test suites (71 cases) written ahead | Groundwork done |
 
-Phases 1–6 and 10 are the core release. Phases 7–9 follow.
+Phases 1–6 and 10 are the core release. Phases 7–9 follow. Test counts are Steward's own: validations in the org also run 10 tests that Salesforce generated when Digital Experiences was turned on.
 
 ## Repository
 

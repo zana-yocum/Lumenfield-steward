@@ -14,11 +14,19 @@ ST-14's rules, built and tested before Data 360 is set up: each household's last
 - **Tests:** `ProductionGuaranteeServiceTest` (8) and `ProductionReviewJobTest` (2)
 - **Docs:** decision S-29, with the credit formula; two explainers; the production guarantee in `docs/security-model.md`; ST-14's traceability; and at the top of `docs/open-items.md`, one list of everything left that needs Zana, across Steward and Accord
 
-### Pull request #22's validations
-- **First** (`0Afaj00000qNqBFCA0`): eight tests failed for two reasons. The service saved reviews in user mode, and the pipeline's admin has no field access on an object deployed through the Metadata API, so every save was refused. That's also why people shouldn't need create on reviews: they're now written in system mode, like the logs (S-29). And a user who can see no household got "Variable does not exist: tmpVar1" from the agreements query, the platform's message for a user-mode query on an object the user can't read; the service now stops before asking
-
 ### Changed in pull request #22
 - **`PortalLinks` always builds the portal's address from the org's domain.** It asked the site first (`Site.getBaseUrl`), and an LWR site has a Visualforce companion at its own path, `/portalvforcesite` in this org. If the site had answered with that path, a customer coming back from Stripe would have landed outside the portal. Checked in the org: the LWR site is at `/portal` on the `my.site.com` domain, which is what the address now always is
+
+### Pull request #22's validations and deploy, 2026-11-04
+- **First** (`0Afaj00000qNqBFCA0`): eight tests failed for two reasons. The service saved reviews in user mode, and the pipeline's admin has no field access on an object deployed through the Metadata API, so every save was refused. That's also why people shouldn't need create on reviews: they're now written in system mode, like the logs (S-29). And a user who can see no household got "Variable does not exist: tmpVar1" from the agreements query, the platform's message for a user-mode query on an object the user can't read; the service now stops before asking
+- **Second** (`0Afaj00000qNsTCCA0`): 419 components, 290 of 290 tests, every class at 90% or more. The two new classes and the two changed ones are at 100%, and Code Analyzer reports 0 at every severity
+- Merged at 10:26 AM CT and quick-deployed as Steward CI (`0Afaj00000qNtaYCAS`, of the second validation). Nothing on the portal changed, so it wasn't republished
+- Checked in the org afterwards: **Production Reviews** and its tab; `PS_Steward_Production_Review` gives read and View All on reviews and read on their fields, with no create, edit or delete; the Dispute Specialist and Collections Supervisor groups hold it and show Updated. There are no reviews and no scheduled review job yet, as expected until part 2
+
+### Pull request #23
+- #22's second validation, deploy and checks, recorded here and in the open items
+- **The README's test counts are Steward's own.** Since Phase 4, every validation in the org has also run 10 tests that Salesforce generated when Digital Experiences was turned on, and the README's rows for Phases 5, 7 and 9 had counted them: Steward had 149, 270 and 217 Apex tests, not 159, 280 and 227. Validation results here keep the org's totals, because that's what ran
+- The open items' list: the portfolio site's version 6, which corrects the Steward card's figures, replaces version 5
 
 ## Unreleased — Phase 6, part 2: the supervisor's dashboard and the agent's design
 
