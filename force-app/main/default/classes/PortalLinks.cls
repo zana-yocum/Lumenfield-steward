@@ -1,9 +1,12 @@
 /**
  * ST-05. Addresses of the portal's own pages, for links that leave Salesforce and come back, such
- * as where Stripe sends a customer after paying. On the portal the address comes from the site
- * itself. Elsewhere, such as the agent or a scheduled job, it's worked out from the org's My
- * Domain: with enhanced domains, which Salesforce enforces, a site lives at
- * <my domain>.my.site.com when the org lives at <my domain>.my.salesforce.com.
+ * as where Stripe sends a customer after paying. Always worked out from the org's My Domain: with
+ * enhanced domains, which Salesforce enforces, the portal lives at <my domain>.my.site.com/portal
+ * when the org lives at <my domain>.my.salesforce.com (checked in the org on 2026-11-04). The same
+ * address comes back whether the link is made on the portal, by the agent or by a scheduled job.
+ *
+ * Site.getBaseUrl isn't used: an LWR site has a Visualforce companion site at its own path
+ * (/portalvforcesite here), and a link to that path would leave the customer outside the portal.
  */
 public with sharing class PortalLinks {
   /** The portal's path on its domain (digitalExperienceConfigs: urlPathPrefix). */
@@ -27,10 +30,6 @@ public with sharing class PortalLinks {
    * @return the address
    */
   public static String baseUrl() {
-    String siteUrl = Site.getBaseUrl();
-    if (String.isNotBlank(siteUrl)) {
-      return siteUrl.removeEnd('/');
-    }
     return URL.getOrgDomainUrl()
         .toExternalForm()
         .removeEnd('/')

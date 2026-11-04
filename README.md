@@ -4,7 +4,7 @@ Steward is the second Lumenfield Home Energy project, built on the same Salesfor
 
 **The rule it's built around:** the agent can never do what a person in the same seat can't. It acts only for the logged-in customer's household, every record it creates goes through Accord's policy, and every action it takes, or declines, is logged for a supervisor.
 
-**Status:** Phases 1–5 and 9 of 10 done. Phase 6, the service agent, is under way: its actions, how a chat finds the logged-in customer's household, the agent user's least-privilege access and the supervisor's dashboard are built and tested, and the agent's design and test suites are written; the agent itself starts with a setup step in Salesforce. Phase 7, online payments through Stripe's hosted checkout, is deployed and tested against a stand-in for Stripe; a real test-mode payment needs a Stripe key entered in Setup. Phase 9, the customer timeline, is deployed. 280 Apex tests and 101 Jest tests. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
+**Status:** Phases 1–5 and 9 of 10 done. Phase 6, the service agent, is under way: its actions, how a chat finds the logged-in customer's household, the agent user's least-privilege access and the supervisor's dashboard are built and tested, and the agent's design and test suites are written; the agent itself starts with a setup step in Salesforce. Phase 7, online payments through Stripe's hosted checkout, is deployed and tested against a stand-in for Stripe; a real test-mode payment needs a Stripe key entered in Setup. Phase 8's production guarantee rules are built and tested; the readings wait on Data 360 being turned on. Phase 9, the customer timeline, is deployed. 280 Apex tests and 101 Jest tests. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
 
 ---
 
@@ -33,7 +33,7 @@ The same way as Accord: requirements before configuration, decisions written dow
 | 5 | Rep assistant: three prompt templates grounded in Apex with the user's own access, three console buttons, and `docs/agent-governance.md`; 159 Apex tests in all and 68 Jest tests | Done, 2026-10-26 |
 | 6 | Service agent: ten actions, the household from the chat's verified user, least-privilege access proved by test, the supervisor's dashboard, and the agent's design; next the Agent Script and the portal chat | In progress |
 | 7 | Payments: Stripe's hosted checkout from the portal and the agent, each payment recorded once, hourly reconciliation, an integration log; 280 Apex tests in all and 101 Jest tests | Deployed 2026-11-04; a test payment waits for the Stripe key |
-| 8 | Data 360 | Planned |
+| 8 | Production guarantee: twelve months of production against the guarantee, and a review with a Draft credit for a shortfall; part 2 adds Data 360 as the readings source | Part 1 built, in review |
 | 9 | Customer timeline: one household's history, newest first, filtered by kind, in the console and on the portal; 227 Apex tests in all and 86 Jest tests | Done, 2026-11-03 |
 | 10 | Testing and release: UAT scripts for all 18 stories and the agent test suites (71 cases) written ahead | Groundwork done |
 
@@ -47,7 +47,7 @@ force-app/main/default/   Steward metadata (source format)
   classes/                Apex services and their tests
   genAiPromptTemplates/   The rep assistant's three prompt templates
   lwc/                    The portal's pages and the rep assistant's buttons
-  objects/                Agent_Action_Log__c, Integration_Log__c
+  objects/                Agent_Action_Log__c, Integration_Log__c, Production_Review__c
   reports/, dashboards/   The Steward Agent reports and dashboard, for supervisors
   externalCredentials/    Stripe_Test (the key itself is entered in Setup)
   namedCredentials/       Stripe_API
@@ -60,7 +60,7 @@ tests/
 docs/
   brief.md                The problem, scope, architecture and phases
   requirements.md         Stories, guardrails, what each audience can see, traceability
-  decision-log.md         S-01 to S-28
+  decision-log.md         S-01 to S-29
   security-model.md       Who can reach what, the agent user line by line, and the tests that prove it
   agent-governance.md     What each AI feature reads, what reaches a model, and the Trust Layer settings
   agent-design.md         The service agent, subagent by subagent, ahead of its Agent Script
@@ -76,7 +76,7 @@ CHANGELOG.md
 
 ## The Apex, in one paragraph
 
-Every service checks the household first, in user mode, so an ID from someone else's household gets the same answer as an ID that doesn't exist. Services return outcome codes and figures, never sentences, so the agent can only word what the records say. Every limit comes from Accord's policy records, and writes go through Accord's own flows and rules. If Accord would send a new promise for approval, the service rolls it back rather than leave a supervisor something to approve. Only six operations run outside user mode, and each is a named decision with its own tests: the commitments read (S-08), the action log write (S-09), the dispute insert (S-14), the agent's lookup of whose chat it is (S-23), recording a payment Stripe confirmed (S-27), and the integration log write (S-28). The rep assistant's Apex reads in user mode too, so a briefing holds only what the rep can see, and names, contact details and record IDs never reach a model (S-20). The [explainers](docs/explainers/README.md) walk through each class.
+Every service checks the household first, in user mode, so an ID from someone else's household gets the same answer as an ID that doesn't exist. Services return outcome codes and figures, never sentences, so the agent can only word what the records say. Every limit comes from Accord's policy records, and writes go through Accord's own flows and rules. If Accord would send a new promise for approval, the service rolls it back rather than leave a supervisor something to approve. Only seven operations run outside user mode, and each is a named decision with its own tests: the commitments read (S-08), the action log write (S-09), the dispute insert (S-14), the agent's lookup of whose chat it is (S-23), recording a payment Stripe confirmed (S-27), the integration log write (S-28), and the production review write (S-29). The rep assistant's Apex reads in user mode too, so a briefing holds only what the rep can see, and names, contact details and record IDs never reach a model (S-20). The [explainers](docs/explainers/README.md) walk through each class.
 
 The agent's actions add one rule: none of them takes an account. Each takes the chat's session ID, which the agent binds to the conversation's own ID so the model can't fill it, and finds the household from the portal user the platform verified for that chat (S-07, S-23). The agent user can see every household, because it serves whichever customer is logged in, and a test proves that a chat still can't reach anyone else's (`AgentAccessTest`).
 

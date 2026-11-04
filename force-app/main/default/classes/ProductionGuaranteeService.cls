@@ -7,8 +7,9 @@
  *
  * Readings come from a Readings source. Data 360's calculated insight is the source in the org
  * once Data 360 is set up (S-29); until then there are none, and nothing is reviewed. Tests supply
- * known readings. Agreements, statements and existing reviews are read with the caller's own
- * access, and reviews and credits are saved the same way.
+ * known readings. Agreements and statements are read, and credits saved, with the caller's own
+ * access. Reviews are Steward's own record of the measure, written in system mode, so nobody needs
+ * create access on them and nobody can make one up.
  */
 public with sharing class ProductionGuaranteeService {
   /** Adjustment__c.Type__c for a production guarantee credit. */
@@ -108,14 +109,18 @@ public with sharing class ProductionGuaranteeService {
    * @return each household's measure, by household
    */
   public static Map<Id, Measurement> measure(Set<Id> householdIds, Date asOf) {
+    Set<Id> visible = HouseholdScope.visibleHouseholds(householdIds);
+    if (visible.isEmpty()) {
+      // Nothing to read, and agreements aren't asked for: a user who can't see a household may
+      // not be able to read agreements at all.
+      return new Map<Id, Measurement>();
+    }
     Date lastMonth = asOf.toStartOfMonth().addMonths(-1);
     Date firstMonth = lastMonth.addMonths(1 - WINDOW_MONTHS);
     Decimal guaranteePct = PolicySettings.getNumber(
       PolicySettings.PRODUCTION_GUARANTEE_PCT
     );
-    Map<Id, ServiceContract> agreements = agreementsOf(
-      HouseholdScope.visibleHouseholds(householdIds)
-    );
+    Map<Id, ServiceContract> agreements = agreementsOf(visible);
     Map<Id, Production> totals = source.totals(
       new Map<Id, ServiceContract>(agreements.values()).keySet(),
       firstMonth,
@@ -272,16 +277,7 @@ public with sharing class ProductionGuaranteeService {
     for (Measurement result : measures) {
       keys.add(keyOf(result));
     }
-    Set<String> reviewed = new Set<String>();
-    for (Production_Review__c existing : [
-      SELECT Review_Key__c
-      FROM Production_Review__c
-      WHERE Review_Key__c IN :keys
-      WITH USER_MODE
-    ]) {
-      reviewed.add(existing.Review_Key__c);
-    }
-    return reviewed;
+    return new Elevated().reviewedKeys(keys);
   }
 
   /**
@@ -316,7 +312,7 @@ public with sharing class ProductionGuaranteeService {
     for (Measurement result : measures) {
       reviews.add(toReview(result, credits.get(result.householdId)?.Id));
     }
-    Database.insert(reviews, AccessLevel.USER_MODE);
+    new Elevated().insertReviews(reviews);
     return reviews.size();
   }
 
@@ -371,6 +367,38 @@ public with sharing class ProductionGuaranteeService {
       }
     }
     return byHousehold;
+  }
+
+  // S-29: reviews are read and written in system mode and without sharing, like the logs (S-09,
+  // S-28). The measure on them is Steward's own, worked out above from the readings and the
+  // agreement; people read reviews through PS_Steward_Production_Review, and nobody gets create or
+  // edit on them. The credit beside each review is Accord's record and is saved in user mode.
+  private without sharing class Elevated {
+    /**
+     * The keys among these that a review already has.
+     * @param keys review keys
+     * @return the ones already reviewed
+     */
+    public Set<String> reviewedKeys(Set<String> keys) {
+      Set<String> reviewed = new Set<String>();
+      for (Production_Review__c existing : [
+        SELECT Review_Key__c
+        FROM Production_Review__c
+        WHERE Review_Key__c IN :keys
+        WITH SYSTEM_MODE
+      ]) {
+        reviewed.add(existing.Review_Key__c);
+      }
+      return reviewed;
+    }
+
+    /**
+     * Saves the reviews, all or none: a review that can't be saved rolls its credit back with it.
+     * @param reviews the reviews
+     */
+    public void insertReviews(List<Production_Review__c> reviews) {
+      Database.insert(reviews, AccessLevel.SYSTEM_MODE);
+    }
   }
 
   /** No readings at all, until Data 360 is set up (S-29). */

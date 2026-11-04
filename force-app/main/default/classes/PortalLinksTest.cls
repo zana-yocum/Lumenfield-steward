@@ -1,6 +1,7 @@
 /**
- * ST-05. Proves a statement's portal address, worked out outside the site, is the org's site
- * domain, the portal's path and the statement page with the statement's ID.
+ * ST-05. Proves a statement's portal address is the org's site domain, the portal's path and the
+ * statement page with the statement's ID, and never the org's own domain or the LWR site's
+ * Visualforce companion.
  */
 @IsTest
 private class PortalLinksTest {
@@ -25,6 +26,10 @@ private class PortalLinksTest {
     Assert.isFalse(
       page.contains('.my.salesforce.com'),
       'Never the org\'s own domain'
+    );
+    Assert.isFalse(
+      page.contains('vforcesite'),
+      'Never the site\'s Visualforce companion: ' + page
     );
   }
 }

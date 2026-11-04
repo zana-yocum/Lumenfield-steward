@@ -85,7 +85,7 @@ GitHub ── Actions: Code Analyzer · Jest · validate + local tests ── qu
 ## Requirements and decisions
 
 - **[Requirements](requirements.md):** 18 stories (11 Must, 6 Should, 1 Could), six agent guardrails, ten non-functional requirements, and what each audience can see.
-- **[Decision log](decision-log.md):** S-01 to S-28, each with the options considered and why one was chosen. A starting position is confirmed or changed, with evidence from the org, in the phase that builds it. S-27 is one the org changed: payments were to be recorded through a platform event, and the third Phase 7 validation showed customers can't publish one.
+- **[Decision log](decision-log.md):** S-01 to S-29, each with the options considered and why one was chosen. A starting position is confirmed or changed, with evidence from the org, in the phase that builds it. S-27 is one the org changed: payments were to be recorded through a platform event, and the third Phase 7 validation showed customers can't publish one.
 - **[Explainers](explainers/README.md):** one page per Apex class, from Phase 3.
 - **[Pipeline](pipeline.md):** how a change reaches the org, and how the pipeline was set up.
 - **[Conventions](conventions.md):** naming and coding standards.

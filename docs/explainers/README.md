@@ -110,6 +110,13 @@ One page per Apex class, Lightning web component, prompt template and agent suba
 | [portalPayment](portalPayment.md) | **Pay online** on a statement's page, and what happened when the customer comes back | ST-05 · NFR-05 |
 | [StripeMock](StripeMock.md) | Stripe's answers in tests, by method and path, with every request kept | ST-05 · NFR-03 |
 
+**The production guarantee (Phase 8)**
+
+| Component | One line | Stories |
+|---|---|---|
+| [ProductionGuaranteeService](ProductionGuaranteeService.md) | Twelve months of production against the guarantee; a review and a Draft credit for a shortfall | ST-14 · S-29 |
+| [ProductionReviewJob](ProductionReviewJob.md) | The review, once a month, for every household with an estimate | ST-14 |
+
 **The customer timeline (Phase 9)**
 
 | Component | One line | Stories |
