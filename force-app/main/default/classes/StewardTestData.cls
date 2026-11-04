@@ -140,7 +140,7 @@ public class StewardTestData {
 
   /**
    * The households a test's setup created, in name order (the order they were created), each
-   * with its primary contact's name and email.
+   * with its primary contact's name and email, and its agreement.
    * @return the households
    */
   public static List<Household> existingHouseholds() {
@@ -149,7 +149,8 @@ public class StewardTestData {
       SELECT
         Id,
         Name,
-        (SELECT Id, FirstName, LastName, Email FROM Contacts LIMIT 1)
+        (SELECT Id, FirstName, LastName, Email FROM Contacts LIMIT 1),
+        (SELECT Id FROM ServiceContracts LIMIT 1)
       FROM Account
       WHERE Name LIKE 'Steward Test Household%'
       ORDER BY Name
@@ -157,6 +158,9 @@ public class StewardTestData {
       Household household = new Household();
       household.account = account;
       household.primaryContact = account.Contacts[0];
+      household.agreement = account.ServiceContracts.isEmpty()
+        ? null
+        : account.ServiceContracts[0];
       households.add(household);
     }
     return households;

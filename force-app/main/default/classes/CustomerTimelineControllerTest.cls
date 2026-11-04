@@ -1,14 +1,15 @@
 /**
  * ST-15, ST-12, NFR-02, NFR-07. Proves the customer timeline shows one household's six kinds of
- * event newest first, pages without repeating or skipping, filters by kind, and shows each person
- * only what they can read: a household out of reach is not found, a customer always gets their own
- * household and no credits or commitments, and a field nobody granted comes back empty.
+ * event newest first, on the right dates, pages without repeating or skipping, filters by kind, and
+ * shows each person only what they can read: a household out of reach is not found, a customer
+ * always gets their own household and no credits or commitments, and a field the customer can't
+ * read comes back empty.
  *
  * The first household's history, newest first: a promise due next week; a dispute opened and a
  * $25 credit posted today; a $40 payment and the statement due at the start of last month; a $120
  * payment and the statement due a month before that; and a commitment signed a year ago. It also
- * has a $10 credit still in draft, which isn't history yet. The second household has one $95
- * statement.
+ * has a credit over the rep's limit, still in draft, which isn't history yet. The second household
+ * has one $95 statement.
  */
 @IsTest
 private class CustomerTimelineControllerTest {
@@ -53,11 +54,12 @@ private class CustomerTimelineControllerTest {
         StewardTestData.monthStart(1).addDays(-1)
       )
     };
+    // Accord posts a new credit within the rep's limit at once, so the draft is over the limit.
     insert new List<Adjustment__c>{
       StewardTestData.credit(statements[1], 25.00, 'Goodwill Credit', 'Posted'),
       StewardTestData.credit(
         statements[1],
-        10.00,
+        StewardTestData.policyNumber('Rep_Credit_Limit') + 50,
         'Billing Correction',
         'Draft'
       )
@@ -131,11 +133,16 @@ private class CustomerTimelineControllerTest {
       'On the same day, the dispute comes before the credit'
     );
     Assert.areEqual(
+      Date.today(),
+      page.events[1].eventDate,
+      'Opened today, in the person\'s own time zone'
+    );
+    Assert.areEqual(
       CustomerTimelineController.CREDIT,
       page.events[2].kind,
       'The posted credit'
     );
-    Assert.areEqual(25.00, page.events[2].amount, 'Not the $10 draft');
+    Assert.areEqual(25.00, page.events[2].amount, 'Not the draft');
     Assert.areEqual(
       CustomerTimelineController.COMMITMENT,
       page.events[7].kind,
@@ -188,11 +195,16 @@ private class CustomerTimelineControllerTest {
     // Accord's flows move the balance and status as payments, credits and disputes land, so the
     // event is checked against the statement as Accord stores it.
     Billing_Statement__c stored = [
-      SELECT Name, Balance__c, Status__c
+      SELECT Name, Statement_Date__c, Balance__c, Status__c
       FROM Billing_Statement__c
       WHERE Id = :latest.recordId
       WITH SYSTEM_MODE
     ];
+    Assert.areEqual(
+      stored.Statement_Date__c,
+      latest.eventDate,
+      'On its statement date, not a day out'
+    );
     Assert.areEqual(StewardTestData.monthStart(1), latest.dueDate, 'Due date');
     Assert.areEqual(120.00, latest.amount, 'Amount due');
     Assert.areEqual(stored.Balance__c, latest.balance, 'Balance');
@@ -334,48 +346,41 @@ private class CustomerTimelineControllerTest {
   }
 
   @IsTest
-  static void aFieldNobodyGrantedComesBackEmpty() {
-    Id household = StewardTestData.existingHouseholds()[0].account.Id;
-    User reader = StewardTestData.createUserWithoutAccess();
-    System.runAs(new User(Id = UserInfo.getUserId())) {
-      PermissionSet onlyDates = new PermissionSet(
-        Name = 'Steward_Timeline_Test_Dates_Only',
-        Label = 'Steward Timeline Test Dates Only'
-      );
-      insert onlyDates;
-      insert new ObjectPermissions(
-        ParentId = onlyDates.Id,
-        SobjectType = 'Billing_Statement__c',
-        PermissionsRead = true
-      );
-      insert new FieldPermissions(
-        ParentId = onlyDates.Id,
-        SobjectType = 'Billing_Statement__c',
-        Field = 'Billing_Statement__c.Statement_Date__c',
-        PermissionsRead = true
-      );
-      insert new PermissionSetAssignment(
-        AssigneeId = reader.Id,
-        PermissionSetId = onlyDates.Id
-      );
-    }
-    StewardTestData.shareRead(household, reader.Id);
+  static void aFieldTheCustomerCantReadComesBackEmpty() {
+    StewardTestData.Household first = StewardTestData.existingHouseholds()[0];
+    Id withoutBalance = PortalTestData.customerAccessWith(
+      'Steward_Test_No_Balance',
+      'Billing_Statement__c.Balance__c',
+      PortalTestData.FieldAccess.NONE
+    );
+    User customer = PortalTestData.createCustomers(
+      new List<StewardTestData.Household>{ first },
+      withoutBalance
+    )[0];
 
     CustomerTimelineController.TimelinePage page;
-    System.runAs(reader) {
-      page = CustomerTimelineController.getTimeline(household, null, null);
+    System.runAs(customer) {
+      page = CustomerTimelineController.getTimeline(
+        null,
+        new List<String>{ CustomerTimelineController.STATEMENT },
+        null
+      );
     }
 
     Assert.areEqual(
-      new List<String>{ CustomerTimelineController.STATEMENT },
-      page.availableKinds,
-      'Only the kind this person can read'
+      StewardOutcome.COMPLETED,
+      page.outcome,
+      'Completed: ' + page.reasonCode
     );
     Assert.areEqual(2, page.events.size(), 'Both statements');
-    Assert.isNotNull(page.events[0].eventDate, 'The date, which was granted');
-    Assert.isNull(page.events[0].amount, 'No amount, which wasn\'t');
-    Assert.isNull(page.events[0].balance, 'No balance');
-    Assert.isNull(page.events[0].status, 'No status');
+    for (CustomerTimelineController.TimelineEvent event : page.events) {
+      Assert.isNull(
+        event.balance,
+        'No balance, which this customer can\'t read'
+      );
+      Assert.areEqual(120.00, event.amount, 'The amount due, which they can');
+      Assert.isNotNull(event.status, 'And the status');
+    }
   }
 
   @IsTest

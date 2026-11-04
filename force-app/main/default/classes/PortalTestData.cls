@@ -127,6 +127,74 @@ public class PortalTestData {
     return customers;
   }
 
+  /** How much of one field a copy of the customer's access keeps (customerAccessWith). */
+  public enum FieldAccess {
+    NONE,
+    READ_ONLY
+  }
+
+  /**
+   * A copy of PS_Steward_Customer with less access to one field, to prove what a customer sees or
+   * can do without it. Give it to customers with createCustomers(households, permissionSetId).
+   * @param name the copy's API name, such as Steward_Test_No_Balance
+   * @param field the field, such as Billing_Statement__c.Balance__c
+   * @param kept what the copy keeps of that field: NONE, or READ_ONLY to take away only editing
+   * @return the copy's ID
+   */
+  public static Id customerAccessWith(
+    String name,
+    String field,
+    FieldAccess kept
+  ) {
+    Id original = [
+      SELECT Id
+      FROM PermissionSet
+      WHERE Name = :CUSTOMER_PERMISSION_SET
+    ]
+    .Id;
+    PermissionSet copy = new PermissionSet(Name = name, Label = name);
+    List<ObjectPermissions> objectAccess = new List<ObjectPermissions>();
+    List<FieldPermissions> fieldAccess = new List<FieldPermissions>();
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      insert copy;
+      for (ObjectPermissions access : [
+        SELECT SobjectType, PermissionsRead, PermissionsCreate
+        FROM ObjectPermissions
+        WHERE ParentId = :original
+      ]) {
+        objectAccess.add(
+          new ObjectPermissions(
+            ParentId = copy.Id,
+            SobjectType = access.SobjectType,
+            PermissionsRead = access.PermissionsRead,
+            PermissionsCreate = access.PermissionsCreate
+          )
+        );
+      }
+      for (FieldPermissions access : [
+        SELECT SobjectType, Field, PermissionsRead, PermissionsEdit
+        FROM FieldPermissions
+        WHERE ParentId = :original
+      ]) {
+        Boolean isTheField = access.Field == field;
+        if (!isTheField || kept == FieldAccess.READ_ONLY) {
+          fieldAccess.add(
+            new FieldPermissions(
+              ParentId = copy.Id,
+              SobjectType = access.SobjectType,
+              Field = access.Field,
+              PermissionsRead = access.PermissionsRead,
+              PermissionsEdit = isTheField ? false : access.PermissionsEdit
+            )
+          );
+        }
+      }
+      insert objectAccess;
+      insert fieldAccess;
+    }
+    return copy.Id;
+  }
+
   /**
    * Inserts a Default Review case on the household, as Accord's collections process opens one.
    * @param household whose review

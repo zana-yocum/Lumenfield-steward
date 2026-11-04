@@ -19,6 +19,8 @@ public with sharing class TimelineKind {
   public String householdPath { get; private set; }
   /** The date that places a record on the timeline, and orders the kind's query. */
   public String datePath { get; private set; }
+  /** True when datePath is a date and time, such as CreatedDate, shown as the person's own date. */
+  public Boolean datedByTimestamp { get; private set; }
   /** The record's number: Name, or CaseNumber for a case. */
   public String nameField { get; private set; }
   /** A field the kind's records must match, such as a case's record type. Null for most kinds. */
@@ -37,6 +39,7 @@ public with sharing class TimelineKind {
     this.code = code;
     this.objectName = objectName;
     this.nameField = 'Name';
+    this.datedByTimestamp = false;
   }
 
   /**
@@ -66,7 +69,7 @@ public with sharing class TimelineKind {
         .showing('status', 'Status__c'),
       new TimelineKind(CustomerTimelineController.DISPUTE, 'Case')
         .tiedBy('AccountId')
-        .datedBy('CreatedDate')
+        .datedByTimestamp('CreatedDate')
         .namedBy('CaseNumber')
         .onlyWhen('RecordTypeId', disputeRecordTypeId())
         .showing('status', 'Status')
@@ -124,10 +127,12 @@ public with sharing class TimelineKind {
     event.kind = code;
     event.recordId = row.Id;
     event.name = (String) row.get(nameField);
-    event.eventDate = dateAt(row, datePath);
+    event.eventDate = datedByTimestamp
+      ? ((Datetime) valueAt(row, datePath))?.date()
+      : (Date) valueAt(row, datePath);
     event.amount = (Decimal) valueAt(row, readable.get('amount'));
     event.balance = (Decimal) valueAt(row, readable.get('balance'));
-    event.dueDate = dateAt(row, readable.get('dueDate'));
+    event.dueDate = (Date) valueAt(row, readable.get('dueDate'));
     event.status = (String) valueAt(row, readable.get('status'));
     event.detail = (String) valueAt(row, readable.get('detail'));
     return event;
@@ -140,6 +145,14 @@ public with sharing class TimelineKind {
 
   private TimelineKind datedBy(String path) {
     datePath = path;
+    return this;
+  }
+
+  // Apex can't tell a date from a date and time with instanceof: a Date passes instanceof Datetime,
+  // and converting it would move it a day for anyone west of Greenwich. So each kind says which it is.
+  private TimelineKind datedByTimestamp(String path) {
+    datePath = path;
+    datedByTimestamp = true;
     return this;
   }
 
@@ -178,13 +191,5 @@ public with sharing class TimelineKind {
     }
     SObject parent = row.getSObject(path.substringBefore('.'));
     return parent?.get(path.substringAfter('.'));
-  }
-
-  private static Date dateAt(SObject row, String path) {
-    Object value = valueAt(row, path);
-    if (value instanceof Datetime) {
-      return ((Datetime) value).date();
-    }
-    return (Date) value;
   }
 }

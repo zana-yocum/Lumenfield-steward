@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <classAccesses>
+        <apexClass>CustomerTimelineController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <description>ST-15. Runs the customer timeline on account pages in the Collections Console. What it shows stays with each persona&apos;s own access, read in user mode. In all three collections groups; customers get the same class in PS_Steward_Customer.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Steward Timeline</label>
+</PermissionSet>
