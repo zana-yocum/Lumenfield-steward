@@ -6,6 +6,67 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ---
 
+## Your list — every phase, as of 2026-11-04
+
+Everything left that needs you, across Steward and Accord, in the order that works best. Each step's clicks are in its phase's section below (or in Accord's open items, where it says so). Claude has done everything else that can be done without you.
+
+**First sitting, in this order (about 1 hour)**
+1. **Stripe (Phase 7, steps 1–4, about 20 minutes):** create a Stripe account in test mode and copy its test secret key; put the key into Salesforce on the `Stripe_Test_Key` principal; give yourself **Steward Payment Reconciliation**; schedule the hourly reconciliation with the one line in the Developer Console.
+2. **The agent (Phase 6, steps 1–3, about 20 minutes):** create the Lumenfield Service Agent and its user; give the agent user the **Steward Agent** permission set and add it to the **Steward Agent** group; look at the Trust Layer page and note what it offers. Then tell Claude "agent created".
+3. **Data 360 (Phase 8, steps 1–2, about 5 minutes and then waiting):** decide whether to turn it on, and if yes, **Get Started** in Data Cloud Setup; check the credit formula ($0.1440 a kWh in the example). Tell Claude "Data 360 ready" when setup finishes.
+4. **Two Accord decisions (about 5 minutes, Accord's open items):** the 12 Organization accounts, (a) keep them and fix the description, recommended, or (b) delete their leases and deals; and DEF-11, how sales input reaches a dispute, (a) a Sales Input action, recommended, (b) the case feed, or (c) edit on cases. Answer with the letters.
+5. **Accord's UAT-14 email (about 5 minutes):** search your inbox for **Dispute Milestone Violation** around 5 PM CT on Oct 15 and Oct 19, and tell Claude what's there. Then dispute 00001049 can be deleted.
+
+**Before any testing or the walkthrough**
+6. **Re-age Accord's data** (Accord's `data/regen/RUNBOOK.md`, about 15 minutes in PowerShell). Bills go overdue again a few weeks after a re-age, so test within a day or two. A re-age deletes every statement and payment, so do it before the test payment, not after.
+
+**Testing (about 30 minutes, `docs/uat-scripts.md`)**
+7. **UAT-S15, the timeline (Phase 9):** in the console as a rep, then on the portal as Sandra Barnett.
+8. **UAT-S05, a test payment (Phase 7, step 5):** as Sandra Barnett, with the test card 4242 4242 4242 4242.
+9. Tell Claude "payments tested" and "timeline checked", with screenshots of anything that looked wrong.
+
+**Housekeeping (about 15 minutes, any time)**
+10. **Tags (PowerShell, from `C:\Lumenfield-steward`):** `v0.5` on `6b64a14` now (Phase 5). After UAT-S15 passes, `v0.9` on `5b155ec`; after UAT-S05, `v0.7` on `1c59185`.
+11. **Re-clone Accord on your computer** (Accord's open items): rename `C:\Lumenfield-accord` to `C:\Lumenfield-accord-old`, clone again in GitHub Desktop, copy back anything of yours, delete the old folder.
+12. **GitHub cleanup (Phase 5, step 6):** delete the branches GitHub marks merged, except `retrieve/2` and `retrieve/3`, and tick **Automatically delete head branches** in Steward's settings.
+13. If `docs/release-readiness-winter27.md` is still on your computer, add it to Accord's `docs/` folder.
+14. Optional: Accord's last persona check (UAT-06 steps 2–5, `docs/persona-checks.md`), and deleting the unused `Product2.Legacy_Id__c` field.
+
+**The portfolio site**
+15. Read the site's Background section once: the roles, dates and numbers come from your résumé.
+16. **After you pass the Platform Administrator exam,** and not before: deploy version 5 (unzip `zana-salesforce-portfolio-v5.zip`, drag the folder onto app.netlify.com/drop), then add the link to your résumé, LinkedIn and Trailblazer profile. The site already says certified.
+
+**What Claude does after your steps**
+- After "agent created": the Agent Script from `docs/agent-design.md`, publishing and activating it through the pipeline, the portal's chat, the live check that a chat reaches only its own household, the Trust Layer settings, and the test suites in their final form.
+- After "payments tested": the payment, its logs and an hourly run checked in the org and recorded, which closes Phase 7.
+- After "Data 360 ready": Phase 8, part 2.
+- After your Accord answers: the Organization accounts and DEF-11 in Accord, and the escalator step in Accord's data generator (ST-03).
+- Phase 10: the suites run, your UAT results recorded, the release notes and `v1.0`, and version 6 of the site with Steward's current figures.
+
+---
+
+## Phase 8 — Data 360 and the production guarantee — part 1, pull request #22
+
+ST-14's rules are built and tested: twelve months of production against the guarantee, and a review with a Draft credit for a shortfall (S-29). The readings come from Data 360, which is licensed in the org but not turned on. On 2026-11-04 its API answered "not currently enabled" for data streams and data spaces, though the Data Cloud license is active and you hold Data Cloud Architect.
+
+**Your steps**
+- ☐ 1. **Decide whether to turn on Data 360**, and if yes, turn it on, about 5 minutes plus waiting. It can't be turned off again, and it counts against Developer Edition's Data 360 limits, which is why ST-14 is a Should. Setup → Quick Find `Data Cloud Setup` (it may say Data 360) → **Get Started**. Salesforce sets it up in the background, which can take an hour or more. If the page doesn't offer **Get Started**, take a screenshot for Claude instead.
+- ☐ 2. **Check the credit formula**, about 2 minutes: a shortfall is priced at a year of the agreement's monthly payments over its estimated annual kWh. A household paying $120.00 a month with a 10,000 kWh estimate gets $0.1440 a kWh, so 1,000 kWh short is $144.00. Tell Claude "formula OK", or the rule Lumenfield would use instead (S-29).
+- ☐ 3. Tell Claude "Data 360 ready" once the setup page says it's done.
+
+**Mine**
+- ☑ **Part 1 (pull request #22):** `ProductionGuaranteeService` with its `Readings` source, `Production_Review__c`, `ProductionReviewJob`, `PS_Steward_Production_Review` in the Dispute Specialist and Collections Supervisor groups; 10 tests; S-29; two explainers
+- ☐ Merge, deploy, and check in the org: the object and tab, the permission set in both groups
+- ☐ **Part 2, after your step 3:**
+  - the Ingestion API connector and the monthly production stream, mapped and matched to households
+  - the `Production_vs_Guarantee` calculated insight, and the Data 360 readings source that reads it, tested with a query stub
+  - a year of invented readings for a few demo households, one of them short
+  - the agent's answer to "did my system produce what you guaranteed?" (Get Production Summary), in `PS_Steward_Agent`
+  - schedule `ProductionReviewJob` (your step then: one line in the Developer Console, like Phase 7's)
+  - UAT-S14
+
+---
+
 ## Phase 10 — Testing and release — groundwork
 
 Written ahead, so testing can start as soon as each piece is live.
@@ -152,7 +213,7 @@ Pull request #17 built everything the agent will run, and the access it runs wit
   - Accord's own account rule still shares the 34 accounts in collections with Collections Team.
   - `PS_Steward_Supervisor` is in the supervisor group, which recalculated (status Updated).
 - ☑ **Ready for Accord's adjustment numbers** (pull request #18): Steward's test data named an adjustment only while the name was still plain text. That turned out not to be enough: Apex checks the field can be written when the class compiles, so Accord's switch stopped Steward's tests compiling. Fixed in pull request #19 (Phase 9)
-- ☑ **Done without the agent (pull request #21):**
+- ☑ **Done without the agent (pull request #21, deployed 2026-11-04 at 9:46 AM CT, quick deploy `0Afaj00000qNr8vCAC`; checked in the org):**
   - **The Steward Agent dashboard (ST-11):** five reports and a dashboard that runs as the viewer, shared with the Collections Supervisor role.
   - **Supervisors can see the log now.** `PS_Steward_Supervisor` had read but not View All, and the log's records belong to the agent user and customers, so a supervisor saw none. Found while building the dashboard.
   - **The agent's design** (`docs/agent-design.md`): every subagent's instructions and actions, the confirmation step, the welcome message, and the reason code passed into the handoff (ST-07). Writing the Agent Script becomes a conversion.
@@ -176,10 +237,10 @@ Pull request #9 built it: the three prompt templates and the Apex behind them, t
 - ☑ 1. Three decisions (2026-10-23): specialists and supervisors read a case's subject, description, account and contact; reps, specialists and supervisors read contact email and phone numbers; a follow-up is drafted for every outcome (S-21, S-22)
 - ☑ 2. Hand check as Test Persona (steps below). Steps 1–4 on 2026-10-24 (login at 8:10 PM CT, in the audit trail); step 5 then found Accord's DEF-08, fixed the same night. **Steps 5–8 on 2026-10-26:** login 1:51 PM CT, logout 1:54 PM CT (audit trail); the Left Voicemail attempt with the note "Hand check" on Sandra Barnett Household at 1:53 PM CT; follow-up draft and dispute summary as written, by your report, and no email sent (none from Test Persona in the org)
 - ☑ 3. Accord's changelog: the entry below is in Accord's `CHANGELOG.md` v1.0.2, with a second entry for pull request #13 (2026-10-25)
-- ☐ 4. `v0.5` tag on the merge of pull request #16, which closes Phase 5. From `C:\Lumenfield-steward` in PowerShell: `git pull`, then `git tag v0.5 <commit>`, then `git push https://Zana-yocum@github.com/zana-yocum/Lumenfield-steward.git v0.5`. Claude gives you the commit
+- ☐ 4. `v0.5` tag on `6b64a14`, the merge of pull request #16, which closes Phase 5. From `C:\Lumenfield-steward` in PowerShell: `git pull`, then `git tag v0.5 6b64a14`, then `git push https://Zana-yocum@github.com/zana-yocum/Lumenfield-steward.git v0.5`
 - ☑ 5. **GitHub email privacy on (2026-10-25).** Checked: pull request #13's merge commit carries your noreply address. The 19 earlier commits on `main` still carry your private address (the 12 pull-request merges and 7 commits pushed from your computer). Removing those means rewriting `main` and recreating the v0.1–v0.4 tags, which only you can push: say so if you want it, and Claude prepares it. If you push from your computer again, first run once in PowerShell: `git config --global user.email "333481738+zana-yocum@users.noreply.github.com"`
 - ☐ 6. Optional cleanup on GitHub, about 5 minutes. Claude can't delete branches.
-  - **Branches** (the repository's **Code** tab → **Branches**): the 14 branches already merged into `main` can be deleted with the trash icon: `docs/open-items-tags`, `docs/phase-4-close`, `docs/phase-4-evidence`, `docs/phase-4-walkthrough`, `docs/phase-5-close-out`, `docs/phase-5-closed`, `docs/phase-5-closed-out`, `docs/phase-5-status`, `feature/phase-4a-digital-experiences`, `feature/phase-4b-portal`, `feature/phase-5-rep-assistant`, `fix/phase-5-hand-check-findings`, `fix/phase-5-match-flag`, `fix/supervisor-hold-override`. So can `tools/accord-restore`, `retrieve/5` and `retrieve/6`, which only restored Accord's repository. **Keep `retrieve/2` and `retrieve/3`:** these docs cite them as the record of what was retrieved
+  - **Branches** (the repository's **Code** tab → **Branches**): every branch GitHub marks merged can be deleted with the trash icon, which since 2026-11-04 includes `fix/adjustment-names`, `phase-6/agent-actions`, `phase-7/payments` and `phase-9/customer-timeline`, and pull requests #21 and #22's branches once they merge. The 14 from earlier: `docs/open-items-tags`, `docs/phase-4-close`, `docs/phase-4-evidence`, `docs/phase-4-walkthrough`, `docs/phase-5-close-out`, `docs/phase-5-closed`, `docs/phase-5-closed-out`, `docs/phase-5-status`, `feature/phase-4a-digital-experiences`, `feature/phase-4b-portal`, `feature/phase-5-rep-assistant`, `fix/phase-5-hand-check-findings`, `fix/phase-5-match-flag`, `fix/supervisor-hold-override`. So can `tools/accord-restore`, `retrieve/5` and `retrieve/6`, which only restored Accord's repository. **Keep `retrieve/2` and `retrieve/3`:** these docs cite them as the record of what was retrieved
   - **Settings** → **General** → **Pull Requests** → tick **Automatically delete head branches**, so merged branches go away on their own. Accord's repository already has it
 
 **Mine**

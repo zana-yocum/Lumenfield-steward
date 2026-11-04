@@ -34,6 +34,7 @@ The decisions that shape Steward, the options considered, and why one was chosen
 | S-26 | The console's account page is Steward's; it's activated in the org, not in either repo | Decided |
 | S-27 | Payments Stripe confirmed are recorded in system mode by one class, not through a platform event | Decided · after the third Phase 7 validation |
 | S-28 | Calls to outside systems are logged in system mode, by one class, after the last callout | Decided |
+| S-29 | A production shortfall is a Steward Production Review with a Draft credit, measured against a readings source Data 360 fills | Decided · the Data 360 source in Phase 8, part 2 |
 
 ---
 
@@ -557,4 +558,36 @@ For paging: one `OFFSET` across the merged timeline can't work when kinds interl
 - **Every entry point that calls out saves the log after its last callout:** `PortalPaymentsController`, `GetPaymentLinkAction` and `PaymentReconciliationJob`. The action log names the integration log records, so a customer's reference leads to Stripe's answer.
 - **A log row the platform refuses is skipped, never thrown,** so logging can't break the payment it describes.
 - **A transaction that fails after the save loses its log with it.** The reconciliation job's finalizer logs a failure the job couldn't catch, in its own transaction.
+
+---
+
+### S-29 — A production shortfall is a Steward Production Review with a Draft credit, measured against a readings source Data 360 fills
+**Status:** Decided · the Data 360 source comes in Phase 8, part 2
+
+**Context:** ST-14 asks for a Draft Production Guarantee credit whenever a household's last 12 months of production fall short of the guaranteed share of its estimate, with the shortfall in kWh recorded, and never two for the same household and period. Accord's `Adjustment__c` has an amount, a type, a status and links, but no kWh and no period. And the readings are meant to come from Data 360, which on 2026-11-04 was licensed in the org (the Data Cloud permission set license is active, and Zana holds Data Cloud Architect) but not set up: its API answered "not currently enabled" for data streams and data spaces.
+
+**Options for where the shortfall is recorded**
+1. Add kWh and period fields to Accord's `Adjustment__c`. That changes Accord's financial record for one kind of credit, and Accord would carry Steward's fields.
+2. Open a Billing Dispute case for each shortfall and hang the credit on it. Accord's dispute process would then mark the statement In Dispute and start a customer-facing SLA for something the customer never raised.
+3. A Steward object, `Production_Review__c`: one per agreement and period, holding the measure (actual, estimated and guaranteed kWh, the shortfall, the rate, the credit) and linking the Draft credit. Its `Review_Key__c` (agreement and period) is a unique external ID. **← decided**
+
+**Options for the readings**
+1. Wait for Data 360 before building anything. ST-14's rules would wait with it.
+2. A Steward object of monthly readings, loaded by hand. It works now, but it's a second home for data that belongs in Data 360, and the story says Data 360.
+3. An interface, `ProductionGuaranteeService.Readings`, that hands back each agreement's total and month count for a window. Data 360's calculated insight answers it once it's set up; until then the default answers nothing, so nothing is reviewed; tests answer with known figures. **← decided**
+
+**Why:** The rules that matter (the window, the guarantee, the rate, the rounding, one review per period, credits through Accord's approval) are built and tested now, and nothing in Accord changes. A credit stays an ordinary Accord credit, so a small one posts at once and a large one waits for approval, exactly as ST-14 says. Swapping in Data 360 later touches one class.
+
+**The credit formula**, which ST-14 left to this phase:
+- **The guarantee** is the estimate times `Production_Guarantee_Pct` (90), rounded down to a whole kWh. The shortfall is measured against the guarantee, not the estimate.
+- **The rate** is a year of the agreement's monthly payments over its estimated annual production: what the customer pays for each expected kWh, to four decimal places.
+- **The credit** is the shortfall times the rate, to the cent.
+- It uses the agreement's monthly payment, not the escalated amount on recent statements, so it's slightly conservative after an anniversary. It's recorded on every review, and it's one of Zana's checks (open items, Phase 8).
+
+**Consequences:**
+- **The review record is written in system mode,** in an `Elevated` inner class, like the two logs (S-09, S-28). Its measure is Steward's own, worked out from the readings and the agreement. People only read reviews, through `PS_Steward_Production_Review`, and nobody gets create or edit on them, so nobody can make one up through the API. That's the seventh exception to user mode.
+- **Everything else runs in user mode,** as whoever schedules `ProductionReviewJob` (an admin): agreements and statements are read, and the Draft credit is saved, with their own access. The credit is Accord's financial record, so it gets no exception.
+- **The credit goes on the household's newest statement that's open, past due or in dispute.** With none, it has no statement, for a specialist to place.
+- **A review is opened once per agreement and period.** Running the job twice in a month opens nothing new.
+- **Part 2** adds the Data 360 source (an ingestion stream, identity resolution and the `Production_vs_Guarantee` insight), and the agent's answer to "did my system produce what you guaranteed?". Both wait on Data 360 being turned on, which is Zana's step.
 

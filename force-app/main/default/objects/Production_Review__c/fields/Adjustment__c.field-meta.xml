@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Adjustment__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>ST-14. The Draft Production Guarantee credit the review opened, which goes through Accord&apos;s credit approval. Empty when the shortfall is worth nothing at the agreement&apos;s rate.</description>
+    <externalId>false</externalId>
+    <label>Credit</label>
+    <referenceTo>Adjustment__c</referenceTo>
+    <relationshipLabel>Production Reviews</relationshipLabel>
+    <relationshipName>Production_Reviews</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

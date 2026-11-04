@@ -5,7 +5,7 @@ Who can reach what in Steward, and the test that proves each line. Steward adds 
 ## The rules every class follows
 
 - **User mode by default (NFR-01).** Every query is `WITH USER_MODE`. Every save uses `AccessLevel.USER_MODE`. Every class is `with sharing`. So a person or the agent gets exactly what their permissions and sharing allow, and no more.
-- **Six named exceptions.** Each one sits in an inner class named `Elevated`, with a comment citing its decision, and has its own tests:
+- **Seven named exceptions.** Each one sits in an inner class named `Elevated`, with a comment citing its decision, and has its own tests:
 
 | Exception | What runs in system mode | Why | Decision |
 |---|---|---|---|
@@ -15,6 +15,7 @@ Who can reach what in Steward, and the test that proves each line. Steward adds 
 | Session lookup | A chat's session, its messaging user, and that user's account | The agent finds the household from links only the platform sets, without reading conversations or user records | S-23 |
 | Payment insert | A Lease Payment for each payment Stripe confirmed, unless that Stripe payment is already recorded | Customers confirm their own payments on the portal, and nobody who confirms a payment may create payments themselves | S-27 |
 | Integration log write | One log record per call to Stripe | Customers, the agent and the job's user all call Stripe, and none of them may read or write the log | S-28 |
+| Production review write | One review per agreement and period, and the check for an existing one | A review is Steward's own measure; people only read it, so nobody gets create on it (Phase 8) | S-29 |
 
 - **The household comes first (ST-12).** Every service asks `HouseholdScope` which of the given households the caller can see before it reads anything else. An ID from someone else's household gets the same answer as an ID that doesn't exist.
 
@@ -141,6 +142,15 @@ Reps, specialists and supervisors can't call Stripe.
 - `GetPaymentLinkActionTest` and `AgentPaymentAccessTest`, as the agent user: only the chat's own customer gets a link. A card number typed in place of a statement ID is refused and kept out of the log.
 - `IntegrationLoggerTest`: a customer's call is recorded, though the customer can't read the log.
 - **What only the org can show:** that a customer's callout works with this access. Tests mock Stripe, so they can't show the credential's principal access at work. UAT-S05 covers it with a real test-mode payment.
+
+## The production guarantee (Phase 8)
+
+- **One new exception: the review itself (S-29).** `ProductionGuaranteeService` writes `Production_Review__c` in system mode, like the logs, so nobody needs create on it and nobody can make one up. Agreements and statements are read, and the Draft credit is saved, in user mode, as whoever runs it. `ProductionReviewJob` runs as the admin who schedules it.
+- **Who reads reviews:** `PS_Steward_Production_Review` gives read and View All on `Production_Review__c`, with its tab, in the Dispute Specialist and Collections Supervisor groups. Nobody gets create, edit or delete; reviews are opened by the service.
+- **The credits are Accord's.** A review's Draft credit is an ordinary `Adjustment__c`, so Accord's rules decide who approves and posts it, and Accord's field security decides who sees it.
+- **Customers and the agent see nothing of it yet.** Part 2's agent answer gives a customer their own actual and guaranteed kWh, through the same household scoping as every other action.
+
+Proved by `ProductionGuaranteeServiceTest`: a user who can't see the households measures nothing.
 
 ## The pipeline
 

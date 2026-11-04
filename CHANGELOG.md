@@ -2,6 +2,24 @@
 
 Newest first. One entry per phase.
 
+## Unreleased — Phase 8, part 1: production guarantee reviews
+
+ST-14's rules, built and tested before Data 360 is set up: each household's last 12 complete months of production against its guarantee, and a review with a Draft credit for a shortfall. Data 360 is licensed in the org but not turned on, so the readings come from an interface, which Data 360 fills in part 2 (S-29). Pull request #22.
+
+### Added in pull request #22
+- **The measure and the review (S-29):** `ProductionGuaranteeService`. The guarantee is `Production_Guarantee_Pct` (90%) of the agreement's estimate. A shortfall is priced at a year of monthly payments over the estimate, per kWh, to the cent. A household short of it gets one `Production_Review__c` per agreement and period, holding the measure, and a Draft Production Guarantee credit on its newest unpaid statement, which Accord posts or sends for approval like any other credit
+- **The schedule:** `ProductionReviewJob`, monthly, for every household whose agreement records an estimate
+- **The readings source:** `ProductionGuaranteeService.Readings`. Until Data 360 is set up the default has no readings, and nothing is reviewed; tests set known readings
+- **Access:** `PS_Steward_Production_Review`, read and View All on the reviews, in the Dispute Specialist and Collections Supervisor groups. Reviews are written in system mode, like the logs, so nobody gets create on them (the seventh exception to user mode); the credit is saved with the runner's own access
+- **Tests:** `ProductionGuaranteeServiceTest` (8) and `ProductionReviewJobTest` (2)
+- **Docs:** decision S-29, with the credit formula; two explainers; the production guarantee in `docs/security-model.md`; ST-14's traceability; and at the top of `docs/open-items.md`, one list of everything left that needs Zana, across Steward and Accord
+
+### Pull request #22's validations
+- **First** (`0Afaj00000qNqBFCA0`): eight tests failed for two reasons. The service saved reviews in user mode, and the pipeline's admin has no field access on an object deployed through the Metadata API, so every save was refused. That's also why people shouldn't need create on reviews: they're now written in system mode, like the logs (S-29). And a user who can see no household got "Variable does not exist: tmpVar1" from the agreements query, the platform's message for a user-mode query on an object the user can't read; the service now stops before asking
+
+### Changed in pull request #22
+- **`PortalLinks` always builds the portal's address from the org's domain.** It asked the site first (`Site.getBaseUrl`), and an LWR site has a Visualforce companion at its own path, `/portalvforcesite` in this org. If the site had answered with that path, a customer coming back from Stripe would have landed outside the portal. Checked in the org: the LWR site is at `/portal` on the `my.site.com` domain, which is what the address now always is
+
 ## Unreleased — Phase 6, part 2: the supervisor's dashboard and the agent's design
 
 Everything for the agent that doesn't need the agent to exist yet: the supervisor's view of what it does, its design subagent by subagent, and its test suites, drafted. Pull request #21.
@@ -16,6 +34,11 @@ Everything for the agent that doesn't need the agent to exist yet: the superviso
 - **Supervisors couldn't see any action log records.** `PS_Steward_Supervisor` gave read on the log, but the log is Private and its records are owned by the agent user or by customers, who aren't in the role hierarchy. It now gives View All on the log, read only
 - `PS_Steward_Integration_Log` is in the Collections Supervisor group, so supervisors can follow a customer's reference to Stripe's answer
 - `docs/uat-scripts.md`: UAT-S05 says when to re-age around a test payment, and UAT-S11 where the dashboard is
+
+### Pull request #21's validation and deploy, 2026-11-04
+- **First validation** (`0Afaj00000qNbliCAC`): 398 components, 280 of 280 tests. The five reports and the dashboard were accepted against the action log's own report type on the first try
+- Merged at 9:46 AM CT and quick-deployed as Steward CI (`0Afaj00000qNr8vCAC`, of that validation). Nothing on the portal changed, so it wasn't republished
+- Checked in the org afterwards: the **Steward Agent** dashboard runs as the logged-in user, in its folder, with the five reports in theirs; `PS_Steward_Supervisor` has read and View All on the action log and no create; the Collections Supervisor group holds `PS_Steward_Integration_Log`; all three collections groups show Updated
 
 ## Unreleased — Phase 7: online payments
 

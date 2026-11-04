@@ -45,7 +45,7 @@ Accord's IDs (`US-xx`, `D-xx`, `DEF-xx`) keep their meaning. Steward's carry an 
 **Rules**
 - Every class declares `with sharing` or `inherited sharing`. `without sharing` appears only in an inner class named `Elevated`, with a comment citing the decision that allows it.
 - Queries use `WITH USER_MODE`. DML uses `Database.insert(records, AccessLevel.USER_MODE)` and its update and upsert equivalents. A read that should show what it can rather than fail on one hidden field, such as the timeline's, describes first and names only readable fields, still in user mode (`Database.queryWithBinds(query, binds, AccessLevel.USER_MODE)`), with constant field paths and every value bound (S-25).
-- Six named exceptions, and no others without a decision first: the commitments read (S-08), the action log write (S-09), the agent's session lookup (S-23), the payment insert (S-27) and the integration log write (S-28), each in an `Elevated` inner class, and the dispute case insert (S-14), one system-mode statement after the caller's create access has been applied with `Security.stripInaccessible`.
+- Seven named exceptions, and no others without a decision first: the commitments read (S-08), the action log write (S-09), the agent's session lookup (S-23), the payment insert (S-27), the integration log write (S-28) and the production review write (S-29), each in an `Elevated` inner class, and the dispute case insert (S-14), one system-mode statement after the caller's create access has been applied with `Security.stripInaccessible`.
 - Every service checks the household with `HouseholdScope` before reading anything else, and answers `NOT_FOUND` for a household or record out of reach, the same as one that doesn't exist (ST-12).
 - No limits, day counts or percentages in code. They come from `Policy_Setting__mdt` through `PolicySettings`, and a missing setting throws instead of falling back to a default.
 - Agent actions are thin: get the verified account from the session (S-07, S-23), call a service, write one log record through `AgentActionLogger`, return a typed result. They never take an account or contact ID as an input. Their first input is `sessionId`, labelled Messaging Session ID, bound to `$Context.RoutableId` in the agent. `AgentActions.Calls` does the rest the same way for every action: `begin` each request, `acceptsId` for a record ID the model passed, one service call for the requests still waiting, `serve` or `fail`, then `finish`, which logs.
@@ -114,7 +114,7 @@ Accord's IDs (`US-xx`, `D-xx`, `DEF-xx`) keep their meaning. Steward's carry an 
 
 | Kind | Convention | Steward's |
 |---|---|---|
-| Custom objects | Accord's: singular label, `Object_Name__c` | `Agent_Action_Log__c`, `Integration_Log__c` |
+| Custom objects | Accord's: singular label, `Object_Name__c` | `Agent_Action_Log__c`, `Integration_Log__c`, `Production_Review__c` |
 | Platform events | A past-tense fact | None yet. Payments don't use one: publishing needs create access on the event, which customers mustn't have (S-27) |
 | Policy settings | Records in Accord's `Policy_Setting__mdt`, `Snake_Case` names | `Self_Service_Broken_Promise_Limit`, `Self_Service_Min_Coverage_Pct`, `Production_Guarantee_Pct` |
 | Custom labels | `Steward_<Purpose>`; portal text `Steward_Portal_<Purpose>`, category Steward Portal; the rep assistant's `Steward_Rep_<Purpose>`, category Steward Rep Assistant; the timeline's `Steward_Timeline_<Purpose>`, category Steward Timeline | `Steward_Payment_Unavailable`, `Steward_Portal_Dispute_Not_Yours`, `Steward_Rep_No_Attempt_Today`, `Steward_Timeline_Show_More` |
@@ -145,6 +145,7 @@ Accord's IDs (`US-xx`, `D-xx`, `DEF-xx`) keep their meaning. Steward's carry an 
 - Amounts go to the provider in its smallest unit (cents for Stripe) through `CheckoutPayments.toCents`, and come back through `CheckoutPayments.toDollars`. Apex's `Decimal` has no `movePointLeft` or `movePointRight`.
 - Parameters another site adds to a portal address, such as Stripe's return, use the `c__` prefix that Lightning page state expects of custom parameters: `c__session_id`, `c__payment`. The page reads them from its page reference's state, like any other.
 - Tests never call out: `StripeMock` answers by method and path, and keeps every request so the test can check what was sent.
+- A data source that isn't there yet, or can't run in a test, sits behind an inner interface with a `@TestVisible` default, as `ProductionGuaranteeService.Readings` does. The default does nothing harmful, and each test sets the source it needs.
 
 ---
 
