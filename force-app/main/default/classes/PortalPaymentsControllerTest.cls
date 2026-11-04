@@ -221,6 +221,7 @@ private class PortalPaymentsControllerTest {
       'Completed: ' + result.reasonCode + ' ' + loggedFailures()
     );
     Assert.areEqual(120.00, result.amount, 'What was paid');
+    Assert.isTrue(result.recorded, 'On the statement now');
     Assert.areEqual(
       1,
       [

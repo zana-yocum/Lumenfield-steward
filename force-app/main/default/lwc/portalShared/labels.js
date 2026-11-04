@@ -105,7 +105,7 @@ import payOpening from "@salesforce/label/c.Steward_Portal_Pay_Opening";
 import paySecureNote from "@salesforce/label/c.Steward_Portal_Pay_Secure_Note";
 import payChecking from "@salesforce/label/c.Steward_Portal_Pay_Checking";
 import payReceived from "@salesforce/label/c.Steward_Portal_Pay_Received";
-import payRefresh from "@salesforce/label/c.Steward_Portal_Pay_Refresh";
+import payRecordedLater from "@salesforce/label/c.Steward_Portal_Pay_Recorded_Later";
 import payNotTaken from "@salesforce/label/c.Steward_Portal_Pay_Not_Taken";
 import payNotFound from "@salesforce/label/c.Steward_Portal_Pay_Not_Found";
 import payNothingOwed from "@salesforce/label/c.Steward_Portal_Pay_Nothing_Owed";
@@ -214,7 +214,7 @@ export const LABELS = {
   paySecureNote,
   payChecking,
   payReceived,
-  payRefresh,
+  payRecordedLater,
   payNotTaken,
   payNotFound,
   payNothingOwed,

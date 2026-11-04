@@ -18,7 +18,8 @@ const NOT_FOUND = "NOT_FOUND";
  * ST-05, ST-12, NFR-07. Paying a statement online, on its own page. Pay sends the customer to
  * Stripe's secure checkout page for the statement's balance; card details are typed there and
  * never reach Lumenfield. When Stripe sends the customer back, the page says whether the payment
- * went through, and the statement shows it within a minute.
+ * went through. A payment recorded at once fires refresh, so the statement shows it in place; one
+ * the platform refused for now says it will show within the hour, when reconciliation records it.
  */
 export default class PortalPayment extends NavigationMixin(LightningElement) {
   /** The statement on this page. */
@@ -38,6 +39,8 @@ export default class PortalPayment extends NavigationMixin(LightningElement) {
   /** Whether the notice is a problem, read out at once. */
   noticeIsProblem = false;
   paid = false;
+  /** True when Stripe has the payment but the statement won't show it until reconciliation. */
+  recordedLater = false;
   checkedSession;
 
   connectedCallback() {
@@ -92,10 +95,6 @@ export default class PortalPayment extends NavigationMixin(LightningElement) {
     this.opening = false;
   }
 
-  handleRefresh() {
-    this.dispatchEvent(new CustomEvent("refresh"));
-  }
-
   async confirm() {
     if (this.checkedSession === this.sessionId) {
       return;
@@ -108,6 +107,11 @@ export default class PortalPayment extends NavigationMixin(LightningElement) {
         this.paid = true;
         this.noticeIsProblem = false;
         this.notice = format(LABELS.payReceived, formatMoney(result.amount));
+        if (result.recorded) {
+          this.dispatchEvent(new CustomEvent("refresh"));
+        } else {
+          this.recordedLater = true;
+        }
       } else if (result?.reasonCode === NOT_PAID) {
         this.noticeIsProblem = false;
         this.notice = LABELS.payNotTaken;

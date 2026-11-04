@@ -1,9 +1,9 @@
 /**
  * ST-05, S-02. The safety net for online payments: a customer who pays and closes the browser
  * never comes back to the portal to confirm, so this job asks Stripe for every completed checkout
- * session in the last Payment_Reconciliation_Hours and publishes each paid one. The subscriber
- * skips a payment it already recorded, so running the job any number of times records each
- * payment once.
+ * session in the last Payment_Reconciliation_Hours and records each paid one. PaymentRecorder
+ * skips a payment already recorded, so running the job any number of times records each payment
+ * once, and a payment refused on one run is tried again on the next.
  *
  * Scheduled, it starts one queueable, which can call out. Each queueable reads one page of 100
  * sessions and starts the next until Stripe has no more, up to MAX_PAGES. Every call is on
@@ -73,7 +73,7 @@ public with sharing class PaymentReconciliationJob implements Schedulable, Queue
   }
 
   /**
-   * Reads one page and publishes its paid sessions, then starts the next page if there is one.
+   * Reads one page and records its paid sessions, then starts the next page if there is one.
    * @param context the queueable
    */
   public void execute(QueueableContext context) {

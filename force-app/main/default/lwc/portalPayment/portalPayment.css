@@ -23,19 +23,7 @@
   cursor: progress;
 }
 
-.link-button {
-  min-height: var(--portal-target-size);
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--portal-color-link);
-  font: inherit;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.pay-button:focus-visible,
-.link-button:focus-visible {
+.pay-button:focus-visible {
   outline: var(--portal-border-focus) solid var(--portal-color-focus);
   outline-offset: var(--portal-border-focus);
 }

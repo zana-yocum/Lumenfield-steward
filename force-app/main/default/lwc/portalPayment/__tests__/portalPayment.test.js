@@ -37,9 +37,13 @@ const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 const STATEMENT_ID = "a01000000000001AAA";
 const CHECKOUT = "https://checkout.stripe.com/c/pay/cs_test_1";
 
-async function render(props = {}) {
+// onRefresh listens from the start: a recorded payment asks for a refresh as soon as it's confirmed.
+async function render(props = {}, onRefresh) {
   const element = createElement("c-portal-payment", { is: PortalPayment });
   Object.assign(element, { statementId: STATEMENT_ID, balance: 120 }, props);
+  if (onRefresh) {
+    element.addEventListener("refresh", onRefresh);
+  }
   document.body.appendChild(element);
   await flushPromises();
   return element;
@@ -141,23 +145,44 @@ describe("c-portal-payment", () => {
     expect(alert.textContent).not.toContain("Network down");
   });
 
-  it("thanks the customer coming back from a paid checkout", async () => {
+  it("thanks the customer coming back from a paid checkout, and refreshes the statement", async () => {
     confirmPayment.mockResolvedValue({
       outcome: "COMPLETED",
       statementId: STATEMENT_ID,
-      amount: 120
+      amount: 120,
+      recorded: true
     });
-    const element = await render({ sessionId: "cs_test_1" });
     const refreshed = jest.fn();
-    element.addEventListener("refresh", refreshed);
+    const element = await render({ sessionId: "cs_test_1" }, refreshed);
 
     expect(confirmPayment).toHaveBeenCalledWith({ sessionId: "cs_test_1" });
     expect(element.shadowRoot.querySelector("[role=status]").textContent).toBe(
-      "Thank you. Your payment of $120.00 is received. It will show on this statement within a minute."
+      "Thank you. Your payment of $120.00 is received."
     );
+    expect(refreshed).toHaveBeenCalledTimes(1);
     expect(element.shadowRoot.querySelector(".pay-button")).toBeNull();
-    element.shadowRoot.querySelector(".link-button").click();
-    expect(refreshed).toHaveBeenCalled();
+    expect(text(element)).not.toContain("within the hour");
+    await expect(element).toBeAccessible();
+  });
+
+  it("says when a payment received will show on the statement later", async () => {
+    confirmPayment.mockResolvedValue({
+      outcome: "COMPLETED",
+      statementId: STATEMENT_ID,
+      amount: 120,
+      recorded: false
+    });
+    const refreshed = jest.fn();
+    const element = await render({ sessionId: "cs_test_1" }, refreshed);
+
+    expect(text(element)).toContain(
+      "Thank you. Your payment of $120.00 is received."
+    );
+    expect(text(element)).toContain(
+      "It will show on this statement within the hour."
+    );
+    expect(refreshed).not.toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector(".pay-button")).toBeNull();
     await expect(element).toBeAccessible();
   });
 

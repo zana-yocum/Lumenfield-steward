@@ -1,45 +1,34 @@
 /**
- * ST-05, S-02. Turns a paid Stripe checkout session into a Payment_Received__e and publishes it,
- * for PaymentCheckoutService. The event carries the statement Steward named when it created the
- * session, what Stripe says was paid, the day, and Stripe's payment ID, on which the subscriber
- * records each payment once.
+ * ST-05, S-02. Reads a paid Stripe checkout session as the Lease Payment it made: the statement
+ * Steward named when it created the session, what Stripe says was paid, the day, and Stripe's
+ * payment ID, on which PaymentRecorder records each payment once. Also converts amounts between
+ * dollars and the cents Stripe works in.
  */
-public with sharing class PaymentEvents {
-  /**
-   * The event for a paid session.
-   * @param session the session, as Stripe describes it
-   * @param source where the confirmation came from, such as Portal return
-   * @return the event, not yet published
-   */
-  public static Payment_Received__e forSession(
-    StripeClient.CheckoutSession session,
-    String source
-  ) {
-    return new Payment_Received__e(
-      Statement_Id__c = session.clientReferenceId,
-      Amount__c = toDollars(session.amountTotal),
-      Paid_On__c = paidOn(session.created),
-      External_Reference__c = session.paymentIntent,
-      Source__c = source
-    );
-  }
+public with sharing class CheckoutPayments {
+  /** Lease Payment Method__c for a payment taken on Stripe's checkout page. */
+  public static final String METHOD_CARD = 'Card';
 
   /**
-   * Publishes payment events. They go out once the transaction commits.
-   * @param events the events
-   * @return the platform's errors as one line, or null when every event was published
+   * The payment a paid session made, not yet saved.
+   * @param session the session, as Stripe describes it
+   * @return the payment, or null when the session isn't paid or isn't for a statement
    */
-  public static String publish(List<Payment_Received__e> events) {
-    if (events.isEmpty()) {
+  public static Payment__c toPayment(StripeClient.CheckoutSession session) {
+    Id statementId = statementIdOrNull(session?.clientReferenceId);
+    if (
+      statementId == null ||
+      session.paymentStatus != StripeClient.PAID ||
+      String.isBlank(session.paymentIntent)
+    ) {
       return null;
     }
-    List<String> failures = new List<String>();
-    for (Database.SaveResult published : EventBus.publish(events)) {
-      if (!published.isSuccess()) {
-        failures.add(StewardOutcome.describeErrors(published.getErrors()));
-      }
-    }
-    return failures.isEmpty() ? null : String.join(failures, '; ');
+    return new Payment__c(
+      Billing_Statement__c = statementId,
+      Amount__c = toDollars(session.amountTotal),
+      Payment_Date__c = paidOn(session.created),
+      Method__c = METHOD_CARD,
+      External_Reference__c = session.paymentIntent
+    );
   }
 
   /**

@@ -53,8 +53,8 @@ public with sharing class PortalPaymentsController {
   }
 
   /**
-   * Whether the checkout the customer came back from was paid. A paid one is handed on to be
-   * recorded as a Lease Payment, which appears on the statement within a minute.
+   * Whether the checkout the customer came back from was paid. A paid one is recorded as a Lease
+   * Payment at once, so the statement shows it when the page reads it again.
    * @param sessionId the session ID Stripe put in the return address
    * @return the confirmation, or why there isn't one
    */

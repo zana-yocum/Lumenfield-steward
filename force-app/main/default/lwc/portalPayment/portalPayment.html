@@ -7,12 +7,8 @@
     <template lwc:if={notice}>
       <p class={noticeClass} role={noticeRole}>{notice}</p>
     </template>
-    <template lwc:if={paid}>
-      <p>
-        <button type="button" class="link-button" onclick={handleRefresh}>
-          {labels.payRefresh}
-        </button>
-      </p>
+    <template lwc:if={recordedLater}>
+      <p class="note">{labels.payRecordedLater}</p>
     </template>
     <template lwc:if={canPay}>
       <p>

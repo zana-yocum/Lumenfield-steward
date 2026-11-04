@@ -266,6 +266,7 @@ private class PaymentCheckoutServiceTest {
     );
     Assert.areEqual(120.00, result.amount, 'What Stripe says was paid');
     Assert.areEqual(lastMonths.Id, result.statementId, 'On the statement');
+    Assert.isTrue(result.recorded, 'Recorded now, so the page can show it');
     Payment__c recorded = [
       SELECT Billing_Statement__c, Amount__c, Method__c, Payment_Date__c
       FROM Payment__c
@@ -434,10 +435,11 @@ private class PaymentCheckoutServiceTest {
 
     Assert.areEqual(5, result.sessionsRead, 'Every session read');
     Assert.areEqual(
-      3,
-      result.paymentsPublished,
-      'The paid ones for a statement'
+      2,
+      result.paymentsRecorded,
+      'The paid ones for a statement, one of them seen twice'
     );
+    Assert.areEqual(0, result.paymentsRefused, 'None refused');
     Assert.isTrue(result.hasMore, 'More to come');
     Assert.areEqual(
       'cs_r5',

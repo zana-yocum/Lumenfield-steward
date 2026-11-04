@@ -590,15 +590,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Portal: payment confirmed; {0} is the amount</shortDescription>
-        <value>Thank you. Your payment of {0} is received. It will show on this statement within a minute.</value>
+        <value>Thank you. Your payment of {0} is received.</value>
     </labels>
     <labels>
-        <fullName>Steward_Portal_Pay_Refresh</fullName>
+        <fullName>Steward_Portal_Pay_Recorded_Later</fullName>
         <categories>Steward Portal</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Portal: reload the statement after paying</shortDescription>
-        <value>Refresh the statement</value>
+        <shortDescription>Portal: a payment received but not yet on the statement</shortDescription>
+        <value>It will show on this statement within the hour.</value>
     </labels>
     <labels>
         <fullName>Steward_Portal_Pay_Secure_Note</fullName>
