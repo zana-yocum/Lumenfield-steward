@@ -6,15 +6,60 @@ Everything deferred, flagged or half-finished. Updated at the end of every sitti
 
 ---
 
-## Phase 9 — Customer timeline — built, pull request #19
+## Phase 7 — Online payments — pull request #20
 
-Built ahead of Phases 7 and 8, which start with your setup steps. One household's history on one timeline (ST-15): statements, payments, promises to pay, billing disputes, credits and commitments, newest first, filtered by kind. Reps get it as the first tab on the console's account page. Customers get their own household's on the portal's My Account page.
+Customers pay a statement on Stripe's hosted checkout page, in test mode, from the statement's portal page or from a link the agent sends (ST-05). Card details are typed on Stripe's page and never reach Salesforce. Salesforce asks Stripe whether a checkout was paid, when the customer comes back and hourly as a safety net (S-02). Everything is built and tested against a stand-in for Stripe. What's left needs your Stripe account and your hands in Setup.
 
 **Your steps**
-- ☐ 1. **Make the new account page the console's default**, about 3 minutes. Claude may do this through the API after the deploy. If so, this step will say ☑ with the date.
-  1. Setup → Quick Find `Lightning App Builder` → **Lightning App Builder** → find **Steward Account Record Page** → **Edit**.
-  2. Top right: **Activation...** → the **App Default** tab → **Assign as App Default** → tick **Collections Console** → **Next** → **Desktop** → **Next** → **Save**.
-  3. Close App Builder. No other page or app changes.
+- ☐ 1. **Create a Stripe account and copy its test key**, about 10 minutes. The key never goes into a chat, an email or the repository, only into Salesforce in step 2.
+  1. Go to `https://dashboard.stripe.com/register` and sign up with your own email. Skip anything about activating payments: test mode works without it.
+  2. Make sure you're in **test mode**: the dashboard says Test mode or Sandbox at the top. Real money can't move there.
+  3. Optional: Settings → **Business** → **Public details** → set the public business name to `Lumenfield Solar (test)`, so the checkout page shows it.
+  4. Open **Developers** → **API keys**. Under **Standard keys**, find the **Secret key** and click **Reveal test key**. It starts with `sk_test_`. Copy it.
+- ☐ 2. **Put the key into Salesforce**, about 3 minutes:
+  1. Setup → Quick Find `Named Credentials` → **Named Credentials** → the **External Credentials** tab → **Stripe Test**.
+  2. Under **Principals**, on the **Stripe_Test_Key** row, open the row's menu (▼) → **Edit**.
+  3. Under **Authentication Parameters**, click **Add**. Name: `ApiKey`. Value: paste the key. **Save**.
+  4. If anything on the page doesn't match, stop and tell Claude what you see. Don't paste the key anywhere else.
+- ☐ 3. **Give yourself the reconciliation permission**, about 2 minutes. The hourly job runs as whoever schedules it, and only users with this permission set can call Stripe. Setup → Quick Find `Users` → **Users** → your name → **Permission Set Assignments** → **Edit Assignments** → move **Steward Payment Reconciliation** to Enabled → **Save**.
+- ☐ 4. **Schedule the hourly reconciliation**, about 2 minutes:
+  1. Click the gear icon → **Developer Console**. In it: **Debug** → **Open Execute Anonymous Window**.
+  2. Paste this one line, then click **Execute**:
+     `System.schedule('Steward Payment Reconciliation', '0 15 * * * ?', new PaymentReconciliationJob());`
+  3. Setup → Quick Find `Scheduled Jobs` → **Scheduled Jobs**. **Steward Payment Reconciliation** is listed, next run at 15 minutes past the hour.
+- ☐ 5. **Pay a statement as Sandra Barnett (UAT-S05)**, about 15 minutes. Follow `docs/uat-scripts.md`, UAT-S05. In short: log in to the portal as Sandra, open her oldest past-due statement, **Pay**, and pay with the test card **4242 4242 4242 4242**, any future expiry date, any CVC and any ZIP code. The statement shows the payment straight away. Take the screenshots the script names.
+- ☐ 6. Tell Claude "payments tested", with anything that looked wrong. Claude then checks the payment, the logs and the hourly run in the org, and records the evidence.
+
+Admins already see the integration log, so `PS_Steward_Integration_Log` is for a support user later. You don't need it.
+
+**Mine**
+- ☑ **The Stripe integration (S-02):** `StripeClient`, the `Stripe_API` Named Credential and `Stripe_Test` External Credential, `StripeMock` for tests
+- ☑ **Paying:** `PaymentCheckoutService`, `CheckoutPayments`, `PaymentRecorder` (S-27), `PaymentReconciliationJob` with the `Payment_Reconciliation_Hours` policy setting (48)
+- ☑ **The integration log (S-28):** `Integration_Log__c`, `IntegrationLogger`, `PS_Steward_Integration_Log`
+- ☑ **Pay online on the portal:** `portalPayment` on the statement's page, `PortalPaymentsController`, `PortalLinks`, 11 `Steward_Portal_Pay_*` labels
+- ☑ **The agent's payment link:** `GetPaymentLinkAction`, in `PS_Steward_Agent` with principal access
+- ☑ **Tests:** 53 Apex tests in 10 classes and 15 Jest tests, every one against `StripeMock` or with accessibility checks. Code Analyzer 0 at every severity across the workspace, Prettier and the personal-details check clean
+- ☑ **Found on the way** (`CHANGELOG.md`):
+  - Apex's `Decimal` has no `movePointLeft` or `movePointRight`.
+  - A customer can't query agreements, so tests read household IDs before `System.runAs`.
+  - A log row naming a statement that doesn't exist was lost; it's now saved without the link.
+  - **Customers can't publish a platform event,** so payments are recorded directly, in system mode, by one class (S-27). Granting them the event would have let them publish payments through the API.
+- ☑ **Docs:** S-02 decided; S-27 and S-28; payments in `docs/security-model.md` and `docs/agent-governance.md`; conventions; 13 explainers; ST-05's traceability; UAT-S05
+- ☐ Merge, deploy, and check in the org: the log object and tab, the credentials, the principal access in the three permission sets
+- ☐ After your steps 1–6: check the payment, its logs and an hourly run in the org, and record the evidence here and in the changelog
+
+**Known and accepted**
+- ⊘ **Two open checkouts for one statement can both be paid** within the hour they stay open. Both are real payments, so both are recorded; the second shows as a credit, and a rep refunds it in Stripe. A production build would expire a statement's other open sessions when one is paid (S-02).
+- ⊘ **No webhook.** A customer who pays and never comes back waits up to an hour for the payment to show (S-02).
+
+---
+
+## Phase 9 — Customer timeline — deployed 2026-11-03
+
+Built ahead of Phases 7 and 8. One household's history on one timeline (ST-15): statements, payments, promises to pay, billing disputes, credits and commitments, newest first, filtered by kind. Reps get it as the first tab on the console's account page. Customers get their own household's on the portal's My Account page.
+
+**Your steps**
+- ☑ 1. Make the new account page the console's default. Claude did this through the API after the deploy, at about 7:51 PM CT on 2026-11-03, by setting the Collections Console's account page assignment (S-26). Nothing for you to do.
 - ☐ 2. **Look at it yourself (UAT-S15)**, about 10 minutes:
   1. In the Collections Console, open any household account, such as Sandra Barnett's. The first tab, **History**, shows the timeline. Untick **Payments**, then tick it again. Scroll to the bottom, or use **Show more** if there is one. Click a statement's heading: it opens in a subtab.
   2. Use only the keyboard for a minute: Tab reaches each filter box and each link, Space ticks a box, and Show more moves you to the first new event.
@@ -30,9 +75,10 @@ Built ahead of Phases 7 and 8, which start with your setup steps. One household'
 - ☑ **Found and fixed on the way** (`CHANGELOG.md`):
   - Steward's tests had stopped compiling in the org when Accord's adjustments became auto-numbered (pull request #18's guard couldn't help).
   - A `Date` passes `instanceof Datetime` in Apex, which had moved dates a day.
-- ☑ Fourth validation (`0Afaj00000qKAlFCAW`): 339 components, 227 of 227 tests, the four new classes at 100%
 - ☑ **Docs:** decisions S-25 and S-26; five explainers; `docs/security-model.md`; conventions; traceability; changelog
-- ☐ Merge, deploy, and check in the org: the page, the permission sets in the groups, and the timeline as a rep and as a customer
+- ☑ **Merged and deployed, 2026-11-03.** Merged at 7:47 PM CT and quick-deployed as Steward CI (`0Afaj00000qKENRCA4`, of validation `0Afaj00000qKCqHCAW`: 339 components, 227 of 227 tests). The pipeline republished the portal. In the org afterwards:
+  - The three collections permission set groups include `PS_Steward_Timeline` and show Updated.
+  - `Steward_Account_Record_Page` is the Collections Console's account page.
 
 ---
 
@@ -321,7 +367,8 @@ The first change went through the whole pipeline: pull request #1 validated as S
 - ☐ Add two statements showing an escalator step to one demo household, so ST-03 can be shown on real data, not just in tests
 
 **Phase 7 — Payments**
-- ☐ Create a free Stripe account and keep it in test mode. The test secret key goes into the `Stripe_Test` External Credential, nowhere else
+- → Moved to Phase 7's steps 1 and 2 above: a free Stripe account in test mode, with the test secret key in the `Stripe_Test` External Credential and nowhere else
+- ☐ Confirm in the org that a customer's callout works with the principal access its permission set grants. Tests mock Stripe, so only UAT-S05 can show it
 
 ---
 

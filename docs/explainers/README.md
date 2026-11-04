@@ -91,6 +91,23 @@ One page per Apex class, Lightning web component, prompt template and agent suba
 | [GetDisputeStatusAction](GetDisputeStatusAction.md) | The household's billing disputes and where each one stands | ST-06 |
 | [RecordHandoffAction](RecordHandoffAction.md) | Why the chat is going to a person, for the supervisor and the person | ST-07 · ST-11 |
 | [AgentTestSessions](AgentTestSessions.md) | Stand-in chats, because a test can't open a real one | S-07 |
+| [AgentTestUsers](AgentTestUsers.md) | The agent's user for tests, with only the agent's access | S-01 · ST-12 |
+
+**Online payments (Phase 7)**
+
+| Component | One line | Stories |
+|---|---|---|
+| [StripeClient](StripeClient.md) | Steward's only caller of Stripe: create a checkout, read it back, list completed ones | ST-05 · S-02 |
+| [PaymentCheckoutService](PaymentCheckoutService.md) | Start a checkout for the household's own statement; confirm it; reconcile a page of them | ST-05 · ST-12 · S-02 |
+| [CheckoutPayments](CheckoutPayments.md) | A paid session as the Lease Payment it made; dollars to cents and back | ST-05 · S-02 |
+| [PaymentRecorder](PaymentRecorder.md) | Records each Stripe payment once, never overwriting one, in system mode | ST-05 · S-27 |
+| [PaymentReconciliationJob](PaymentReconciliationJob.md) | The hourly safety net for customers who paid and never came back | ST-05 · S-02 |
+| [IntegrationLogger](IntegrationLogger.md) | Every call to Stripe on `Integration_Log__c`, saved after the last callout | ST-05 · S-28 · NFR-07 |
+| [PortalPaymentsController](PortalPaymentsController.md) | **Pay online**'s server side: start a checkout, confirm the return | ST-05 · ST-12 |
+| [PortalLinks](PortalLinks.md) | A statement's portal address, from anywhere, for Stripe to send the customer back to | ST-05 |
+| [GetPaymentLinkAction](GetPaymentLinkAction.md) | The agent's payment link: Stripe's page for the household's own statement | ST-05 · GR-01 |
+| [portalPayment](portalPayment.md) | **Pay online** on a statement's page, and what happened when the customer comes back | ST-05 · NFR-05 |
+| [StripeMock](StripeMock.md) | Stripe's answers in tests, by method and path, with every request kept | ST-05 · NFR-03 |
 
 **The customer timeline (Phase 9)**
 
@@ -111,6 +128,7 @@ One page per Apex class, Lightning web component, prompt template and agent suba
 | [StewardOutcome](StewardOutcome.md) | The outcome and reason codes every service returns |
 | [SensitiveText](SensitiveText.md) | Removes card numbers before anything is saved, and contact details before a prompt |
 | [StewardTestData](StewardTestData.md) | The invented households the tests run against |
+| [TestIds](TestIds.md) | A well-formed ID that no record has, for tests |
 
 ## Template
 

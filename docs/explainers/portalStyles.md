@@ -6,7 +6,7 @@
 
 **How it works:**
 1. The tokens are set on `:host`, so each component that imports the sheet gets them. Each one names an SLDS global styling hook, such as `--portal-color-link: var(--slds-g-color-accent-2, #0b5cab)`. The value after the hook is used only where the site doesn't define it, so the portal looks right either way.
-2. The one value with no SLDS hook, the page's maximum width, is a named token too, so no component hard-codes a size.
+2. The one value with no SLDS hook, the page's maximum width, is a named token too, so no component hard-codes a size. Text on an accent background, such as **Pay online**'s button, uses `--portal-color-on-accent`, from the hook SLDS pairs with the accent (Phase 7).
 3. The classes keep one column on a 360-pixel phone, show details in a two-column grid that becomes three on a wider screen, and give every link and focusable heading a visible focus ring.
 4. Status is always written out in words. Borders and color only frame it.
 

@@ -537,6 +537,94 @@
         <value>Past due</value>
     </labels>
     <labels>
+        <fullName>Steward_Portal_Pay_Button</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: the Pay button; {0} is the balance</shortDescription>
+        <value>Pay {0}</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Pay_Checking</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: shown while the payment is checked</shortDescription>
+        <value>Checking your payment…</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Pay_Not_Found</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: a payment that isn't this household's</shortDescription>
+        <value>We couldn't find that payment on your account. If you were charged, contact us.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Pay_Not_Taken</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: checkout left or declined</shortDescription>
+        <value>No payment was taken. You can try again whenever you're ready.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Pay_Nothing_Owed</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: a statement with no balance</shortDescription>
+        <value>There's nothing to pay on this statement.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Pay_Opening</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: shown while the checkout page opens</shortDescription>
+        <value>Opening secure checkout…</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Pay_Received</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: payment confirmed; {0} is the amount</shortDescription>
+        <value>Thank you. Your payment of {0} is received.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Pay_Recorded_Later</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: a payment received but not yet on the statement</shortDescription>
+        <value>It will show on this statement within the hour.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Pay_Secure_Note</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: where card details go</shortDescription>
+        <value>You'll pay on Stripe's secure page. Your card details never reach Lumenfield.</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Pay_Title</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: heading of the pay section</shortDescription>
+        <value>Pay online</value>
+    </labels>
+    <labels>
+        <fullName>Steward_Portal_Pay_Unavailable</fullName>
+        <categories>Steward Portal</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Portal: Stripe unreachable; {0} is the reference</shortDescription>
+        <value>Online payment isn't available right now. Please try again later, and quote reference {0} if you contact us.</value>
+    </labels>
+    <labels>
         <fullName>Steward_Portal_Payments</fullName>
         <categories>Steward Portal</categories>
         <language>en_US</language>

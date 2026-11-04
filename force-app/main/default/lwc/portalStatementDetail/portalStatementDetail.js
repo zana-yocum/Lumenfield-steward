@@ -4,6 +4,7 @@ import getStatement from "@salesforce/apex/PortalAccountController.getStatement"
 import {
   CONNECTION_PROBLEM,
   LABELS,
+  OUTCOME,
   PAGES,
   format,
   namedPage,
@@ -13,10 +14,17 @@ import {
 
 const NOT_YOURS = LABELS.statementNotYours;
 
+/** Stripe sends the customer back with these in the address (PaymentCheckoutService). */
+const SESSION_PARAM = "c__session_id";
+const PAYMENT_PARAM = "c__payment";
+const CANCELLED = "cancelled";
+
 /**
- * ST-01, ST-12. A statement's own page. The ID comes from the address (?recordId=…), so the server
- * looks for it only among the logged-in household's statements: another household's ID gets the
- * same answer as one that doesn't exist, and nothing about it reaches the browser.
+ * ST-01, ST-05, ST-12. A statement's own page. The ID comes from the address (?recordId=…), so
+ * the server looks for it only among the logged-in household's statements: another household's ID
+ * gets the same answer as one that doesn't exist, and nothing about it reaches the browser. Below
+ * the statement, Pay online (portalPayment), which also reads what Stripe put in the address on
+ * the way back.
  */
 export default class PortalStatementDetail extends NavigationMixin(
   LightningElement
@@ -28,6 +36,10 @@ export default class PortalStatementDetail extends NavigationMixin(
   problem;
   statementsUrl;
   hasPage = false;
+  /** The checkout session Stripe sent the customer back from, if any. */
+  paymentSession;
+  /** True when the customer came back from Stripe without paying. */
+  paymentCancelled = false;
 
   @wire(CurrentPageReference)
   setCurrentPage(pageRef) {
@@ -37,6 +49,8 @@ export default class PortalStatementDetail extends NavigationMixin(
     }
     this.hasPage = true;
     this.statementId = statementId;
+    this.paymentSession = pageRef.state?.[SESSION_PARAM];
+    this.paymentCancelled = pageRef.state?.[PAYMENT_PARAM] === CANCELLED;
     this.load();
   }
 
@@ -71,6 +85,25 @@ export default class PortalStatementDetail extends NavigationMixin(
       if (requested === this.statementId) {
         this.loading = false;
       }
+    }
+  }
+
+  /**
+   * Reads the statement again without clearing the page, after a payment, so it shows the new
+   * balance and payment.
+   */
+  async handleRefresh() {
+    const requested = this.statementId;
+    try {
+      const result = await getStatement({ statementId: requested });
+      if (
+        requested === this.statementId &&
+        result?.outcome === OUTCOME.completed
+      ) {
+        this.statement = result.statement;
+      }
+    } catch {
+      // The statement on screen stays; the customer can reload the page.
     }
   }
 

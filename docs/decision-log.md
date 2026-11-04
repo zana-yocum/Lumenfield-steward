@@ -7,7 +7,7 @@ The decisions that shape Steward, the options considered, and why one was chosen
 | ID | Decision | Status |
 |---|---|---|
 | S-01 | The service agent runs as its own least-privilege user | Decided · confirmed in Phase 6 |
-| S-02 | Salesforce asks the payment provider; the provider never calls Salesforce | Proposed · Phase 7 |
+| S-02 | Salesforce asks the payment provider; the provider never calls Salesforce | Decided · built in Phase 7 |
 | S-03 | Apex for agent actions; Accord's flows keep the policy | Decided |
 | S-04 | Customer Community licenses with sharing sets | Decided · confirmed in Phase 4 |
 | S-05 | The pipeline validates against the org; no scratch orgs | Decided |
@@ -32,6 +32,8 @@ The decisions that shape Steward, the options considered, and why one was chosen
 | S-24 | The action log's conversation ID is the messaging session's ID | Decided |
 | S-25 | The timeline reads each kind in user mode, naming only the fields the person can read | Decided |
 | S-26 | The console's account page is Steward's; it's activated in the org, not in either repo | Decided |
+| S-27 | Payments Stripe confirmed are recorded in system mode by one class, not through a platform event | Decided · after the third Phase 7 validation |
+| S-28 | Calls to outside systems are logged in system mode, by one class, after the last callout | Decided |
 
 ---
 
@@ -63,18 +65,30 @@ The decisions that shape Steward, the options considered, and why one was chosen
 ---
 
 ### S-02 — Salesforce asks the payment provider; the provider never calls Salesforce
-**Status:** Proposed · confirm in Phase 7
+**Status:** Decided · built in Phase 7
 
 **Context:** A customer pays on the provider's checkout page. Salesforce needs to learn about each completed payment once, reliably.
 
 **Options**
 1. **Webhook:** the provider calls a public Salesforce endpoint when a payment completes. Fast, but it opens a public door into the org that needs a site user and signature verification to secure.
-2. **Polling:** Salesforce checks for completed payments once when the customer returns to the portal, and again on a schedule as a safety net. **← starting position**
+2. **Polling:** Salesforce checks for completed payments once when the customer returns to the portal, and again on a schedule as a safety net. **← decided**
 3. **Salesforce Payments**, the native product: less code, but the work becomes configuring its checkout and merchant onboarding rather than building an integration.
 
 **Why:** Polling leaves no public surface to secure and works within Developer Edition. Its cost is a delay of up to one schedule interval when a customer never returns to the portal, which is acceptable for a monthly lease payment. The integration skills it exercises (credentials, callouts, async reconciliation, idempotency) carry over to any provider.
 
-**Consequences:** `PaymentReconciliationJob` runs on a schedule. Duplicates are prevented by upserting on `External_Reference__c`, and every request that creates something at the provider sends an idempotency key. A production build would revisit webhooks, with signature checks, for real-time posting.
+**How it was built (Phase 7):**
+- The provider is Stripe, in test mode, through its hosted Checkout page. Card details are typed on Stripe's page and never reach Salesforce, the portal or the chat.
+- Each checkout session carries the statement's ID as its `client_reference_id`. A session is trusted only after Salesforce reads it back from Stripe, and on the portal only when that statement is the household's own.
+- **On the way back:** Stripe returns the customer to the statement's portal page with the session ID in the address (`c__session_id`). The page asks Stripe whether it was paid.
+- **The safety net:** `PaymentReconciliationJob` runs hourly. It lists the completed sessions of the last `Payment_Reconciliation_Hours` (48) and records any payment the return missed.
+- Either path hands the paid session to `PaymentRecorder`, which records the Lease Payment once (S-27).
+
+**Consequences:**
+- **A payment is recorded once.** `PaymentRecorder` inserts only payments whose Stripe payment ID isn't already on a Lease Payment. Accord's `External_Reference__c` is a unique external ID, so a racing second confirmation is refused. A recorded payment is never overwritten.
+- **A refused payment isn't lost.** It's noted on the integration log, and the next reconciliation run records it, because Stripe still lists the session for 48 hours.
+- **The idempotency key covers a resent request.** Every create request sends one. If the same request reaches Stripe twice, Stripe answers with the first session. Two separate requests make two sessions.
+- **Two open checkouts can both be paid.** A customer who opens two checkouts for the same statement and pays both within the hour pays twice. Both are real payments, so both are recorded. The second shows as a credit on the account, and a rep refunds it from Stripe's dashboard. A production build would expire a statement's other open sessions when one is paid (Stripe's expire endpoint), which needs the open sessions stored.
+- **Real-time posting would need webhooks.** A production build would revisit them, with signature checks.
 
 ---
 
@@ -474,7 +488,7 @@ For paging: one `OFFSET` across the merged timeline can't work when kinds interl
 **Why:** Option 3 keeps every read in user mode, so sharing, object access and field access are all the platform's. A kind the person can't fully read is simply not offered. A hidden field is a gap in one event, not an error. The query text holds only paths written in `TimelineKind`, and every value is bound, so nothing from the browser becomes SOQL. The cursor is untrusted input too. It's parsed strictly, and its counts can only skip records inside the household the server already chose.
 
 **Consequences:**
-- No new exception to user mode (NFR-01). The S-08, S-09, S-14 and S-23 exceptions stay the only four.
+- No new exception to user mode (NFR-01). The S-08, S-09, S-14 and S-23 exceptions were the only four. Phase 7 adds S-27 and S-28.
 - Every kind's query is ordered by the date that places it, so the merge stays newest first. That's why credits appear once posted, on their posted date. Drafts and credits waiting for approval stay in the Adjustments list.
 - Each kind declares whether its date is a timestamp. A `Date` passes `instanceof Datetime` in Apex, and converting it moved dates a day for users west of Greenwich, as the first validation showed.
 - A kind stops paging at SOQL's 2,000-row offset limit. That's more than 160 years of monthly statements.
@@ -497,4 +511,50 @@ For paging: one `OFFSET` across the merged timeline can't work when kinds interl
 - Open items record when the page was activated and by whom. Until it is, the timeline is deployed but reps don't see it.
 - Accord's retrieve workflow would pick the activation up into Accord's copy of the app. If Accord ever deploys that app file without it, the activation is undone, so a deploy of Accord's console app is followed by a look at the account page.
 - The page keeps what reps had: the highlights, related lists and details, with activity alongside. The timeline is the first tab.
+
+---
+
+### S-27 — Payments Stripe confirmed are recorded in system mode by one class, not through a platform event
+**Status:** Decided · after the third Phase 7 validation
+
+**Context:** A payment is confirmed in two places: on the customer's return to the portal, as the customer, and by the reconciliation job, as the admin who scheduled it. The agent's payment link returns the customer to the same portal page. Neither customers nor the agent should be able to create Lease Payments: they have read only, and a create grant would let them record payments through the API that never happened.
+
+**Options**
+1. Give each caller create on Lease Payments and save in user mode. That's the API hole above.
+2. Publish a platform event, `Payment_Received__e`, and record the payment in its trigger, which runs as the Automated Process user. **← built first, and refused by the org**
+3. Record the payment where it's confirmed, through one class, `PaymentRecorder`, that saves in system mode, and only after Stripe says the session was paid. **← decided**
+4. Option 2, with the customer given create on the event and the subscriber checking every payment with Stripe again. That needs callouts from the subscriber, as a named user set in `PlatformEventSubscriberConfig`.
+
+**What the org showed:** option 2 was built and tested first. The third validation (`0Afaj00000qNc1pCAC`) refused both customer tests that confirmed a payment: `EventBus.publish` checks the running user's create access on the event, and a customer has none (`CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY: Access to entity 'Payment_Received__e' denied`). Granting it would reopen option 1's hole, because anyone with create on the event can publish one through the API.
+
+**Why option 3:**
+- **One door in, and it opens only after Stripe answers.** `PaymentCheckoutService` reads the session back from Stripe, checks that it's paid, and on the portal checks that its statement is the household's own. Only then does it hand the payment to `PaymentRecorder`. The amount and payment ID are Stripe's, never the page's.
+- **No new access.** Customers and the agent keep read only on Lease Payments. The insert sits in `PaymentRecorder`'s `Elevated` inner class, like the other exceptions.
+- **It's simpler, and faster for the customer.** The payment is on the statement when the page refreshes, not after an event is delivered.
+- **The retry an event gave is still there.** A refused payment, such as one for a locked statement, is noted on the integration log, and the next hourly reconciliation run records it.
+- **Option 4 costs more than it gives.** It needs a second call to Stripe for every payment, and a user named in metadata, which differs between orgs.
+
+**Consequences:**
+- **The customer is told the payment is received whenever Stripe says it was paid,** because Stripe has the money. If the platform refused the record for the moment, the page says it will show on the statement within the hour.
+- **Callouts come first.** Recording is the last thing before the logs are saved, so every entry point keeps the callout-before-save order (S-28).
+- **Steward has no platform events.** The convention for naming one stays, for later.
+
+---
+
+### S-28 — Calls to outside systems are logged in system mode, by one class, after the last callout
+**Status:** Decided
+
+**Context:** Support staff need to answer "did the payment reach Stripe, and what did Stripe say?" without debug logs (NFR-07). Calls to Stripe are made as customers, the agent user and the job's user. None of them should be able to read the log, which holds Stripe's errors and IDs for every household. And Salesforce refuses a callout after a save in the same transaction, so a log saved as each call happens would block the next call.
+
+**Options**
+1. Give every caller create on `Integration_Log__c` and save in user mode. Customers could then write rows into a support record through the API.
+2. Publish a platform event per call and save it in a subscriber. That survives a rollback, but it adds an event and a trigger for a record nobody acts on in real time.
+3. `IntegrationLogger` keeps calls in memory and saves them all in one system-mode statement when the entry point calls `save()` after its last callout. Reading stays with `PS_Steward_Integration_Log`. **← decided**
+
+**Why:** It's the action log's pattern (S-09): one writer, in an `Elevated` inner class, with the readers set by a permission set. Keeping calls in memory makes the callout rule a single line at each entry point instead of a constraint on every class. Text is cut to fit and card numbers removed (`SensitiveText`) before anything is saved.
+
+**Consequences:**
+- **Every entry point that calls out saves the log after its last callout:** `PortalPaymentsController`, `GetPaymentLinkAction` and `PaymentReconciliationJob`. The action log names the integration log records, so a customer's reference leads to Stripe's answer.
+- **A log row the platform refuses is skipped, never thrown,** so logging can't break the payment it describes.
+- **A transaction that fails after the save loses its log with it.** The reconciliation job's finalizer logs a failure the job couldn't catch, in its own transaction.
 

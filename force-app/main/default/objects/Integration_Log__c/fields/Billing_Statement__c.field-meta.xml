@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Billing_Statement__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>ST-05. The statement being paid, when the call was about one.</description>
+    <externalId>false</externalId>
+    <label>Billing Statement</label>
+    <referenceTo>Billing_Statement__c</referenceTo>
+    <relationshipLabel>Integration Logs</relationshipLabel>
+    <relationshipName>Integration_Logs</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

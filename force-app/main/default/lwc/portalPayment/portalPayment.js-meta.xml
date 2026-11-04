@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <description>ST-05. Paying a statement online: Pay opens Stripe's secure checkout page for the balance, and the page says whether the payment went through when Stripe sends the customer back.</description>
+    <isExposed>false</isExposed>
+    <masterLabel>Portal Payment</masterLabel>
+</LightningComponentBundle>

@@ -5,7 +5,7 @@ Who can reach what in Steward, and the test that proves each line. Steward adds 
 ## The rules every class follows
 
 - **User mode by default (NFR-01).** Every query is `WITH USER_MODE`. Every save uses `AccessLevel.USER_MODE`. Every class is `with sharing`. So a person or the agent gets exactly what their permissions and sharing allow, and no more.
-- **Four named exceptions.** Each one sits in an inner class named `Elevated`, with a comment citing its decision, and has its own tests:
+- **Six named exceptions.** Each one sits in an inner class named `Elevated`, with a comment citing its decision, and has its own tests:
 
 | Exception | What runs in system mode | Why | Decision |
 |---|---|---|---|
@@ -13,6 +13,8 @@ Who can reach what in Steward, and the test that proves each line. Steward adds 
 | Action log write | One log record per agent action | A declined request must be logged even when the caller can't see the account, and the agent needs no access to the log | S-09 |
 | Dispute insert | The case's account; every other field is checked against the caller's own create access first | Nobody can edit `Case.AccountId`, and the agent shouldn't be able to move cases between households | S-14 |
 | Session lookup | A chat's session, its messaging user, and that user's account | The agent finds the household from links only the platform sets, without reading conversations or user records | S-23 |
+| Payment insert | A Lease Payment for each payment Stripe confirmed, unless that Stripe payment is already recorded | Customers confirm their own payments on the portal, and nobody who confirms a payment may create payments themselves | S-27 |
+| Integration log write | One log record per call to Stripe | Customers, the agent and the job's user all call Stripe, and none of them may read or write the log | S-28 |
 
 - **The household comes first (ST-12).** Every service asks `HouseholdScope` which of the given households the caller can see before it reads anything else. An ID from someone else's household gets the same answer as an ID that doesn't exist.
 
@@ -21,7 +23,7 @@ Who can reach what in Steward, and the test that proves each line. Steward adds 
 | What | Grants |
 |---|---|
 | Profiles **Steward Customer** and **Steward Customer Login** (S-18) | Customer Community licenses. Custom profiles, not the standard external ones |
-| `PS_Steward_Customer` | The three portal controllers and the timeline's (`CustomerTimelineController`, Phase 9). Read on Account, Contact, Billing Statement, Lease Payment and Promise to Pay. Read and create on Case, with the Billing Dispute record type. Read on the balances and statement amounts. Create on the dispute fields. Nothing on commitments, opportunities, adjustments, agreements or the action log |
+| `PS_Steward_Customer` | The three portal controllers, the timeline's (`CustomerTimelineController`, Phase 9) and payments' (`PortalPaymentsController`, Phase 7). Calls to Stripe through the `Stripe_Test` credential's principal. Read on Account, Contact, Billing Statement, Lease Payment and Promise to Pay. Read and create on Case, with the Billing Dispute record type. Read on the balances and statement amounts. Create on the dispute fields. Nothing on commitments, opportunities, adjustments, agreements or the action log |
 | Sharing set `Customer_Household` | Read on the customer's own account, which statements, payments and promises follow. Read on cases whose `Customer_Household__c` is that account, so Accord's default reviews stay internal (S-16) |
 
 Proved by `PortalControllersTest`, `DisputeStatusServiceTest` and `PortalHouseholdTest`, which run as customer users with another household's IDs.
@@ -42,7 +44,8 @@ The agent user is created with the agent, on the **Einstein Agent User** profile
 | Promise to Pay | Read, Create | Date, amount and status (required fields). Read: `Grace_Ends__c` |
 | Case | Read, Create | Read: `AccountId`. Create: contact, description, dispute reason, disputed statement, origin, subject. Record type: Billing Dispute |
 | Contact | Read | No fields. A lookup to an object the user can't read is hidden, so without this the agent couldn't read the household's primary contact or name it on a dispute. Customers have it for the same reason |
-| Apex classes | The nine actions | `GetAccountSummaryAction`, `GetCommitmentsAction`, `ExplainStatementAction`, `CheckPaymentArrangementAction`, `CreatePaymentArrangementAction`, `GetDisputeReasonsAction`, `OpenDisputeAction`, `GetDisputeStatusAction`, `RecordHandoffAction` |
+| Apex classes | The ten actions | `GetAccountSummaryAction`, `GetCommitmentsAction`, `ExplainStatementAction`, `CheckPaymentArrangementAction`, `CreatePaymentArrangementAction`, `GetDisputeReasonsAction`, `OpenDisputeAction`, `GetDisputeStatusAction`, `RecordHandoffAction`, `GetPaymentLinkAction` (Phase 7) |
+| External credential | Principal access | `Stripe_Test-Stripe_Test_Key`, so Get Payment Link can ask Stripe for a checkout page (Phase 7) |
 
 Nothing else, so it has no Delete, no Edit on any object, no View All or Modify All, and no approval rights. It also gets nothing on Opportunity, Commitment, the action log, messaging records or users, and no contact field. The services reach the commitments, the log and the session for it, through the named exceptions above.
 
@@ -58,7 +61,7 @@ Nothing else, so it has no Delete, no Edit on any object, no View All or Modify 
 **Why every household:** the agent serves whichever customer is logged in, so the agent user needs access to every household it may serve. Which household one conversation may act for comes from the session, never from this access (S-07, S-23). So a chat reaches only its own customer's records, even though the agent user can see them all.
 
 **Proved by:**
-- `AgentAccessTest` runs all nine actions as an Einstein Agent User with only this permission set and the group's access, and every one answers in full. It also checks three more things:
+- `AgentAccessTest` runs the first nine actions as an Einstein Agent User with only this permission set and the group's access, and every one answers in full. `AgentPaymentAccessTest` does the same for Get Payment Link (Phase 7), with Stripe mocked. It also checks three more things:
   - From a second customer's chat, the first household's statement is not found, even though the agent user can see that household.
   - The agent user can't see an Organization account.
   - The agent user can't set a case's account, which is why the dispute insert stays an exception (S-14).
@@ -91,6 +94,48 @@ One component, two audiences, and no extra access for either (S-25):
 - **The page sends a cursor back, and it's untrusted.** It's parsed strictly, and its counts are bound as values. A count can only skip records inside the household the server already chose.
 
 Proved by `CustomerTimelineControllerTest`: an outsider gets `NOT_FOUND`, a customer passing another household's ID still gets only their own, and a customer without one field gets events without it.
+
+## Online payments (Phase 7)
+
+Customers pay on Stripe's hosted checkout page, in test mode (S-02). Card details are typed on Stripe's page and never reach Salesforce, the portal or the chat.
+
+**The key**
+- Stripe's secret key is entered in Setup, as the `ApiKey` parameter of the `Stripe_Test_Key` principal on the `Stripe_Test` External Credential. It's never in code, the repository or a test.
+- Apex calls `callout:Stripe_API`, and the credential adds the `Authorization` header itself. `StripeClientTest` checks Steward never sets one.
+
+**Who can call Stripe:** only users whose permission set grants the principal.
+
+| Permission set | Who | Why |
+|---|---|---|
+| `PS_Steward_Customer` | Customers | **Pay online** on a statement |
+| `PS_Steward_Agent` | The agent user | Get Payment Link |
+| `PS_Steward_Payment_Reconciliation` | The admin who schedules `PaymentReconciliationJob` | The job runs as that admin. This set grants the principal and nothing else |
+
+Reps, specialists and supervisors can't call Stripe.
+
+**Whose statement**
+- A checkout starts only for a statement in the caller's own household. On the portal that's the logged-in customer's (`PortalHousehold`), and in the chat the session's verified customer (S-23).
+- Coming back, the session's client reference must be one of the household's statements, or the answer is `NOT_FOUND` and nothing is recorded.
+- The session ID from the address is checked for its `cs_` prefix before Stripe is asked.
+
+**What goes to Stripe:** the statement's ID and number, the household's ID, and the amount. No name, email address, phone number or address. Stripe's page asks the customer for what it needs.
+
+**Recording the payment**
+- Only `PaymentRecorder` creates Lease Payments for Steward, in system mode (S-27), and only after Stripe says the session was paid. On the portal, the session's statement must also be the household's own. The amount and Stripe's payment ID come from Stripe, never from the page.
+- Customers and the agent keep read only on Lease Payments, so they can't record a payment through the API.
+- Each Stripe payment is recorded once, on its unique payment ID, however many times it's confirmed.
+- A platform event was built first and dropped: publishing one needs create access on the event, and with that access anyone could publish a payment through the API (S-27).
+
+**The integration log**
+- `Integration_Log__c` is Private. Every call to Stripe is written to it in system mode (S-28), and nobody gets create, edit or delete on it.
+- `PS_Steward_Integration_Log` gives read and View All, with its tab, to support staff. It's not in any group yet; an admin assigns it.
+- Customers, reps and the agent can't read it.
+
+**Proved by:**
+- `PortalPaymentsControllerTest` and `PaymentCheckoutServiceTest`, as customer users. Another household's statement or session is `NOT_FOUND`, and Stripe is never asked.
+- `GetPaymentLinkActionTest` and `AgentPaymentAccessTest`, as the agent user: only the chat's own customer gets a link. A card number typed in place of a statement ID is refused and kept out of the log.
+- `IntegrationLoggerTest`: a customer's call is recorded, though the customer can't read the log.
+- **What only the org can show:** that a customer's callout works with this access. Tests mock Stripe, so they can't show the credential's principal access at work. UAT-S05 covers it with a real test-mode payment.
 
 ## The pipeline
 

@@ -99,6 +99,17 @@ import uploadThanksOne from "@salesforce/label/c.Steward_Portal_Upload_Thanks_On
 import uploadThanksMany from "@salesforce/label/c.Steward_Portal_Upload_Thanks_Many";
 import disputeClosed from "@salesforce/label/c.Steward_Portal_Dispute_Closed";
 import backToDisputes from "@salesforce/label/c.Steward_Portal_Back_To_Disputes";
+import payTitle from "@salesforce/label/c.Steward_Portal_Pay_Title";
+import payButton from "@salesforce/label/c.Steward_Portal_Pay_Button";
+import payOpening from "@salesforce/label/c.Steward_Portal_Pay_Opening";
+import paySecureNote from "@salesforce/label/c.Steward_Portal_Pay_Secure_Note";
+import payChecking from "@salesforce/label/c.Steward_Portal_Pay_Checking";
+import payReceived from "@salesforce/label/c.Steward_Portal_Pay_Received";
+import payRecordedLater from "@salesforce/label/c.Steward_Portal_Pay_Recorded_Later";
+import payNotTaken from "@salesforce/label/c.Steward_Portal_Pay_Not_Taken";
+import payNotFound from "@salesforce/label/c.Steward_Portal_Pay_Not_Found";
+import payNothingOwed from "@salesforce/label/c.Steward_Portal_Pay_Nothing_Owed";
+import payUnavailable from "@salesforce/label/c.Steward_Portal_Pay_Unavailable";
 
 export const LABELS = {
   connectionProblem,
@@ -196,5 +207,16 @@ export const LABELS = {
   uploadThanksOne,
   uploadThanksMany,
   disputeClosed,
-  backToDisputes
+  backToDisputes,
+  payTitle,
+  payButton,
+  payOpening,
+  paySecureNote,
+  payChecking,
+  payReceived,
+  payRecordedLater,
+  payNotTaken,
+  payNotFound,
+  payNothingOwed,
+  payUnavailable
 };

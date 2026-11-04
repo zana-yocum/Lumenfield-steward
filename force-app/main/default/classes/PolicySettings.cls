@@ -1,5 +1,5 @@
 /**
- * ST-04, S-03. The only class that reads Policy_Setting__mdt, so every limit, day count and
+ * ST-04, ST-05, S-03. The only class that reads Policy_Setting__mdt, so every limit, day count and
  * percentage Steward applies comes from Accord's policy records rather than from code. A setting
  * that's missing or blank stops the caller instead of falling back to a guess.
  */
@@ -10,6 +10,8 @@ public with sharing class PolicySettings {
   public static final String SELF_SERVICE_BROKEN_PROMISE_LIMIT = 'Self_Service_Broken_Promise_Limit';
   /** Share of the past-due balance an online arrangement must cover, in percent (ST-04). */
   public static final String SELF_SERVICE_MIN_COVERAGE_PCT = 'Self_Service_Min_Coverage_Pct';
+  /** How far back each payment reconciliation looks for completed checkouts, in hours (ST-05). */
+  public static final String PAYMENT_RECONCILIATION_HOURS = 'Payment_Reconciliation_Hours';
 
   /**
    * Test seam. Lets a test show what happens when Steward's reading of a policy and Accord's

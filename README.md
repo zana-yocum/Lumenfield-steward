@@ -4,7 +4,7 @@ Steward is the second Lumenfield Home Energy project, built on the same Salesfor
 
 **The rule it's built around:** the agent can never do what a person in the same seat can't. It acts only for the logged-in customer's household, every record it creates goes through Accord's policy, and every action it takes, or declines, is logged for a supervisor.
 
-**Status:** Phases 1–5 of 10 done. Phase 6, the service agent, is under way: its nine actions, how a chat finds the logged-in customer's household, and the agent user's least-privilege access are built and tested, and the agent itself starts with a setup step in Salesforce. Phase 9, the customer timeline, is built: one household's history in the console and on the portal, read in user mode. 227 Apex tests and 86 Jest tests. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
+**Status:** Phases 1–5 and 9 of 10 done. Phase 6, the service agent, is under way: its actions, how a chat finds the logged-in customer's household, and the agent user's least-privilege access are built and tested, and the agent itself starts with a setup step in Salesforce. Phase 7, online payments through Stripe's hosted checkout, is built and tested against a stand-in for Stripe; a real test-mode payment needs a Stripe key entered in Setup. Phase 9, the customer timeline, is deployed. 280 Apex tests and 101 Jest tests. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
 
 ---
 
@@ -16,7 +16,7 @@ Steward is the second Lumenfield Home Energy project, built on the same Salesfor
 | Service agent | Agentforce, written in Agent Script: billing questions, payment arrangements within policy, payments, disputes with the right evidence list, handoff to a person over Enhanced Chat and Omni-Channel |
 | Rep assistant | Prompt Builder: account briefing before a call, dispute summary, follow-up draft |
 | Code | Apex services in user mode with at least 90% coverage and real assertions; a Lightning web component timeline with Jest tests |
-| Integration | Stripe test mode through Named and External Credentials, scheduled reconciliation, a platform event; no public endpoint |
+| Integration | Stripe test mode through Named and External Credentials: hosted checkout, confirmation on the customer's return, hourly reconciliation, every call logged; no public endpoint |
 | Data 360 | Solar production through the Ingestion API, matched to households; a production-versus-guarantee insight that opens credit reviews |
 | Release | GitHub Actions: Code Analyzer, Jest, validated deploys, quick deploy on merge. The agent ships through the same pipeline |
 
@@ -32,9 +32,9 @@ The same way as Accord: requirements before configuration, decisions written dow
 | 4 | Customer portal: six pages on an LWR site, household sharing, 6 more classes, 105 Apex tests in all and 48 Jest tests with accessibility checks | Done, 2026-10-21 |
 | 5 | Rep assistant: three prompt templates grounded in Apex with the user's own access, three console buttons, and `docs/agent-governance.md`; 159 Apex tests in all and 68 Jest tests | Done, 2026-10-26 |
 | 6 | Service agent: nine actions, the household from the chat's verified user, least-privilege access proved by test; next the Agent Script and the portal chat | In progress |
-| 7 | Payments | Planned |
+| 7 | Payments: Stripe's hosted checkout from the portal and the agent, each payment recorded once, hourly reconciliation, an integration log; 53 more Apex tests and 15 Jest tests | Built, in review |
 | 8 | Data 360 | Planned |
-| 9 | Customer timeline: one household's history, newest first, filtered by kind, in the console and on the portal; 227 Apex tests in all and 86 Jest tests | Built, in review |
+| 9 | Customer timeline: one household's history, newest first, filtered by kind, in the console and on the portal; 227 Apex tests in all and 86 Jest tests | Done, 2026-11-03 |
 | 10 | Testing and release | Planned |
 
 Phases 1–6 and 10 are the core release. Phases 7–9 follow.
@@ -47,7 +47,9 @@ force-app/main/default/   Steward metadata (source format)
   classes/                Apex services and their tests
   genAiPromptTemplates/   The rep assistant's three prompt templates
   lwc/                    The portal's pages and the rep assistant's buttons
-  objects/                Agent_Action_Log__c
+  objects/                Agent_Action_Log__c, Integration_Log__c
+  externalCredentials/    Stripe_Test (the key itself is entered in Setup)
+  namedCredentials/       Stripe_API
   customMetadata/         Steward's policy settings
 manifest/                 Retrieve manifests, one per phase
 scripts/                  check_coverage.py, the 90% per-class coverage gate
@@ -57,7 +59,7 @@ tests/
 docs/
   brief.md                The problem, scope, architecture and phases
   requirements.md         Stories, guardrails, what each audience can see, traceability
-  decision-log.md         S-01 to S-24
+  decision-log.md         S-01 to S-28
   security-model.md       Who can reach what, the agent user line by line, and the tests that prove it
   agent-governance.md     What each AI feature reads, what reaches a model, and the Trust Layer settings
   pipeline.md             How a change reaches the org, and how the pipeline was set up
@@ -71,9 +73,11 @@ CHANGELOG.md
 
 ## The Apex, in one paragraph
 
-Every service checks the household first, in user mode, so an ID from someone else's household gets the same answer as an ID that doesn't exist. Services return outcome codes and figures, never sentences, so the agent can only word what the records say. Every limit comes from Accord's policy records, and writes go through Accord's own flows and rules. If Accord would send a new promise for approval, the service rolls it back rather than leave a supervisor something to approve. Only four operations run outside user mode, and each is a named decision with its own tests: the commitments read (S-08), the action log write (S-09), the dispute insert (S-14), and the agent's lookup of whose chat it is (S-23). The rep assistant's Apex reads in user mode too, so a briefing holds only what the rep can see, and names, contact details and record IDs never reach a model (S-20). The [explainers](docs/explainers/README.md) walk through each class.
+Every service checks the household first, in user mode, so an ID from someone else's household gets the same answer as an ID that doesn't exist. Services return outcome codes and figures, never sentences, so the agent can only word what the records say. Every limit comes from Accord's policy records, and writes go through Accord's own flows and rules. If Accord would send a new promise for approval, the service rolls it back rather than leave a supervisor something to approve. Only six operations run outside user mode, and each is a named decision with its own tests: the commitments read (S-08), the action log write (S-09), the dispute insert (S-14), the agent's lookup of whose chat it is (S-23), recording a payment Stripe confirmed (S-27), and the integration log write (S-28). The rep assistant's Apex reads in user mode too, so a briefing holds only what the rep can see, and names, contact details and record IDs never reach a model (S-20). The [explainers](docs/explainers/README.md) walk through each class.
 
 The agent's actions add one rule: none of them takes an account. Each takes the chat's session ID, which the agent binds to the conversation's own ID so the model can't fill it, and finds the household from the portal user the platform verified for that chat (S-07, S-23). The agent user can see every household, because it serves whichever customer is logged in, and a test proves that a chat still can't reach anyone else's (`AgentAccessTest`).
+
+Payments follow the same idea. Card details are typed on Stripe's page, never in Salesforce or the chat. Salesforce asks Stripe whether a checkout was paid, when the customer comes back and hourly as a safety net, so there's no public endpoint to secure (S-02). A payment is recorded only after Stripe says it was paid, once, on Stripe's own payment ID, by one class in system mode, because customers can't create payments themselves (S-27). Every call to Stripe is logged with Stripe's answer, so a customer's reference leads support straight to what happened (S-28).
 
 Component descriptions cite stories (`ST-xx`) and decisions (`S-xx`), so anything in `force-app/` can be traced back to why it exists.
 

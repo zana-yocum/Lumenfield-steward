@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customObject>true</customObject>
+    <description>ST-05, S-28. The integration log: every call Steward made to Stripe, with its outcome and status. Visible to support staff through PS_Steward_Integration_Log.</description>
+    <motif>Custom18: Form</motif>
+</CustomTab>
