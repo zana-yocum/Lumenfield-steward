@@ -5,10 +5,10 @@
  * with every household shared to it, the agent still acts only for the customer behind the chat.
  * If an action ever needs more access, this test fails first.
  *
- * The group gets here, by hand, exactly what the two sharing rules give it: Edit on households with
- * Read on their cases, and Read on agreements. A check-only deployment doesn't apply sharing rules
- * it brings, and these tests make their own records, so the rules themselves are checked in the org
- * after each release (docs/security-model.md).
+ * The group gets here, by hand (AgentTestUsers), exactly what the two sharing rules give it: Edit
+ * on households with Read on their cases, and Read on agreements. A check-only deployment doesn't
+ * apply sharing rules it brings, and these tests make their own records, so the rules themselves
+ * are checked in the org after each release (docs/security-model.md).
  *
  * The first household has three statements, the last one after its agreement's first anniversary
  * (the escalator), two of them past due, and was promised two covered payments at signing. The
@@ -16,9 +16,6 @@
  */
 @IsTest
 private class AgentAccessTest {
-  private static final String AGENT_PROFILE = 'Einstein Agent User';
-  private static final String AGENT_PERMISSION_SET = 'PS_Steward_Agent';
-  private static final String AGENT_GROUP = 'Steward_Agent';
   private static final String PAYMENT_NOT_POSTED = 'Payment Not Posted';
 
   @TestSetup
@@ -71,7 +68,9 @@ private class AgentAccessTest {
   static void theAgentReadsItsCustomersHouseholdInFull() {
     List<StewardTestData.Household> households = StewardTestData.existingHouseholds();
     AgentTestSessions sessions = chatsFor(households);
-    User agent = createAgentUser();
+    User agent = AgentTestUsers.createAgentUser(
+      StewardTestData.existingHouseholds()
+    );
 
     GetAccountSummaryAction.Output summary;
     GetCommitmentsAction.Output commitments;
@@ -123,7 +122,9 @@ private class AgentAccessTest {
   static void theAgentSetsUpAnArrangementOpensADisputeAndHandsOff() {
     List<StewardTestData.Household> households = StewardTestData.existingHouseholds();
     AgentTestSessions sessions = chatsFor(households);
-    User agent = createAgentUser();
+    User agent = AgentTestUsers.createAgentUser(
+      StewardTestData.existingHouseholds()
+    );
     Decimal pastDue = pastDueOf(households[0]);
     Date nextWeek = Date.today().addDays(7);
     Id latest = latestStatementOf(households[0]);
@@ -183,7 +184,9 @@ private class AgentAccessTest {
   static void everyHouseholdIsSharedButTheAgentActsOnlyForTheCustomerInTheChat() {
     List<StewardTestData.Household> households = StewardTestData.existingHouseholds();
     AgentTestSessions sessions = chatsFor(households);
-    User agent = createAgentUser();
+    User agent = AgentTestUsers.createAgentUser(
+      StewardTestData.existingHouseholds()
+    );
     Account organization = new Account(
       Name = 'Steward Test Organization',
       RecordTypeId = Schema.SObjectType.Account
@@ -248,7 +251,9 @@ private class AgentAccessTest {
       Subject = 'Billing dispute: ' + PAYMENT_NOT_POSTED,
       Description = 'My payment on the 3rd isn\'t showing.'
     );
-    User agent = createAgentUser();
+    User agent = AgentTestUsers.createAgentUser(
+      StewardTestData.existingHouseholds()
+    );
 
     SObjectAccessDecision decision;
     String blocked;
@@ -279,86 +284,6 @@ private class AgentAccessTest {
    * agent's permission set and group, and the group's sharing.
    * @return the user
    */
-  private static User createAgentUser() {
-    String unique = String.valueOf(Math.abs(Crypto.getRandomInteger()));
-    User agent = new User(
-      Alias = 'stwagent',
-      Email = 'steward.agent.' + unique + '@example.com',
-      EmailEncodingKey = 'UTF-8',
-      LastName = 'Steward Agent',
-      LanguageLocaleKey = 'en_US',
-      LocaleSidKey = 'en_US',
-      ProfileId = [SELECT Id FROM Profile WHERE Name = :AGENT_PROFILE LIMIT 1]
-      .Id,
-      TimeZoneSidKey = 'America/New_York',
-      Username = 'steward.agent.' + unique + '@example.com'
-    );
-    Id agentGroup = [
-      SELECT Id
-      FROM Group
-      WHERE DeveloperName = :AGENT_GROUP AND Type = 'Regular'
-      LIMIT 1
-    ]
-    .Id;
-    shareLikeTheRules(StewardTestData.existingHouseholds(), agentGroup);
-    // Users, permission set assignments and group members are setup records: their own context.
-    System.runAs(new User(Id = UserInfo.getUserId())) {
-      insert agent;
-      insert new PermissionSetAssignment(
-        AssigneeId = agent.Id,
-        PermissionSetId = [
-          SELECT Id
-          FROM PermissionSet
-          WHERE Name = :AGENT_PERMISSION_SET
-          LIMIT 1
-        ]
-        .Id
-      );
-      insert new GroupMember(GroupId = agentGroup, UserOrGroupId = agent.Id);
-    }
-    return agent;
-  }
-
-  /**
-   * What Households_to_Steward_Agent and Agreements_to_Steward_Agent give the group.
-   * @param households the test's households
-   * @param agentGroup the Steward Agent group
-   */
-  private static void shareLikeTheRules(
-    List<StewardTestData.Household> households,
-    Id agentGroup
-  ) {
-    List<SObject> shares = new List<SObject>();
-    Set<Id> accountIds = new Set<Id>();
-    for (StewardTestData.Household household : households) {
-      accountIds.add(household.account.Id);
-      shares.add(
-        new AccountShare(
-          AccountId = household.account.Id,
-          UserOrGroupId = agentGroup,
-          AccountAccessLevel = 'Edit',
-          CaseAccessLevel = 'Read',
-          OpportunityAccessLevel = 'None'
-        )
-      );
-    }
-    for (ServiceContract agreement : [
-      SELECT Id
-      FROM ServiceContract
-      WHERE AccountId IN :accountIds
-      WITH SYSTEM_MODE
-    ]) {
-      shares.add(
-        new ServiceContractShare(
-          ParentId = agreement.Id,
-          UserOrGroupId = agentGroup,
-          AccessLevel = 'Read'
-        )
-      );
-    }
-    insert shares;
-  }
-
   /**
    * Chat 1 is the first household's customer and chat 2 the second's.
    * @param households the test's households

@@ -1,0 +1,46 @@
+@import "c/portalStyles";
+/* ST-05, NFR-05. The Pay section on a statement's page. Every value comes from portalStyles'
+   tokens, each set from an SLDS global styling hook. The button is at least 24 pixels tall
+   (WCAG 2.2), and what happened is always written out. */
+
+.pay {
+  margin-top: var(--portal-space-5);
+}
+
+.pay-button {
+  min-height: var(--portal-target-size);
+  padding: var(--portal-space-2) var(--portal-space-5);
+  border: var(--portal-border-thin) solid var(--portal-color-focus);
+  border-radius: var(--portal-radius-card);
+  background: var(--portal-color-link);
+  color: var(--portal-color-on-accent);
+  font: inherit;
+  font-weight: var(--portal-font-weight-bold);
+  cursor: pointer;
+}
+
+.pay-button[aria-disabled="true"] {
+  cursor: progress;
+}
+
+.link-button {
+  min-height: var(--portal-target-size);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--portal-color-link);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.pay-button:focus-visible,
+.link-button:focus-visible {
+  outline: var(--portal-border-focus) solid var(--portal-color-focus);
+  outline-offset: var(--portal-border-focus);
+}
+
+.note {
+  font-size: var(--portal-font-size-small);
+  color: var(--portal-color-text-label);
+}

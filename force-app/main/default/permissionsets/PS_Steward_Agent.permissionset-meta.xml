@@ -29,6 +29,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>GetPaymentLinkAction</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>OpenDisputeAction</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -36,7 +40,11 @@
         <apexClass>RecordHandoffAction</apexClass>
         <enabled>true</enabled>
     </classAccesses>
-    <description>S-01, ST-12. The service agent user&apos;s whole access: the nine actions, read on what the services read in user mode, and create on promises to pay and billing disputes. Nothing on payment methods, commitments or the action log.</description>
+    <description>S-01, ST-12. The service agent user&apos;s whole access: the ten actions, read on what the services read in user mode, create on promises to pay and billing disputes, and Stripe for payment links. Nothing on commitments or the logs.</description>
+    <externalCredentialPrincipalAccesses>
+        <enabled>true</enabled>
+        <externalCredentialPrincipal>Stripe_Test-Stripe_Test_Key</externalCredentialPrincipal>
+    </externalCredentialPrincipalAccesses>
     <fieldPermissions>
         <editable>false</editable>
         <field>Account.Account_Status__c</field>

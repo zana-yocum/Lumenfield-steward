@@ -9,6 +9,8 @@
   --portal-color-text-label: var(--slds-g-color-on-surface-1, #3e3e3c);
   --portal-color-text-strong: var(--slds-g-color-on-surface-3, #032d60);
   --portal-color-link: var(--slds-g-color-accent-2, #0b5cab);
+  /* Text on a filled accent button, paired with the link color it sits on. */
+  --portal-color-on-accent: var(--slds-g-color-on-accent-2, #ffffff);
   --portal-color-focus: var(--slds-g-color-border-accent-2, #0b5cab);
   --portal-color-border: var(--slds-g-color-border-1, #c9c9c9);
   --portal-color-border-strong: var(--slds-g-color-border-2, #706e6b);

@@ -113,6 +113,27 @@ public class StewardTestData {
   }
 
   /**
+   * Delinquent households that each owe one statement, past due since the start of last month.
+   * @param count how many
+   * @param amountDue each statement's amount due
+   * @return the households, in insert order
+   */
+  public static List<Household> createHouseholdsOwing(
+    Integer count,
+    Decimal amountDue
+  ) {
+    List<Household> households = createHouseholds(count, ACCOUNT_DELINQUENT);
+    List<Billing_Statement__c> statements = new List<Billing_Statement__c>();
+    for (Household household : households) {
+      statements.add(
+        statement(household, monthStart(1), amountDue, STATEMENT_PAST_DUE)
+      );
+    }
+    insert statements;
+    return households;
+  }
+
+  /**
    * Gives a household the known-answer history the snapshot and briefing tests check: four $120
    * statements (one paid, two past due, one open and due in two weeks), $120 paid on the first
    * and $50 on the third, and a $190 promise ten days out. $310 owed, $190 past due.

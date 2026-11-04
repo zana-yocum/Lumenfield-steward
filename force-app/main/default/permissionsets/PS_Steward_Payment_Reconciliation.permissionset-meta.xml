@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>ST-05, S-02. For the user the payment reconciliation job runs as: calls to Stripe through the Stripe Test credential, and nothing else. Assign it to the admin who schedules PaymentReconciliationJob.</description>
+    <externalCredentialPrincipalAccesses>
+        <enabled>true</enabled>
+        <externalCredentialPrincipal>Stripe_Test-Stripe_Test_Key</externalCredentialPrincipal>
+    </externalCredentialPrincipalAccesses>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Steward Payment Reconciliation</label>
+</PermissionSet>

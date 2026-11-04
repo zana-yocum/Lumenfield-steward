@@ -12,6 +12,13 @@
         statement={statement}
         hide-title
       ></c-portal-statement-card>
+      <c-portal-payment
+        statement-id={statement.statementId}
+        balance={statement.balance}
+        session-id={paymentSession}
+        cancelled={paymentCancelled}
+        onrefresh={handleRefresh}
+      ></c-portal-payment>
     </template>
     <p>
       <a href={statementsUrl} onclick={handleBack}>{labels.backToStatements}</a>

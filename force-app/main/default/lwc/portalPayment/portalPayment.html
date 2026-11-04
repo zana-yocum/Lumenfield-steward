@@ -1,0 +1,31 @@
+<template>
+  <section class="pay" aria-labelledby="pay-title">
+    <h2 class="section-title" id="pay-title">{labels.payTitle}</h2>
+    <template lwc:if={checking}>
+      <p role="status">{labels.payChecking}</p>
+    </template>
+    <template lwc:if={notice}>
+      <p class={noticeClass} role={noticeRole}>{notice}</p>
+    </template>
+    <template lwc:if={paid}>
+      <p>
+        <button type="button" class="link-button" onclick={handleRefresh}>
+          {labels.payRefresh}
+        </button>
+      </p>
+    </template>
+    <template lwc:if={canPay}>
+      <p>
+        <button
+          type="button"
+          class="pay-button"
+          aria-disabled={busy}
+          onclick={handlePay}
+        >
+          {payLabel}
+        </button>
+      </p>
+      <p class="note">{labels.paySecureNote}</p>
+    </template>
+  </section>
+</template>

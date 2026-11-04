@@ -8,27 +8,55 @@ jest.mock(
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
+// The page holds Pay online, which asks the server about payments.
+jest.mock(
+  "@salesforce/apex/PortalPaymentsController.startPayment",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/PortalPaymentsController.confirmPayment",
+  () => ({
+    default: jest.fn(() =>
+      Promise.resolve({ outcome: "COMPLETED", amount: 120 })
+    )
+  }),
+  { virtual: true }
+);
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 const RECORD_ID = "a01000000000001AAA";
 
-function statementPage(recordId) {
+function statementPage(recordId, extra = {}) {
   return {
     type: "comm__namedPage",
     attributes: { name: "Statement__c" },
-    state: recordId ? { recordId } : {}
+    state: recordId ? { recordId, ...extra } : {}
   };
 }
 
-async function render(recordId = RECORD_ID) {
+async function render(recordId = RECORD_ID, extra = {}) {
   const element = createElement("c-portal-statement-detail", {
     is: PortalStatementDetail
   });
   document.body.appendChild(element);
-  CurrentPageReference.emit(statementPage(recordId));
+  CurrentPageReference.emit(statementPage(recordId, extra));
   await flushPromises();
   return element;
 }
+
+const STATEMENT = {
+  statementId: RECORD_ID,
+  statementNumber: "BS-000101",
+  statementDate: "2026-09-01",
+  dueDate: "2026-09-15",
+  amountDue: 120,
+  amountPaid: 0,
+  creditsApplied: 0,
+  balance: 120,
+  status: "Open",
+  payments: []
+};
 
 describe("c-portal-statement-detail", () => {
   afterEach(() => {
@@ -105,5 +133,65 @@ describe("c-portal-statement-detail", () => {
     expect(getStatement).toHaveBeenLastCalledWith({
       statementId: "a01000000000002AAA"
     });
+  });
+
+  it("offers Pay online for the statement's balance (ST-05)", async () => {
+    getStatement.mockResolvedValue({
+      outcome: "COMPLETED",
+      statement: STATEMENT
+    });
+    const element = await render();
+    const payment = element.shadowRoot.querySelector("c-portal-payment");
+    expect(payment.statementId).toBe(RECORD_ID);
+    expect(payment.balance).toBe(120);
+    expect(payment.sessionId).toBeUndefined();
+    expect(payment.cancelled).toBe(false);
+    await expect(element).toBeAccessible();
+  });
+
+  it("hands the session Stripe sent back to Pay online, and shows the payment once refreshed", async () => {
+    getStatement.mockResolvedValueOnce({
+      outcome: "COMPLETED",
+      statement: STATEMENT
+    });
+    const element = await render(RECORD_ID, { c__session_id: "cs_test_1" });
+    const payment = element.shadowRoot.querySelector("c-portal-payment");
+    expect(payment.sessionId).toBe("cs_test_1");
+    getStatement.mockResolvedValueOnce({
+      outcome: "COMPLETED",
+      statement: {
+        ...STATEMENT,
+        amountPaid: 120,
+        balance: 0,
+        payments: [
+          {
+            paymentId: "a02000000000001AAA",
+            paymentDate: "2026-11-04",
+            amount: 120
+          }
+        ]
+      }
+    });
+
+    payment.dispatchEvent(new CustomEvent("refresh"));
+    await flushPromises();
+
+    expect(getStatement).toHaveBeenCalledTimes(2);
+    expect(
+      element.shadowRoot.querySelector("c-portal-statement-card").statement
+        .balance
+    ).toBe(0);
+    expect(element.shadowRoot.querySelector("c-portal-payment")).toBe(payment);
+  });
+
+  it("tells Pay online when the customer went back from Stripe without paying", async () => {
+    getStatement.mockResolvedValue({
+      outcome: "COMPLETED",
+      statement: STATEMENT
+    });
+    const element = await render(RECORD_ID, { c__payment: "cancelled" });
+    expect(element.shadowRoot.querySelector("c-portal-payment").cancelled).toBe(
+      true
+    );
   });
 });
