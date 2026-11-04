@@ -235,7 +235,8 @@ public class StewardTestData {
 
   /**
    * A credit adjustment on a statement, not inserted. Posted credits get today's posted date;
-   * rejected ones get a reason, which Accord's validation rule requires.
+   * rejected ones get a reason, which Accord's validation rule requires. Accord numbers
+   * adjustments itself (ADJ-00001 onward), so the name is left to the platform.
    * @param statement the statement it credits
    * @param amount the amount
    * @param type Type__c
@@ -248,7 +249,7 @@ public class StewardTestData {
     String type,
     String status
   ) {
-    Adjustment__c credit = new Adjustment__c(
+    return new Adjustment__c(
       Account__c = statement.Account__c,
       Billing_Statement__c = statement.Id,
       Amount__c = amount,
@@ -259,12 +260,6 @@ public class StewardTestData {
         ? 'Not supported by the records'
         : null
     );
-    // Accord's plan numbers adjustments ADJ-00001 onward. While the name is still plain text, the
-    // test gives each one a readable name; once it's an auto-number, the platform numbers it.
-    if (!Schema.SObjectType.Adjustment__c.fields.Name.isAutoNumber()) {
-      credit.Name = type + ' ' + nextSuffix();
-    }
-    return credit;
   }
 
   /**

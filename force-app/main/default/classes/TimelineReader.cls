@@ -83,10 +83,19 @@ public with sharing class TimelineReader {
     takePage(page, offsets);
   }
 
+  /**
+   * Whether the person can read a kind: its object, the field that ties it to the household, its
+   * date, and any field its query filters on. User mode refuses a query that names a field the
+   * person can't read, so a kind they can't fully read isn't offered at all.
+   * @param kind the kind
+   * @return true when all of those are readable
+   */
   private Boolean isReadable(TimelineKind kind) {
     return readableObjects.get(kind.objectName) == true &&
       canRead(kind.objectName, kind.householdPath) &&
-      canRead(kind.objectName, kind.datePath);
+      canRead(kind.objectName, kind.datePath) &&
+      (kind.conditionField == null ||
+      canRead(kind.objectName, kind.conditionField));
   }
 
   /**
@@ -139,8 +148,8 @@ public with sharing class TimelineReader {
       'rowLimit' => pageSize + 1,
       'rowOffset' => offset
     };
-    if (kind.condition.contains(':recordType')) {
-      binds.put('recordType', CustomerTimelineController.DISPUTE_RECORD_TYPE);
+    if (kind.conditionField != null) {
+      binds.put('conditionValue', kind.conditionValue);
     }
     List<CustomerTimelineController.TimelineEvent> events = new List<CustomerTimelineController.TimelineEvent>();
     for (
@@ -157,7 +166,9 @@ public with sharing class TimelineReader {
 
   /**
    * Takes the page's events from the kinds' lists, latest date first, and works out the cursor.
-   * The lists are in display order, so on the same date the earlier kind comes first.
+   * The lists are in display order, so on the same date the earlier kind comes first. A kind that
+   * wasn't read this time, because it reached MAX_OFFSET, keeps its count in the cursor, so a
+   * later page never starts it again from the top.
    * @param page the page to fill
    * @param offsets how many of each kind earlier pages showed
    */
@@ -175,7 +186,7 @@ public with sharing class TimelineReader {
       taken[next] = taken[next] + 1;
       next = latest(taken);
     }
-    Map<String, Integer> nextOffsets = new Map<String, Integer>();
+    Map<String, Integer> nextOffsets = new Map<String, Integer>(offsets);
     Boolean more = false;
     for (Integer i = 0; i < lists.size(); i++) {
       String code = queried[i].code;

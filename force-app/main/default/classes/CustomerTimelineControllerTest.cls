@@ -6,8 +6,9 @@
  *
  * The first household's history, newest first: a promise due next week; a dispute opened and a
  * $25 credit posted today; a $40 payment and the statement due at the start of last month; a $120
- * payment and the statement due a month before that; and a commitment signed a year ago. The
- * second household has one $95 statement.
+ * payment and the statement due a month before that; and a commitment signed a year ago. It also
+ * has a $10 credit still in draft, which isn't history yet. The second household has one $95
+ * statement.
  */
 @IsTest
 private class CustomerTimelineControllerTest {
@@ -52,12 +53,15 @@ private class CustomerTimelineControllerTest {
         StewardTestData.monthStart(1).addDays(-1)
       )
     };
-    insert StewardTestData.credit(
-      statements[1],
-      25.00,
-      'Goodwill Credit',
-      'Posted'
-    );
+    insert new List<Adjustment__c>{
+      StewardTestData.credit(statements[1], 25.00, 'Goodwill Credit', 'Posted'),
+      StewardTestData.credit(
+        statements[1],
+        10.00,
+        'Billing Correction',
+        'Draft'
+      )
+    };
     insert StewardTestData.promise(
       first,
       Date.today().addDays(7),
@@ -122,11 +126,51 @@ private class CustomerTimelineControllerTest {
     );
     Assert.areEqual(80.00, page.events[0].amount, 'Its amount');
     Assert.areEqual(
+      CustomerTimelineController.DISPUTE,
+      page.events[1].kind,
+      'On the same day, the dispute comes before the credit'
+    );
+    Assert.areEqual(
+      CustomerTimelineController.CREDIT,
+      page.events[2].kind,
+      'The posted credit'
+    );
+    Assert.areEqual(25.00, page.events[2].amount, 'Not the $10 draft');
+    Assert.areEqual(
       CustomerTimelineController.COMMITMENT,
       page.events[7].kind,
       'The commitment from signing is the oldest'
     );
     Assert.areEqual('Promotional Credit', page.events[7].detail, 'Its type');
+  }
+
+  @IsTest
+  static void aKindPastTheOffsetLimitKeepsItsPlace() {
+    Id household = StewardTestData.existingHouseholds()[0].account.Id;
+    Map<String, Integer> offsets = TimelineCursor.parse(
+      '{"STATEMENT":' + (CustomerTimelineController.MAX_OFFSET + 1) + '}'
+    );
+    CustomerTimelineController.TimelinePage page = new CustomerTimelineController.TimelinePage();
+
+    new TimelineReader(household, 1).fill(page, null, offsets);
+
+    Assert.areEqual(1, page.events.size(), 'One to a page');
+    Assert.areNotEqual(
+      CustomerTimelineController.STATEMENT,
+      page.events[0].kind,
+      'Statements stopped at the limit'
+    );
+    Map<String, Integer> next = TimelineCursor.parse(page.nextCursor);
+    Assert.areEqual(
+      CustomerTimelineController.MAX_OFFSET + 1,
+      next.get(CustomerTimelineController.STATEMENT),
+      'Their count is kept, so they never start again from the top'
+    );
+    Assert.areEqual(
+      1,
+      next.get(CustomerTimelineController.PROMISE),
+      'The promise shown is counted'
+    );
   }
 
   @IsTest

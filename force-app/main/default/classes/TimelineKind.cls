@@ -2,21 +2,31 @@
  * ST-15. One kind of event on the customer timeline: the object it lives in, how it's tied to the
  * household, which date places it on the timeline, and the fields it shows when the person can
  * read them. all() lists the six kinds in the order the timeline shows them on the same date.
+ *
+ * Each kind's query is ordered by the same date that places its events on the timeline, so every
+ * kind's events come back newest first and TimelineReader can merge them. That's why credits
+ * appear once they're posted, on their posted date: drafts and credits waiting for approval are
+ * work in progress, and stay in the account's Adjustments list.
  */
 public with sharing class TimelineKind {
+  /** The only credits the timeline shows. */
+  @TestVisible
+  private static final String POSTED = 'Posted';
+
   public final String code;
   public final String objectName;
   /** The field that ties a record to the household, such as Account__c. */
   public String householdPath { get; private set; }
-  /** The date that places a record on the timeline. */
+  /** The date that places a record on the timeline, and orders the kind's query. */
   public String datePath { get; private set; }
   /** The record's number: Name, or CaseNumber for a case. */
   public String nameField { get; private set; }
-  /** Anything more the query must check, such as the case record type. Empty for most kinds. */
-  public String condition { get; private set; }
+  /** A field the kind's records must match, such as a case's record type. Null for most kinds. */
+  public String conditionField { get; private set; }
+  /** The value conditionField must have. */
+  public Object conditionValue { get; private set; }
   /** Event property → field path, for the fields shown when readable. */
   public final Map<String, String> shown = new Map<String, String>();
-  private String ordering;
 
   /**
    * A kind of event.
@@ -27,7 +37,6 @@ public with sharing class TimelineKind {
     this.code = code;
     this.objectName = objectName;
     this.nameField = 'Name';
-    this.condition = '';
   }
 
   /**
@@ -59,14 +68,13 @@ public with sharing class TimelineKind {
         .tiedBy('AccountId')
         .datedBy('CreatedDate')
         .namedBy('CaseNumber')
-        .onlyWhen(' AND RecordType.DeveloperName = :recordType')
+        .onlyWhen('RecordTypeId', disputeRecordTypeId())
         .showing('status', 'Status')
         .showing('detail', 'Dispute_Reason__c'),
       new TimelineKind(CustomerTimelineController.CREDIT, 'Adjustment__c')
         .tiedBy('Account__c')
         .datedBy('Posted_Date__c')
-        .orderedBy('Posted_Date__c DESC NULLS FIRST, CreatedDate DESC, Id DESC')
-        .showing('fallbackDate', 'CreatedDate')
+        .onlyWhen('Status__c', POSTED)
         .showing('amount', 'Amount__c')
         .showing('status', 'Status__c')
         .showing('detail', 'Type__c'),
@@ -80,9 +88,9 @@ public with sharing class TimelineKind {
   }
 
   /**
-   * The query for this kind's next records. It names only constant field paths from all(), already
-   * filtered to what the person can read, and binds every value: :household, :recordType,
-   * :rowLimit and :rowOffset.
+   * The query for this kind's next records, newest first. It names only constant field paths from
+   * all(), already filtered to what the person can read, and binds every value: :household,
+   * :conditionValue, :rowLimit and :rowOffset.
    * @param fields the fields to select
    * @return the query
    */
@@ -94,10 +102,12 @@ public with sharing class TimelineKind {
       ' WHERE ' +
       householdPath +
       ' = :household' +
-      condition +
+      (conditionField == null
+        ? ''
+        : ' AND ' + conditionField + ' = :conditionValue') +
       ' ORDER BY ' +
-      (ordering != null ? ordering : datePath + ' DESC NULLS LAST, Id DESC') +
-      ' LIMIT :rowLimit OFFSET :rowOffset';
+      datePath +
+      ' DESC NULLS LAST, Id DESC LIMIT :rowLimit OFFSET :rowOffset';
   }
 
   /**
@@ -115,9 +125,6 @@ public with sharing class TimelineKind {
     event.recordId = row.Id;
     event.name = (String) row.get(nameField);
     event.eventDate = dateAt(row, datePath);
-    if (event.eventDate == null) {
-      event.eventDate = dateAt(row, readable.get('fallbackDate'));
-    }
     event.amount = (Decimal) valueAt(row, readable.get('amount'));
     event.balance = (Decimal) valueAt(row, readable.get('balance'));
     event.dueDate = dateAt(row, readable.get('dueDate'));
@@ -141,19 +148,25 @@ public with sharing class TimelineKind {
     return this;
   }
 
-  private TimelineKind onlyWhen(String clause) {
-    condition = clause;
-    return this;
-  }
-
-  private TimelineKind orderedBy(String clause) {
-    ordering = clause;
+  private TimelineKind onlyWhen(String field, Object value) {
+    conditionField = field;
+    conditionValue = value;
     return this;
   }
 
   private TimelineKind showing(String property, String path) {
     shown.put(property, path);
     return this;
+  }
+
+  /**
+   * The Billing Dispute record type, so the timeline never shows Accord's default reviews.
+   * @return its ID, or null if the org has no such record type, which matches no case
+   */
+  private static Id disputeRecordTypeId() {
+    return Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName()
+      .get(CustomerTimelineController.DISPUTE_RECORD_TYPE)
+      ?.getRecordTypeId();
   }
 
   private static Object valueAt(SObject row, String path) {
