@@ -20,7 +20,7 @@ public with sharing class TimelineKind {
   /** The date that places a record on the timeline, and orders the kind's query. */
   public String datePath { get; private set; }
   /** True when datePath is a date and time, such as CreatedDate, shown as the person's own date. */
-  public Boolean datedByTimestamp { get; private set; }
+  public Boolean dateIsTimestamp { get; private set; }
   /** The record's number: Name, or CaseNumber for a case. */
   public String nameField { get; private set; }
   /** A field the kind's records must match, such as a case's record type. Null for most kinds. */
@@ -39,7 +39,7 @@ public with sharing class TimelineKind {
     this.code = code;
     this.objectName = objectName;
     this.nameField = 'Name';
-    this.datedByTimestamp = false;
+    this.dateIsTimestamp = false;
   }
 
   /**
@@ -127,7 +127,7 @@ public with sharing class TimelineKind {
     event.kind = code;
     event.recordId = row.Id;
     event.name = (String) row.get(nameField);
-    event.eventDate = datedByTimestamp
+    event.eventDate = dateIsTimestamp
       ? ((Datetime) valueAt(row, datePath))?.date()
       : (Date) valueAt(row, datePath);
     event.amount = (Decimal) valueAt(row, readable.get('amount'));
@@ -152,7 +152,7 @@ public with sharing class TimelineKind {
   // and converting it would move it a day for anyone west of Greenwich. So each kind says which it is.
   private TimelineKind datedByTimestamp(String path) {
     datePath = path;
-    datedByTimestamp = true;
+    dateIsTimestamp = true;
     return this;
   }
 

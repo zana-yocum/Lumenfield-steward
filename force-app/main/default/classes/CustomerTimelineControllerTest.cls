@@ -351,7 +351,7 @@ private class CustomerTimelineControllerTest {
     Id withoutBalance = PortalTestData.customerAccessWith(
       'Steward_Test_No_Balance',
       'Billing_Statement__c.Balance__c',
-      PortalTestData.FieldAccess.NONE
+      PortalTestData.KeptAccess.NONE
     );
     User customer = PortalTestData.createCustomers(
       new List<StewardTestData.Household>{ first },

@@ -128,7 +128,7 @@ public class PortalTestData {
   }
 
   /** How much of one field a copy of the customer's access keeps (customerAccessWith). */
-  public enum FieldAccess {
+  public enum KeptAccess {
     NONE,
     READ_ONLY
   }
@@ -144,7 +144,7 @@ public class PortalTestData {
   public static Id customerAccessWith(
     String name,
     String field,
-    FieldAccess kept
+    KeptAccess kept
   ) {
     Id original = [
       SELECT Id
@@ -177,7 +177,7 @@ public class PortalTestData {
         WHERE ParentId = :original
       ]) {
         Boolean isTheField = access.Field == field;
-        if (!isTheField || kept == FieldAccess.READ_ONLY) {
+        if (!isTheField || kept == KeptAccess.READ_ONLY) {
           fieldAccess.add(
             new FieldPermissions(
               ParentId = copy.Id,

@@ -677,7 +677,7 @@ private class PortalControllersTest {
     return PortalTestData.customerAccessWith(
       'Steward_Test_No_Reason',
       'Case.Dispute_Reason__c',
-      PortalTestData.FieldAccess.READ_ONLY
+      PortalTestData.KeptAccess.READ_ONLY
     );
   }
 }
