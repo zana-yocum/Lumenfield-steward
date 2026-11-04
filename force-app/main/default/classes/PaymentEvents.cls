@@ -48,7 +48,18 @@ public with sharing class PaymentEvents {
    * @return the amount in dollars, or null
    */
   public static Decimal toDollars(Long cents) {
-    return cents == null ? null : Decimal.valueOf(cents).movePointLeft(2);
+    return cents == null ? null : Decimal.valueOf(cents).divide(100, 2);
+  }
+
+  /**
+   * An amount in dollars, as the whole cents Stripe asks for. Half a cent rounds up.
+   * @param dollars the amount, in dollars
+   * @return the amount in cents, or null
+   */
+  public static Long toCents(Decimal dollars) {
+    return dollars == null
+      ? null
+      : (dollars.setScale(2, System.RoundingMode.HALF_UP) * 100).longValue();
   }
 
   /**

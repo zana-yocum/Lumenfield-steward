@@ -94,9 +94,7 @@ public with sharing class PaymentCheckoutService {
     request.accountId = household;
     request.description =
       'Lumenfield lease payment, statement ' + statement.Name;
-    request.amountCents = statement.Balance__c.setScale(2)
-      .movePointRight(2)
-      .longValue();
+    request.amountCents = PaymentEvents.toCents(statement.Balance__c);
     String page = PortalLinks.statementPage(statement.Id);
     request.successUrl = page + '&c__session_id={CHECKOUT_SESSION_ID}';
     request.cancelUrl = page + '&c__payment=cancelled';

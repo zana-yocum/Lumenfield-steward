@@ -112,10 +112,7 @@ private class PaymentCheckoutServiceTest {
     Assert.areEqual(lastMonths.Name, result.statementNumber, 'Its number');
     String body = EncodingUtil.urlDecode(stripe.last().getBody(), 'UTF-8');
     Assert.isTrue(
-      body.contains(
-        'unit_amount=' +
-        lastMonths.Balance__c.setScale(2).movePointRight(2).longValue()
-      ),
+      body.contains('line_items[0][price_data][unit_amount]=12000'),
       'The balance in cents: ' + body
     );
     Assert.isTrue(
