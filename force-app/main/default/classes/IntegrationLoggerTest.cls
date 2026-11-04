@@ -1,8 +1,8 @@
 /**
  * ST-05, S-28, NFR-07. Proves calls kept in memory are saved together and read back by number,
  * that long text is cut to fit and card numbers are removed before saving, that nothing is saved
- * when there's nothing to save, and that a customer, who has no access to the log, still gets their
- * calls recorded.
+ * when there's nothing to save, that a call about a record that doesn't exist is still saved, and
+ * that a customer, who has no access to the log, still gets their calls recorded.
  */
 @IsTest
 private class IntegrationLoggerTest {
@@ -62,10 +62,46 @@ private class IntegrationLoggerTest {
 
   @IsTest
   static void nothingToSaveSavesNothing() {
+    // The setup's saves count against the method's limits, so count from startTest.
+    Test.startTest();
     Map<Id, String> numbers = IntegrationLogger.save();
+    Integer saves = Limits.getDmlStatements();
+    Test.stopTest();
 
     Assert.isTrue(numbers.isEmpty(), 'Nothing');
-    Assert.areEqual(0, Limits.getDmlStatements(), 'Not even an empty save');
+    Assert.areEqual(0, saves, 'Not even an empty save');
+  }
+
+  @IsTest
+  static void aCallAboutARecordThatDoesntExistIsStillSaved() {
+    Id noSuchStatement = TestIds.missing(Billing_Statement__c.SObjectType);
+    IntegrationLogger.Call call = new IntegrationLogger.Call(
+      'Stripe',
+      'Record payment'
+    );
+    call.outcome = IntegrationLogger.FAILED;
+    call.statementId = noSuchStatement;
+    call.details = 'The statement is gone.';
+    IntegrationLogger.record(call);
+
+    Map<Id, String> numbers = IntegrationLogger.save();
+
+    Assert.areEqual(1, numbers.size(), 'Saved all the same');
+    Integration_Log__c saved = [
+      SELECT Billing_Statement__c, Details__c
+      FROM Integration_Log__c
+      WHERE Id IN :numbers.keySet()
+      WITH SYSTEM_MODE
+    ];
+    Assert.isNull(
+      saved.Billing_Statement__c,
+      'Without the link it can\'t hold'
+    );
+    Assert.isTrue(
+      saved.Details__c.contains(noSuchStatement) &&
+      saved.Details__c.endsWith('The statement is gone.'),
+      'The statement\'s ID is kept in the details: ' + saved.Details__c
+    );
   }
 
   @IsTest

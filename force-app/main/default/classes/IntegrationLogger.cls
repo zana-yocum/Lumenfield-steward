@@ -68,7 +68,8 @@ public with sharing class IntegrationLogger {
 
   /**
    * Saves every call kept since the last save, in one statement. Call it after the transaction's
-   * last callout. A row the platform rejects is left out, never thrown.
+   * last callout. A row refused for its links, such as a statement that doesn't exist, is saved
+   * again without them, with the IDs in its details. Any other refusal is left out, never thrown.
    * @return the saved logs' numbers, such as INT-000012, keyed by ID
    */
   public static Map<Id, String> save() {
@@ -123,15 +124,30 @@ public with sharing class IntegrationLogger {
      */
     public Map<Id, String> insertRows(List<Integration_Log__c> rows) {
       Set<Id> saved = new Set<Id>();
-      for (
-        Database.SaveResult result : Database.insert(
-          rows,
-          false,
-          AccessLevel.SYSTEM_MODE
-        )
-      ) {
-        if (result.isSuccess()) {
-          saved.add(result.getId());
+      List<Integration_Log__c> unlinked = new List<Integration_Log__c>();
+      List<Database.SaveResult> results = Database.insert(
+        rows,
+        false,
+        AccessLevel.SYSTEM_MODE
+      );
+      for (Integer i = 0; i < results.size(); i++) {
+        if (results[i].isSuccess()) {
+          saved.add(results[i].getId());
+        } else if (hasLinks(rows[i])) {
+          unlinked.add(withoutLinks(rows[i]));
+        }
+      }
+      if (!unlinked.isEmpty()) {
+        for (
+          Database.SaveResult result : Database.insert(
+            unlinked,
+            false,
+            AccessLevel.SYSTEM_MODE
+          )
+        ) {
+          if (result.isSuccess()) {
+            saved.add(result.getId());
+          }
         }
       }
       Map<Id, String> numbers = new Map<Id, String>();
@@ -145,6 +161,37 @@ public with sharing class IntegrationLogger {
         numbers.put(row.Id, row.Name);
       }
       return numbers;
+    }
+
+    private Boolean hasLinks(Integration_Log__c row) {
+      return row.Account__c != null || row.Billing_Statement__c != null;
+    }
+
+    /**
+     * The row again, without the links the platform refused, such as a statement that doesn't
+     * exist, and with their IDs at the start of its details instead.
+     * @param row the refused row
+     * @return a new row to save
+     */
+    private Integration_Log__c withoutLinks(Integration_Log__c row) {
+      Integration_Log__c copy = row.clone(false, true);
+      List<String> links = new List<String>();
+      if (row.Account__c != null) {
+        links.add('household ' + row.Account__c);
+      }
+      if (row.Billing_Statement__c != null) {
+        links.add('statement ' + row.Billing_Statement__c);
+      }
+      copy.Account__c = null;
+      copy.Billing_Statement__c = null;
+      copy.Details__c = fit(
+        'Not linked: ' +
+          String.join(links, ', ') +
+          '. ' +
+          (row.Details__c == null ? '' : row.Details__c),
+        Integration_Log__c.Details__c
+      );
+      return copy;
     }
   }
 }

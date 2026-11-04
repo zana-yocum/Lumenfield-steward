@@ -7,7 +7,8 @@
  * All data is made in the setup, because Salesforce refuses a callout after a save in the same
  * test. The first household has a $95 statement past due since two months ago, a $120 statement
  * past due since last month, and a $120 statement paid in full. The second has an $80 statement.
- * Each household has a customer user.
+ * Each household has a customer user. A test reads the household's ID before System.runAs: a
+ * customer can't query agreements, which StewardTestData.existingHouseholds reads with it.
  */
 @IsTest
 private class PaymentCheckoutServiceTest {
@@ -88,13 +89,11 @@ private class PaymentCheckoutServiceTest {
       );
     Test.setMock(HttpCalloutMock.class, stripe);
 
+    Id home = household(0);
     PaymentCheckoutService.Checkout result;
     Test.startTest();
-    System.runAs(customerOf(household(0))) {
-      result = PaymentCheckoutService.startCheckout(
-        household(0),
-        lastMonths.Id
-      );
+    System.runAs(customerOf(home)) {
+      result = PaymentCheckoutService.startCheckout(home, lastMonths.Id);
     }
     Test.stopTest();
 
@@ -131,9 +130,10 @@ private class PaymentCheckoutServiceTest {
     Test.setMock(HttpCalloutMock.class, stripe);
     Id someoneElses = statement(1, 80.00).Id;
 
+    Id home = household(0);
     PaymentCheckoutService.Checkout result;
-    System.runAs(customerOf(household(0))) {
-      result = PaymentCheckoutService.startCheckout(household(0), someoneElses);
+    System.runAs(customerOf(home)) {
+      result = PaymentCheckoutService.startCheckout(home, someoneElses);
     }
 
     Assert.areEqual(StewardOutcome.DECLINED_POLICY, result.outcome, 'Declined');
@@ -251,10 +251,11 @@ private class PaymentCheckoutServiceTest {
         )
     );
 
+    Id home = household(0);
     PaymentCheckoutService.Confirmation result;
     Test.startTest();
-    System.runAs(customerOf(household(0))) {
-      result = PaymentCheckoutService.confirm(household(0), 'cs_test_1');
+    System.runAs(customerOf(home)) {
+      result = PaymentCheckoutService.confirm(home, 'cs_test_1');
     }
     Test.stopTest();
 
@@ -337,10 +338,11 @@ private class PaymentCheckoutServiceTest {
         )
     );
 
+    Id home = household(0);
     PaymentCheckoutService.Confirmation result;
     Test.startTest();
-    System.runAs(customerOf(household(0))) {
-      result = PaymentCheckoutService.confirm(household(0), 'cs_test_9');
+    System.runAs(customerOf(home)) {
+      result = PaymentCheckoutService.confirm(home, 'cs_test_9');
     }
     Test.stopTest();
 

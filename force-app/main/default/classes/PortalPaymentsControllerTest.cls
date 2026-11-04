@@ -177,6 +177,21 @@ private class PortalPaymentsControllerTest {
     );
   }
 
+  // What the action log says went wrong, for a failing assertion's message.
+  private static String loggedFailures() {
+    List<String> details = new List<String>();
+    for (Agent_Action_Log__c logged : [
+      SELECT Details__c
+      FROM Agent_Action_Log__c
+      WITH SYSTEM_MODE
+      ORDER BY Name
+      LIMIT 10
+    ]) {
+      details.add(logged.Details__c);
+    }
+    return String.join(details, ' | ');
+  }
+
   @IsTest
   static void aCustomerComingBackFromAPaidCheckoutHasItRecorded() {
     Id statementId = statementOf(0);
@@ -203,7 +218,7 @@ private class PortalPaymentsControllerTest {
     Assert.areEqual(
       StewardOutcome.COMPLETED,
       result.outcome,
-      'Completed: ' + result.reasonCode
+      'Completed: ' + result.reasonCode + ' ' + loggedFailures()
     );
     Assert.areEqual(120.00, result.amount, 'What was paid');
     Assert.areEqual(
