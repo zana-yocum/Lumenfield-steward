@@ -21,7 +21,7 @@ Who can reach what in Steward, and the test that proves each line. Steward adds 
 | What | Grants |
 |---|---|
 | Profiles **Steward Customer** and **Steward Customer Login** (S-18) | Customer Community licenses. Custom profiles, not the standard external ones |
-| `PS_Steward_Customer` | The three portal controllers. Read on Account, Contact, Billing Statement, Lease Payment and Promise to Pay. Read and create on Case, with the Billing Dispute record type. Read on the balances and statement amounts. Create on the dispute fields. Nothing on commitments, opportunities, adjustments, agreements or the action log |
+| `PS_Steward_Customer` | The three portal controllers and the timeline's (`CustomerTimelineController`, Phase 9). Read on Account, Contact, Billing Statement, Lease Payment and Promise to Pay. Read and create on Case, with the Billing Dispute record type. Read on the balances and statement amounts. Create on the dispute fields. Nothing on commitments, opportunities, adjustments, agreements or the action log |
 | Sharing set `Customer_Household` | Read on the customer's own account, which statements, payments and promises follow. Read on cases whose `Customer_Household__c` is that account, so Accord's default reviews stay internal (S-16) |
 
 Proved by `PortalControllersTest`, `DisputeStatusServiceTest` and `PortalHouseholdTest`, which run as customer users with another household's IDs.
@@ -67,7 +67,7 @@ Nothing else, so it has no Delete, no Edit on any object, no View All or Modify 
   - The agreement rule shared all 100 agreements, read only. That includes the 12 on Organization accounts, which the agent never reaches.
   - Accord's own rule still shared its 34 accounts in collections.
 
-## Collections personas (Phases 5 and 6)
+## Collections personas (Phases 5, 6 and 9)
 
 Steward's permission sets, in Accord's three permission set groups (S-22):
 
@@ -77,8 +77,20 @@ Steward's permission sets, in Accord's three permission set groups (S-22):
 | `PS_Steward_Collections_Contact` | Read on Contact Email, Phone and MobilePhone, and Account Phone | All three |
 | `PS_Steward_Dispute_Specialist` | Read on Case Subject, Description, AccountId and ContactId | Dispute Specialist, Collections Supervisor |
 | `PS_Steward_Supervisor` | Read on the agent's action log and its fields | Collections Supervisor |
+| `PS_Steward_Timeline` | The customer timeline's controller, and nothing else | All three |
 
 Reps and specialists get nothing on the action log. The log's outcome field is required, so it's readable with the object and isn't listed.
+
+## The customer timeline (Phase 9)
+
+One component, two audiences, and no extra access for either (S-25):
+
+- **What it can show is what the person can already read.** `TimelineReader` describes each object and field for the running user, offers only the kinds they can fully read, and selects only the fields they can read, all in user mode. It adds no exception to the four above.
+- **Whose household it shows is decided on the server.** On the portal it's always the logged-in customer's own (`PortalHousehold`), whatever the page passes. In the console it's the record page's account, only if `HouseholdScope` says it's a household the user can see. Anything else is `NOT_FOUND`.
+- **Customers see four kinds.** They have no access to adjustments or commitments, so credits and commitments are never offered to them. Disputes come through the `Customer_Household` sharing set, so Accord's default reviews never appear.
+- **The page sends a cursor back, and it's untrusted.** It's parsed strictly, and its counts are bound as values. A count can only skip records inside the household the server already chose.
+
+Proved by `CustomerTimelineControllerTest`: an outsider gets `NOT_FOUND`, a customer passing another household's ID still gets only their own, and a customer without one field gets events without it.
 
 ## The pipeline
 

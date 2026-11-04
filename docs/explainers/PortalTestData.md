@@ -7,10 +7,10 @@
 **How it works:**
 1. `giveRunningUserARole()` gives the running user a role if it has none. Salesforce won't enable a contact as a customer user when the account's owner has no role, and the pipeline user has none. Tests call it before creating the households.
 2. `createCustomers(households)` inserts one customer user per household's primary contact, on the Steward Customer Login profile, and assigns `PS_Steward_Customer`. Test customers use login licenses so the member licenses held by the demo customers are never needed by a test (S-18). Usernames and emails are on example.com and end in a sequence and a random token.
-3. A second version takes another permission set, or none. `PortalControllersTest` uses it with a copy of `PS_Steward_Customer` that can't set the dispute reason, to prove S-14's field-level refusal.
+3. A second version takes another permission set, or none. `customerAccessWith(name, field, kept)` makes that permission set: a copy of `PS_Steward_Customer` that keeps less of one field, either `READ_ONLY` or `NONE`. `PortalControllersTest` uses a copy that can read the dispute reason but not set it, to prove S-14's field-level refusal. `CustomerTimelineControllerTest` uses one without the statement balance, to prove the timeline leaves out a field the customer can't read (ST-15).
 4. `insertDefaultReview(household)` inserts the kind of case Accord's collections process opens, for the tests proving customers never see one.
 5. Users are inserted in their own context (`System.runAs`), so creating a user doesn't collide with the test's other inserts.
 
 **What can go wrong:** If Salesforce changes what a customer user needs, the tests fail at setup with Salesforce's own message, as they did when standard external profiles were switched off for user creation. That's what moved the tests to a custom profile.
 
-**How it's tested:** By `PortalHouseholdTest`, `PortalControllersTest` and `DisputeStatusServiceTest`, which use it.
+**How it's tested:** By `PortalHouseholdTest`, `PortalControllersTest`, `DisputeStatusServiceTest` and `CustomerTimelineControllerTest`, which use it.

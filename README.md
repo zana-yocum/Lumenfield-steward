@@ -4,7 +4,7 @@ Steward is the second Lumenfield Home Energy project, built on the same Salesfor
 
 **The rule it's built around:** the agent can never do what a person in the same seat can't. It acts only for the logged-in customer's household, every record it creates goes through Accord's policy, and every action it takes, or declines, is logged for a supervisor.
 
-**Status:** Phases 1–5 of 10 done; Phase 6, the service agent, is under way. Its nine actions, how a chat finds the logged-in customer's household, and the agent user's least-privilege access are built and tested: 214 Apex tests, including every action run as an Einstein Agent User with only the agent's access. Next: the agent itself, written in Agent Script, and its chat on the portal. Phase 5, the rep assistant, closed on 2026-10-26. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
+**Status:** Phases 1–5 of 10 done. Phase 6, the service agent, is under way: its nine actions, how a chat finds the logged-in customer's household, and the agent user's least-privilege access are built and tested, and the agent itself starts with a setup step in Salesforce. Phase 9, the customer timeline, is built: one household's history in the console and on the portal, read in user mode. 227 Apex tests and 86 Jest tests. **Start here:** [Brief](docs/brief.md) · [Requirements](docs/requirements.md) · [Decisions](docs/decision-log.md) · [Explainers](docs/explainers/README.md)
 
 ---
 
@@ -34,7 +34,7 @@ The same way as Accord: requirements before configuration, decisions written dow
 | 6 | Service agent: nine actions, the household from the chat's verified user, least-privilege access proved by test; next the Agent Script and the portal chat | In progress |
 | 7 | Payments | Planned |
 | 8 | Data 360 | Planned |
-| 9 | Customer timeline component | Planned |
+| 9 | Customer timeline: one household's history, newest first, filtered by kind, in the console and on the portal; 227 Apex tests in all and 86 Jest tests | Built, in review |
 | 10 | Testing and release | Planned |
 
 Phases 1–6 and 10 are the core release. Phases 7–9 follow.

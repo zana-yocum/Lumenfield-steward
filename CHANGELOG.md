@@ -2,6 +2,35 @@
 
 Newest first. One entry per phase.
 
+## Unreleased — Phase 9: the customer timeline
+
+One household's history on one timeline (ST-15): statements, payments, promises to pay, billing disputes, credits and commitments, newest first, filtered by kind. Reps see it on the account page in the Collections Console. Customers see their own household's on the portal's My Account page. Built ahead of Phases 7 and 8, which start with Zana's setup steps (open items). Pull request #19.
+
+### Added in pull request #19
+- **The timeline's server side (S-25):** `CustomerTimelineController`, `TimelineReader`, `TimelineKind` and `TimelineCursor`. Every read is in user mode and names only the fields the person can read, so a hidden field is a gap, not an error, and a kind they can't read isn't offered. Pages hold 20 events. The cursor counts each kind separately, so pages neither repeat nor skip
+- **The component:** `customerTimeline`, with a filter of the readable kinds, Show more plus loading as the end of the list scrolls into view, focus moved to the first new event after Show more, and loading, empty, no-access and error states. 39 `Steward_Timeline_*` labels hold its text
+- **Where it appears (S-26):** `Steward_Account_Record_Page`, the console's account page, with the timeline as its first tab beside related lists and details, and activity alongside; and the portal's My Account page, below the figures
+- **Access:** `PS_Steward_Timeline` (the controller only) in the Collections Rep, Dispute Specialist and Collections Supervisor groups; the controller added to `PS_Steward_Customer`
+- **Tests:** `CustomerTimelineControllerTest` (10), `TimelineCursorTest` (3), `customerTimeline.test.js` (17) and one more in `portalMyAccount.test.js`, every state with an accessibility check
+- **Docs:** decisions S-25 and S-26; five explainers; the timeline in `docs/security-model.md`; ST-15's traceability
+
+### Changed in pull request #19
+- `StewardTestData.existingHouseholds` fills in each household's agreement, so a test can add statements to a household from its setup
+- `PortalTestData.customerAccessWith` copies the customer's access less one field (`NONE` or `READ_ONLY`). `PortalControllersTest` uses it for its dispute-reason copy, which was its own code
+
+### Fixed in pull request #19
+- **Steward's tests stopped compiling in the org when Accord numbered its adjustments.** Pull request #18 named a test credit only while the name field was plain text, and called that ready for Accord's auto-number. It wasn't: Apex checks that a field can be written when a class compiles, so once Accord's change was deployed, `StewardTestData` was invalid, and with it every Steward test class. No customer-facing code was affected, but no Steward deployment could have passed. `credit` now leaves the name to Accord, and the conventions say to validate Steward after any Accord change to a field Steward's code names
+
+### Pull request #19's validations
+- **First** (`0Afaj00000qK57FCAS`): the org couldn't compile `StewardTestData`, as above
+- **Second** (`0Afaj00000qK6rJCAS`): four timeline tests failed, each for a real reason:
+  - A `Date` passes `instanceof Datetime` in Apex, so every date field was converted as a timestamp and moved a day earlier for a user west of Greenwich. Each kind now declares whether its date is a timestamp.
+  - Accord posts a new credit within the rep's limit at once, so the test's draft credit was posted. The draft is now over the limit.
+  - The test platform user's profile reads every Accord field once it's given an object, so "a field nobody granted" was granted. The test now uses a customer whose access leaves out the statement balance.
+  - A household read back from the setup had no agreement.
+- **Third** (`0Afaj00000qK9qnCAC`): two refusals. Apex names aren't case-sensitive, so the new enum `FieldAccess` resolved to the local list `fieldAccess`; it's `KeptAccess` now. The account page's `<mode>` elements apply only to a page that inherits from a parent page
+- **Fourth** (`0Afaj00000qKAlFCAW`): 339 components, 227 of 227 tests, every class at 90% or more. The four new classes are at 100%, and Code Analyzer reports 0 at every severity
+
 ## Unreleased — Phase 6, part 1: the service agent's actions and access
 
 Everything the service agent will run, and the access it runs with, built and tested before the agent itself exists. The agent, its chat on the portal and its Trust Layer settings come next and start with Zana in Setup (open items). Pull request #17.
@@ -38,7 +67,7 @@ Everything the service agent will run, and the access it runs with, built and te
   - `PS_Steward_Supervisor` is in the supervisor group, which recalculated.
 
 ### Pull request #18
-- `StewardTestData.credit` names an adjustment only while the name field is plain text. This makes Steward's tests ready for Accord's switch to the planned auto-number (`ADJ-{00000}`), which is Accord's half of the change
+- `StewardTestData.credit` names an adjustment only while the name field is plain text. This was meant to make Steward's tests ready for Accord's switch to the planned auto-number (`ADJ-{00000}`), which is Accord's half of the change. It didn't: see Phase 9's fixes
 - #17's deploy and org checks recorded here, in the open items and in S-01
 
 ## v0.5 — 2026-10-26 — Phase 5: Rep assistant

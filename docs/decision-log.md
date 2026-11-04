@@ -30,6 +30,8 @@ The decisions that shape Steward, the options considered, and why one was chosen
 | S-22 | Steward permission sets close the collections groups' access gaps | Decided |
 | S-23 | The agent finds the household in system mode, from the session's authenticated user | Decided |
 | S-24 | The action log's conversation ID is the messaging session's ID | Decided |
+| S-25 | The timeline reads each kind in user mode, naming only the fields the person can read | Decided |
+| S-26 | The console's account page is Steward's; it's activated in the org, not in either repo | Decided |
 
 ---
 
@@ -454,3 +456,45 @@ The agent never:
 **Why:** It's the platform's own ID for the conversation. The transcript, the participants and the routing all hang off that `MessagingSession` record, and every action in one conversation logs the same value.
 
 **Consequences:** `AgentActions.entry` sets the field from the session the action was given. A person with access to messaging sessions opens the conversation at `/lightning/r/MessagingSession/<ID>/view`. A request whose session ID wasn't a messaging session's still logs the value it was given, so a bad binding shows up in the log rather than disappearing.
+
+---
+
+### S-25 — The timeline reads each kind in user mode, naming only the fields the person can read
+**Status:** Decided
+
+**Context:** ST-15 puts six kinds of record on one timeline, for reps in the console and for customers on the portal. Its acceptance criteria say a field the person can't read doesn't appear, and the timeline pages as they scroll. Steward's other reads use `WITH USER_MODE`, which refuses the whole query if it names one field the person can't read. Customers can't read credits or commitments at all.
+
+**Options**
+1. One `WITH USER_MODE` query per kind with fixed fields. One hidden field would fail the page for anyone without it.
+2. Read in system mode and strip fields with `Security.stripInaccessible`. That's a fifth exception to user mode, for a read that doesn't need one.
+3. Describe first, then build each kind's query from constant field paths, naming only what the person can read, and run it with `Database.queryWithBinds` in `AccessLevel.USER_MODE`. **← decided**
+
+For paging: one `OFFSET` across the merged timeline can't work when kinds interleave by date, so the cursor holds a count for each kind.
+
+**Why:** Option 3 keeps every read in user mode, so sharing, object access and field access are all the platform's. A kind the person can't fully read is simply not offered. A hidden field is a gap in one event, not an error. The query text holds only paths written in `TimelineKind`, and every value is bound, so nothing from the browser becomes SOQL. The cursor is untrusted input too. It's parsed strictly, and its counts can only skip records inside the household the server already chose.
+
+**Consequences:**
+- No new exception to user mode (NFR-01). The S-08, S-09, S-14 and S-23 exceptions stay the only four.
+- Every kind's query is ordered by the date that places it, so the merge stays newest first. That's why credits appear once posted, on their posted date. Drafts and credits waiting for approval stay in the Adjustments list.
+- Each kind declares whether its date is a timestamp. A `Date` passes `instanceof Datetime` in Apex, and converting it moved dates a day for users west of Greenwich, as the first validation showed.
+- A kind stops paging at SOQL's 2,000-row offset limit. That's more than 160 years of monthly statements.
+
+---
+
+### S-26 — The console's account page is Steward's; it's activated in the org, not in either repo
+**Status:** Decided
+
+**Context:** ST-15 puts the timeline on the account page reps use in the Collections Console. Until now accounts used the system's default page. The console app belongs to Accord, and Lightning page activation is stored in the app's metadata.
+
+**Options**
+1. Activate the page in Accord's `Collections_Console` app metadata. Accord would then name a page only Steward deploys, and Accord couldn't deploy without Steward.
+2. Activate it as the org default in the Account object's metadata, which Accord also owns. Same coupling, and wider.
+3. Steward owns `Steward_Account_Record_Page`. It's activated once in the org as the console's default account page, the way an admin does it in Lightning App Builder, and neither repo carries the activation. **← decided**
+
+**Why:** Each project stays deployable on its own. Activation is done once, recorded in Steward's release notes and open items, and checked in UAT-S15.
+
+**Consequences:**
+- Open items record when the page was activated and by whom. Until it is, the timeline is deployed but reps don't see it.
+- Accord's retrieve workflow would pick the activation up into Accord's copy of the app. If Accord ever deploys that app file without it, the activation is undone, so a deploy of Accord's console app is followed by a look at the account page.
+- The page keeps what reps had: the highlights, related lists and details, with activity alongside. The timeline is the first tab.
+
