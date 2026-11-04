@@ -71,7 +71,7 @@ Customer ── Portal (Experience Cloud, LWR) ── Enhanced Chat ── Servi
         Account · Statement ·         │                  └──── Agent Action Log (S-09)
         Payment · Promise ·           ├── StripeClient ── Named + External Credential ── Stripe (test)
         Adjustment · Commitment       │        ▲
-                 ▲                    │   Reconcile job ── Payment_Received__e ── Lease Payment
+                 ▲                    │   Portal return · Reconcile job ── PaymentRecorder ── Lease Payment
                  │                    │
         Data 360: production stream ── identity resolution ── production vs guarantee insight
                  │
@@ -85,7 +85,7 @@ GitHub ── Actions: Code Analyzer · Jest · validate + local tests ── qu
 ## Requirements and decisions
 
 - **[Requirements](requirements.md):** 18 stories (11 Must, 6 Should, 1 Could), six agent guardrails, ten non-functional requirements, and what each audience can see.
-- **[Decision log](decision-log.md):** S-01 to S-14. Decided: Apex for actions with Accord keeping the policy (S-03), validating against the org instead of scratch orgs (S-05), what the agent may never do (S-06), identity from the login and never from the model (S-07), agent outcomes logged to a custom object (S-09), the Agent Script in Git (S-10), the pipeline's own sign-in (S-12), pull requests for anything that deploys (S-13), and dispute cases saved in system mode with the caller's create access applied to every other field (S-14). The rest are starting positions confirmed in the phase that builds them.
+- **[Decision log](decision-log.md):** S-01 to S-28, each with the options considered and why one was chosen. A starting position is confirmed or changed, with evidence from the org, in the phase that builds it. S-27 is one the org changed: payments were to be recorded through a platform event, and the third Phase 7 validation showed customers can't publish one.
 - **[Explainers](explainers/README.md):** one page per Apex class, from Phase 3.
 - **[Pipeline](pipeline.md):** how a change reaches the org, and how the pipeline was set up.
 - **[Conventions](conventions.md):** naming and coding standards.

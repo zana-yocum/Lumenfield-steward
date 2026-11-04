@@ -2,7 +2,7 @@
 
 What each AI feature can read, what it sends to the model, and what's kept (ST-17). Written for a security review: every object and field below is read from the code, and every setting from the org, with the date it was read.
 
-Phase 5 covers the rep assistant's three prompt templates. Phase 6 adds the service agent's actions (below). The Trust Layer settings for the agent are decided in Setup once the agent exists, with the recommendations at the end of the settings section.
+Phase 5 covers the rep assistant's three prompt templates. Phase 6 adds the service agent's actions (below), and Phase 7 adds Get Payment Link, the agent's only action that calls outside Salesforce. The Trust Layer settings for the agent are decided in Setup once the agent exists, with the recommendations at the end of the settings section.
 
 ---
 
@@ -79,7 +79,7 @@ After the model has written the body, `RepAssistantController` reads the primary
 
 ## What the service agent's actions return (Phase 6)
 
-The agent's model never reads records itself. It calls the nine actions, and each one returns a typed answer from a Phase 3 service. The service reads in user mode, as the agent user, whose whole access is in `docs/security-model.md`. Every answer carries an outcome and a reason code, and on a failure, the log number to quote. Error messages go only to the log. On a decline or failure, an answer carries no figures.
+The agent's model never reads records itself. It calls the ten actions, and each one returns a typed answer from a Phase 3 service. The service reads in user mode, as the agent user, whose whole access is in `docs/security-model.md`. Every answer carries an outcome and a reason code, and on a failure, the log number to quote. Error messages go only to the log. On a decline or failure, an answer carries no figures.
 
 | Action | What the model gets back |
 |---|---|
@@ -92,6 +92,7 @@ The agent's model never reads records itself. It calls the nine actions, and eac
 | Open Dispute | The case number, status, reason and evidence list |
 | Get Dispute Status | Each billing dispute's case number, status, whether it's closed, reason, statement number and date opened |
 | Record Handoff | The reason code and the log number |
+| Get Payment Link (Phase 7) | A link to Stripe's checkout page for one statement's balance, open for an hour, with the amount and the statement number. On a decline or failure, the reason and the log number, and no link |
 
 **What never comes back from an action:**
 - Names, email addresses, phone numbers and street addresses.
@@ -105,6 +106,11 @@ The agent's model never reads records itself. It calls the nine actions, and eac
 **Which household:** no action has an account input. Each one takes the messaging session's ID, which the agent binds to `$Context.RoutableId`, and finds the household from the portal user the platform verified for the chat (S-07, S-23).
 
 **Text the model sends in:** the dispute description, which is saved on the case, and the handoff summary, which is saved in the log. Card numbers are removed from both before they're saved (`SensitiveText`). Neither one is sent to a model by Steward's Apex.
+
+**What Get Payment Link sends to Stripe (Phase 7):** the statement's ID and number, the household's ID, and the balance in cents. No name, email address, phone number or street address, and nothing the customer typed. `StripeClientTest` checks the request holds no email address.
+- **Card details never pass through the agent.** The customer types them on Stripe's page. If a customer types a card number into the chat instead, the agent shouldn't repeat it or use it, and sends the link. A card number the model passes in place of a statement ID is refused before anything is read, and kept out of the log (`GetPaymentLinkActionTest`).
+- **The link is the household's own.** The statement is looked for only in the session's household, like every ID the model passes.
+- **The call is logged twice:** on the action log, like every action, and on the integration log (S-28) with Stripe's answer. The action log's detail names the integration log record on a failure.
 
 **Every request is logged:** one `Agent_Action_Log__c` record per action, declines and failures included. Each record holds the household, the action, the outcome, the reason code, a short line of what was asked, and the session ID as the conversation (S-09, S-24). Supervisors read the log through `PS_Steward_Supervisor`.
 

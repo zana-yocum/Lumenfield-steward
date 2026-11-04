@@ -2,6 +2,37 @@
 
 Newest first. One entry per phase.
 
+## Unreleased — Phase 7: online payments
+
+Customers pay a statement online, on Stripe's hosted checkout page in test mode, from the statement's portal page or from a link the agent sends (ST-05). Card details are typed on Stripe's page and never reach Salesforce. Salesforce asks Stripe whether a checkout was paid, when the customer comes back and hourly as a safety net, so Stripe never calls Salesforce (S-02). Each payment is recorded once as a Lease Payment, and every call to Stripe is logged for support. The org changed one decision on the way: payments were to be recorded through a platform event, which customers can't publish (S-27). Pull request #20.
+
+### Added in pull request #20
+- **The Stripe integration (S-02):** `StripeClient`, Steward's only caller of Stripe, through the `Stripe_API` Named Credential and the `Stripe_Test` External Credential. The key is entered in Setup on the credential's principal, never in code. Checkout sessions carry the statement's ID as their client reference, the balance in cents and an idempotency key, and expire after an hour. No contact details are sent
+- **Paying (ST-05, ST-12):** `PaymentCheckoutService` starts a checkout only for a statement in the caller's own household, confirms a returning session only when it's for one of the household's statements, and reconciles a page of completed sessions. `CheckoutPayments` reads a paid session as the Lease Payment it made, and converts dollars to cents and back
+- **Recording a payment once (S-27):** `PaymentRecorder` inserts a Lease Payment only when Stripe's payment ID isn't already on one, in system mode, and only after Stripe says the session was paid. A refusal is noted for support, and the next reconciliation run records it
+- **The safety net:** `PaymentReconciliationJob`, a schedulable job that reads the completed checkouts of the last `Payment_Reconciliation_Hours` (48, a new policy setting) a page at a time, with a finalizer that logs a failure the job couldn't catch
+- **The integration log (S-28):** `Integration_Log__c` and `IntegrationLogger`. Every call to Stripe is recorded with its outcome, status, duration, household, statement and Stripe's ID, and saved after the transaction's last callout. The action log names the integration log records on a failure. `PS_Steward_Integration_Log` lets support staff read it
+- **Pay online on the portal:** `portalPayment` on the statement's page, with `PortalPaymentsController` and `PortalLinks`. The customer comes back to the same page, which says whether the payment went through and refreshes the statement in place. 11 `Steward_Portal_Pay_*` labels hold its text
+- **The agent's payment link:** `GetPaymentLinkAction` (Get Payment Link), the agent's tenth action. A card number typed where a statement ID belongs is refused and kept out of the log
+- **Access:** principal access to the credential in `PS_Steward_Customer` and `PS_Steward_Agent`, and in the new `PS_Steward_Payment_Reconciliation` for the job's user. The two new classes in the customer's and agent's permission sets. Nobody gets create on Lease Payments or the log
+- **Tests:** `StripeClientTest` (6), `PaymentCheckoutServiceTest` (11), `CheckoutPaymentsTest` (5), `PaymentRecorderTest` (6), `PaymentReconciliationJobTest` (5), `IntegrationLoggerTest` (4), `PortalPaymentsControllerTest` (8), `PortalLinksTest` (1), `GetPaymentLinkActionTest` (6) and `AgentPaymentAccessTest` (1), 53 in all, all against `StripeMock`, so no test calls out. `portalPayment.test.js` (12) and three more in `portalStatementDetail.test.js`, with accessibility checks
+- **Docs:** S-02 decided, with how it was built; decisions S-27 and S-28; payments in `docs/security-model.md` and `docs/agent-governance.md`; the conventions for callouts, logging and tests that call out; 13 explainers; ST-05's traceability; and `docs/uat-scripts.md`, one script per story, ahead of Phase 10, so UAT-S05 can be run as soon as the Stripe key is in
+
+### Changed in pull request #20
+- **Phase 9's open items and changelog:** the deploy, the portal's republish and the console page's activation, recorded
+- `AgentTestUsers` holds the agent user for tests, moved out of `AgentAccessTest` so the payment test can share it. `TestIds.missing` gives a test an ID no record has
+- `StewardTestData.createHouseholdsOwing` creates households with one past-due statement each
+- `portalStyles` adds `--portal-color-on-accent` for text on the accent color
+
+### Pull request #20's validations
+- **First** (`0Afaj00000qN7vjCAC`): 19 refusals from three mistakes. Apex's `Decimal` has no `movePointLeft` or `movePointRight`, so the cents conversion didn't compile, and every class that used it failed with it. The `Stripe_Test` credential's description was over 255 characters, and the named credential and the three permission sets that name its principal failed with it. And the log's permission set listed two required fields, which are always readable and can't be granted. `PaymentEvents` now converts with `toCents` and `toDollars`, tested on their own
+- **Second** (`0Afaj00000qNZaDCAW`): every component accepted, and seven tests failed for three reasons:
+  - The service tests read household IDs inside `System.runAs`, as the customer, and `StewardTestData.existingHouseholds` reads agreements, which customers can't query. They're read before `runAs` now.
+  - The logger's empty-save test counted the setup's saves against the method. It counts from `Test.startTest` now.
+  - A payment for a statement that doesn't exist was refused, and so was the log row about it, because the row named the missing statement. A refused row is now saved again without its links, with the IDs in its details.
+- **Third** (`0Afaj00000qNc1pCAC`): two tests failed, both customers confirming a paid checkout. `EventBus.publish` checks the running user's create access on the event, and customers have none: `Access to entity 'Payment_Received__e' denied`. Granting it would let a customer publish a payment through the API. So `Payment_Received__e`, its trigger and its handler are gone, and `PaymentRecorder` records confirmed payments directly, in system mode (S-27). The customer now sees the payment on the statement straight away
+- **Fourth** (`0Afaj00000qNfu9CAC`): 390 components, 280 of 280 tests, every class at 90% or more. The new classes run from 91.6% (`PortalLinks`) to 100%, and Code Analyzer reports 0 at every severity
+
 ## Unreleased — Phase 9: the customer timeline
 
 One household's history on one timeline (ST-15): statements, payments, promises to pay, billing disputes, credits and commitments, newest first, filtered by kind. Reps see it on the account page in the Collections Console. Customers see their own household's on the portal's My Account page. Built ahead of Phases 7 and 8, which start with Zana's setup steps (open items). Pull request #19.
@@ -30,6 +61,13 @@ One household's history on one timeline (ST-15): statements, payments, promises 
   - A household read back from the setup had no agreement.
 - **Third** (`0Afaj00000qK9qnCAC`): two refusals. Apex names aren't case-sensitive, so the new enum `FieldAccess` resolved to the local list `fieldAccess`; it's `KeptAccess` now. The account page's `<mode>` elements apply only to a page that inherits from a parent page
 - **Fourth** (`0Afaj00000qKAlFCAW`): 339 components, 227 of 227 tests, every class at 90% or more. The four new classes are at 100%, and Code Analyzer reports 0 at every severity
+- **Fifth** (`0Afaj00000qKCqHCAW`), on the docs commit: the same 339 components and 227 of 227 tests. This is the validation that was deployed
+
+### Deployed, 2026-11-03
+- Merged at 7:47 PM CT and quick-deployed as Steward CI (`0Afaj00000qKENRCA4`, of validation `0Afaj00000qKCqHCAW`). The portal changed, so the pipeline republished it (background job `08Paj00001EFwGIEA1`).
+- The three collections permission set groups recalculated with `PS_Steward_Timeline` and show Updated.
+- `Steward_Account_Record_Page` was activated as the Collections Console's account page a few minutes later, by updating the console app's page assignment in the org (S-26). Neither repo carries the activation.
+- What only a person can check, the timeline in the console and on the portal, is UAT-S15 (open items).
 
 ## Unreleased — Phase 6, part 1: the service agent's actions and access
 
